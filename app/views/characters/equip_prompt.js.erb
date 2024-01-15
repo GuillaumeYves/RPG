@@ -1,0 +1,26 @@
+<%= javascript_tag do %>
+  const choice = prompt("Choose where to equip the item:\n1. Main Hand\n2. Off Hand");
+
+  if (choice === "1") {
+    // Call AJAX to equip in the main hand
+    $.ajax({
+      type: "POST",
+      url: "<%= equip_item_character_path(@character, item_id: @new_item.id, slot: 'main_hand') %>",
+      success: function() {
+        location.reload(); // Refresh the page after successful equip
+      }
+    });
+  } else if (choice === "2") {
+    // Call AJAX to equip in the off hand
+    $.ajax({
+      type: "POST",
+      url: "<%= equip_item_character_path(@character, item_id: @new_item.id, slot: 'off_hand') %>",
+      success: function() {
+        location.reload(); // Refresh the page after successful equip
+      }
+    });
+  } else {
+    // Handle invalid choice or cancel
+    console.log("Invalid choice or canceled.");
+  }
+<% end %>

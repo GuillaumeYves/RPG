@@ -1,0 +1,28 @@
+<div class="container text-center mt-5"> 
+  <% @characters.each_with_index do |character, index| %>
+    <div class="row mb-4">
+      <div class="col-12">
+        <h4 class="text-center"><%= "#{index + 1}." %></h4>
+        <div class="card text-left mx-auto" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 350px;">
+          <div class="card-body text-center">
+            <h5 class="card-header text-white bg-primary"><%= "#{character.character_name}, Character_title" %></h5>
+            <br>
+            <%= image_tag(character.race_image, style: 'width:80px; height:80px; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: character.race_image) %>
+            <h5 class="card-title"><small><%= character.race.capitalize %> <%= character.character_class.capitalize %> Level <%= character.level %></small></h5>
+
+            <% current_experience = character.experience %>
+            <% required_experience = character.required_experience_for_next_level %>
+            <% progress_percentage = (current_experience.to_f / required_experience) * 100 %>
+            <small><i>Experience: <%= "#{current_experience} / #{required_experience}" %></i></small>
+            <div class="progress" style="max-height: 10px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+            </div>
+            <br>
+            <%= link_to 'Profile', character_path(character), class: "btn btn-outline-primary" %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+  <% end %>
+</div>

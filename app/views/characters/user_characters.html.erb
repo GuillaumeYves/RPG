@@ -1,0 +1,53 @@
+<% if @characters.any? %>
+  <div>
+    <table class="table">
+      <tbody>
+        <tr>
+          <% @characters.each do |character| %>
+            <td style="padding-right: 50px;">
+              <div class="card" style="border: 2px solid #000; padding: 30px; max-width: 500px;">
+                <%= image_tag(character.race_image, style: 'width:100%; height:auto; border-radius:30%;', class: 'card-img-top', alt: character.race_image) %>
+                <div class="card-body">
+                  <h3><%= character.character_name %></h3>
+                  <h5 class="card-title"><%= character.race.capitalize %> <%= character.character_class.capitalize %> Level <%= character.level %></h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <%= form_with(model: character, url: select_character_path(character), method: :post, local: true) do |form| %>
+                        <%= form.submit 'Select', class: "btn btn-outline-primary", data: { confirm: 'Are you sure?' } %>
+                      <% end %>
+                    </div>
+                    <div class="col-md-6">
+                      <%= form_with(model: character, url: character_path(character), method: :delete, local: true) do |form| %>
+                        <%= form.button 'Delete', class: "btn btn-outline-danger", data: { confirm: 'Are you sure?' } %>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          <% end %>
+        </tr>
+      </tbody>
+    </table>
+    <% else %>
+      <p>You don't have any characters yet.</p>
+      <br>
+      <%= link_to "Create a Character", new_character_path %>
+    <% end %>
+  </div>
+
+<script>
+  document.addEventListener('turbo:load', function () {
+    <% @characters.each do |character| %>
+      const deleteButton<%= character.id %> = document.getElementById('delete-character-<%= character.id %>');
+      if (deleteButton<%= character.id %>) {
+        deleteButton<%= character.id %>.addEventListener('click', function (event) {
+          const confirmation = confirm('Are you sure?');
+          if (!confirmation) {
+            event.preventDefault();
+          }
+        });
+      }
+    <% end %>
+  });
+</script>

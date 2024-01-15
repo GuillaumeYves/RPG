@@ -1,0 +1,14 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: RPG_development
+  pool: 5
+  username: guillaume
+  password: "211197"
+  host: localhost
+  port: 5432
