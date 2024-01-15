@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_11_205643) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_15_210211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -149,6 +149,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_11_205643) do
     t.datetime "updated_at", null: false
     t.string "skill_image"
     t.bigint "character_id"
+    t.boolean "locked", default: true
+    t.boolean "unlocked"
     t.index ["character_id"], name: "index_skills_on_character_id"
   end
 

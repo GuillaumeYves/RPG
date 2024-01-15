@@ -258,6 +258,26 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
+    def unlock_skill
+        @character = Character.find(params[:id])
+        skill_id = params[:skill_id]
+        skill = Skill.find(skill_id)
+
+        return unless @character.level >= skill.level_requirement && skill.locked
+
+        if @character.skill_points.zero?
+            flash[:alert] = 'You have no skill points.'
+        elsif @character.skills.where(row: skill.row, unlocked: true).exists?
+            flash[:alert] = 'You can only unlock one skill from this row.'
+        else
+            skill.update(unlocked: true, locked: false)
+            @character.decrement(:skill_points)
+            flash[:notice] = 'Skill unlocked successfully.'
+        end
+
+        redirect_to @character
+    end
+
     def spend_skill_point
     @selected_character = Character.find(params[:id])
     attribute = params[:attribute]

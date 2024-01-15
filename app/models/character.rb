@@ -138,14 +138,11 @@ validate :max_characters, on: :create
     end
 
     def assign_skills_based_on_class
-        puts "Assigning skills based on class for character ID: #{id}"
         case character_class
             when 'warrior'
                 # Seed warrior skills
                 warrior_skills_seeder = WarriorSkillsSeeder.new(self)
                 warrior_skills_seeder.seed_skills
-                 puts "Warrior skills created: #{warrior_skills_seeder.warrior_skills.map(&:name).join(', ')}"
-            
             when 'mage'
                 # Seed mage skills
                 mage_skills_seeder = MageSkillsSeeder.new(self)
@@ -208,35 +205,6 @@ validate :max_characters, on: :create
 
     def update_required_experience_for_next_level
         self.required_experience_for_next_level = (500 * (1.1 ** (self.level - 1))).round
-    end
-
-    def available_skills
-        excluded_skill_ids = selected_skills.map(&:id)
-        Skill.where(character_class: character_class)
-            .where.not(id: excluded_skill_ids)
-    end
-
-    def select_skill(skill_id)
-        skill = Skill.find(skill_id)
-        
-        # Ensure the skill is part of the available skills for the character
-        return unless available_skills.include?(skill)
-
-        # Update the selected_skills array and deduct the skill points
-        case skill.row
-        when 1
-            update(selected_skill_row_1: skill, skill_points: skill_points - 1)
-        when 2
-            update(selected_skill_row_2: skill, skill_points: skill_points - 1)
-        when 3
-            update(selected_skill_row_3: skill, skill_points: skill_points - 1)
-        when 4
-            update(selected_skill_row_4: skill, skill_points: skill_points - 1)
-        end
-    end
-
-    def selected_skills
-        [selected_skill_row_1, selected_skill_row_2, selected_skill_row_3, selected_skill_row_4].compact
     end
 
     def add_item_to_inventory(item)

@@ -19,7 +19,7 @@ Rails.application.routes.draw do
       get '/combat_result/:id', to: 'combat#combat_result', as: :combat_result
       post 'select', to: 'characters#select'
       post 'gain_experience'
-      post 'select_skill/:id', to: 'characters#select_skill', as: 'select_skill_character'
+      post 'unlock_skill'
       post 'complete_hunt'
       post 'add_to_inventory/:item_id', to: 'characters#add_to_inventory', as: :add_to_inventory
       delete 'remove_from_inventory/:item_id', to: 'characters#remove_from_inventory', as: :remove_from_inventory

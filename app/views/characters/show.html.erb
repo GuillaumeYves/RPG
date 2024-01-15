@@ -212,13 +212,21 @@
             <!-- Right column -->
             <div class="col-md-4 mx-auto">
               <div class="text-center">
-                <h4 class="card-header text-white bg-primary">Talents</h4><br>
-                <% @character.selected_skills.each do |selected_skill_id| %>
-                  <% skill = Skill.find_by(id: selected_skill_id) %>
-                  <div class="mb-2">
-                    <%= image_tag skill.skill_image, class: "img-thumbnail", alt: "#{skill.name} Image", style: 'width: 60px; height: 60px;' if skill&.skill_image&.attached? %>
-                  </div>
-                <% end %>
+                <h4 class="card-header text-white bg-primary">Skills</h4><br>
+                  <% if @skills.any?(&:unlocked) %>
+                    <% @skills.each do |skill| %>
+                      <% if skill.unlocked %>
+                        <div>
+                          <span data-tooltip="tooltip" title="<%= skill.description %>%">
+                            <%= image_tag skill.skill_image, style: 'width: 60px; height: 60px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                          </span>
+                          <p><strong><%= skill.name %></strong></p>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <p>No skills unlocked.</p>
+                  <% end %>
               </div>
             </div>
 
@@ -227,19 +235,55 @@
       </div>
   </div>
 
-<div>
-  <!-- Display skills -->
-  <h3>Skills</h3>
-  <% @skills.each do |skill| %>
-    <div>
-      <%= image_tag skill.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-      <p><strong><%= skill.name %></strong></p>
-      <p><%= skill.description %></p>
-      <!-- Add other skill details as needed -->
-    </div>
-  <% end %>
-</div>
+  <div class="container-fluid mt-1">
+    <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="card-body">
+        <% @character.skills.group_by(&:row).each do |row, row_skills| %>
+          <div class="row mt-3">
+            <% row_skills.each_slice(2) do |skill1, skill2| %>
+              <div class="col-md-6">
+                <div class="card mb-3">
+                  <div class="card-body" style ="height: 300px;">
+                    <h5 class="card-title"><%= skill1.name %></h5>
+                    <% if skill1.unlocked %>
+                      <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                      <% else %>
+                        <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                        <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
+                          <%= form.submit 'Unlock', data: { confirm: 'Are you sure you want to unlock this skill?' } %>
+                        <% end %>
+                    <% end %>
+                    <br>
+                    <p class="card-text"><%= skill1.description %></p>
+                  </div>
+                </div>
+              </div>
 
+              <% if skill2 %>
+              <div class="col-md-6">
+                <div class="card mb-3">
+                  <div class="card-body" style ="height: 300px;">
+                    <h5 class="card-title"><%= skill2.name %></h5>
+                    <% if skill2.unlocked %>
+                      <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                      <% else %>
+                        <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                        <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
+                          <%= form.submit 'Unlock', data: { confirm: 'Are you sure you want to unlock this skill?' } %>
+                        <% end %>
+                    <% end %>
+                    <br>
+                    <p class="card-text"><%= skill2.description %></p>
+                  </div>
+                </div>
+              </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 
   <%= render partial: 'inventory', locals: { character: @character } %>
 
@@ -266,6 +310,9 @@
 <script>
   $(function () {
     $('[data-tooltip="tooltip"]').tooltip({
+      template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+      delay: { "show": 500, "hide": 100 },
+      trigger: 'hover'
     });
   });
 </script>
