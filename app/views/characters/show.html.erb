@@ -191,9 +191,11 @@
                 <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.health %></span><br>
                 <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.attack %></span><br>
                 <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.spellpower %></span><br>
-                <span data-tooltip="tooltip" title="Critical strikes increase your damage by 150%"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.critical_strike_chance, precision: 2)%>%</span><br>
+                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.critical_strike_chance, precision: 2)%>%</span><br>
+                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= (@character.critical_strike_damage * 100).to_i %>%</span><br>
                 <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.armor %></span><br>
                 <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%= @character.magic_resistance %></span><br>
+                <span data-tooltip="tooltip" title="Evading will allow you to ignore damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
                 <span data-tooltip="tooltip" title="Ignoring pain will reduce damage taken by 20%"><strong>Chance to Ignore Pain:</strong> <%= number_with_precision(@character.ignore_pain_chance, precision: 2)%>%</span><br>
               </div>
             </div>
@@ -204,31 +206,35 @@
                 <h4 class="card-header text-white bg-primary">Attributes</h4><br>
                 <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= @character.strength %></span><br>
                 <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= @character.intelligence %></span><br>
+                <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= @character.agility %></span><br>
                 <span data-tooltip="tooltip" title="Increases your critical strike chance"><strong>Luck:</strong> <%= @character.luck %></span><br>
                 <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= @character.willpower %></span><br>
               </div>
             </div>
 
-            <!-- Right column -->
-            <div class="col-md-4 mx-auto">
-              <div class="text-center">
-                <h4 class="card-header text-white bg-primary">Skills</h4><br>
+              <div class="col-md-4 mx-auto">
+                <div class="text-center">
+                  <h4 class="card-header text-white bg-primary">Talents</h4><br>
                   <% if @skills.any?(&:unlocked) %>
-                    <% @skills.each do |skill| %>
-                      <% if skill.unlocked %>
-                        <div>
-                          <span data-tooltip="tooltip" title="<%= skill.description %>%">
-                            <%= image_tag skill.skill_image, style: 'width: 60px; height: 60px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-                          </span>
-                          <p><strong><%= skill.name %></strong></p>
-                        </div>
+                    <div class="row">
+                      <% @skills.each do |skill| %>
+                        <% if skill.unlocked %>
+                          <div class="col-md-6">
+                            <div>
+                              <span data-tooltip="tooltip" title="<%= skill.description %>">
+                                <%= image_tag skill.skill_image, style: 'width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                              </span>
+                              <p><small><%= skill.name %></small></p>
+                            </div>
+                          </div>
+                        <% end %>
                       <% end %>
-                    <% end %>
+                    </div>
                   <% else %>
-                    <p>No skills unlocked.</p>
+                    <p>No talent unlocked.</p>
                   <% end %>
+                </div>
               </div>
-            </div>
 
           </div>
         </div>
@@ -238,9 +244,12 @@
   <div class="container-fluid mt-1">
     <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
       <div class="card-body">
-        <% @character.skills.group_by(&:row).each do |row, row_skills| %>
+        <h4 class="card-header text-white bg-primary">Talents</h4>
+        <p><small>Choose your talents wisely, as you can only pick one talent in each row.</small></p><br>
+        <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
+          <h4 class="card-title">Level <%= level %></h4>
           <div class="row mt-3">
-            <% row_skills.each_slice(2) do |skill1, skill2| %>
+            <% level_skills.each_slice(2) do |skill1, skill2| %>
               <div class="col-md-6">
                 <div class="card mb-3">
                   <div class="card-body" style ="height: 300px;">
@@ -250,7 +259,7 @@
                       <% else %>
                         <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
                         <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
-                          <%= form.submit 'Unlock', data: { confirm: 'Are you sure you want to unlock this skill?' } %>
+                          <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
                         <% end %>
                     <% end %>
                     <br>
@@ -269,7 +278,7 @@
                       <% else %>
                         <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
                         <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
-                          <%= form.submit 'Unlock', data: { confirm: 'Are you sure you want to unlock this skill?' } %>
+                          <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
                         <% end %>
                     <% end %>
                     <br>
@@ -284,8 +293,6 @@
       </div>
     </div>
   </div>
-
-  <%= render partial: 'inventory', locals: { character: @character } %>
 
           <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
           <%= form.hidden_field :amount, value: 5 %>
@@ -303,9 +310,23 @@
           <%= form.hidden_field :amount, value: 1000 %>
           <%= form.submit "Gain 1000 XP" %>
         <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 10000 %>
+          <%= form.submit "Gain 10000 XP" %>
+        <% end %>
+
+  <%= render partial: 'inventory', locals: { character: @character } %>
 
 
 </div>
+
+<script>
+    $(document).ready(function() {
+      $('form[data-confirm]').submit(function() {
+        return confirm($(this).data('confirm'));
+      });
+    });
+</script>
 
 <script>
   $(function () {

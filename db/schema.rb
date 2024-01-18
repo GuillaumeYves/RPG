@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_15_210211) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_17_180501) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -80,6 +80,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_15_210211) do
     t.integer "selected_skill_row_2"
     t.integer "selected_skill_row_3"
     t.integer "selected_skill_row_4"
+    t.string "gender"
+    t.integer "agility", default: 5
+    t.float "critical_strike_damage", default: 1.5
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
@@ -137,6 +140,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_15_210211) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "monster_image"
+    t.integer "spellpower", default: 10
+    t.integer "strength", default: 5
+    t.integer "intelligence", default: 5
+    t.integer "luck", default: 5
+    t.integer "willpower", default: 5
+    t.integer "agility", default: 5
+    t.integer "level", default: 1
+    t.float "critical_strike_damage", default: 1.5
   end
 
   create_table "skills", force: :cascade do |t|

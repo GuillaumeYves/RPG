@@ -34,13 +34,15 @@ Rails.application.routes.draw do
 
   resources :hunts, only: [:index] do
     member do
-      get 'pve_combat', to: 'combat#pve_combat'
-      post 'accept_hunt', to: 'hunts#accept_hunt' # Specify the controller action
-      post 'cancel_hunt', to: 'hunts#cancel_hunt' # Specify the controller action
+      get '/combat_hunt', to: 'combat#combat', as: :combat_hunt
+      post 'accept_hunt', to: 'hunts#accept_hunt'
+      post 'cancel_hunt', to: 'hunts#cancel_hunt'
     end
   end
 
   get '/user_characters', to: 'characters#user_characters', as: 'user_characters'
   get '/combat_result', to: 'combat#combat_result', as: :combat_result
+  get 'update_health_bars', to: 'combat_controller#update_health_bars'
+
 end
 

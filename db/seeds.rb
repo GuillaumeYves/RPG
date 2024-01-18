@@ -43,11 +43,21 @@ begin
     
     create_item("Perseverance", "Ring", "Legendary", { willpower: 5, health: 20 }, "You persevere through the pain, for it is the only way to achieve victory.", 'app/assets/images/legendary_items/perseverance.jpg')
 
+    vampire = Monster.create!(monster_name: "Vampire")
+    vampire.monster_image.attach(io: File.open('app/assets/images/monsters/vampire.jpg'), filename: 'vampire.jpg', content_type: 'image/jpeg')
+    vampire.save!
 
-    Monster.create!(monster_name: "Vampire").monster_image.attach(io: File.open('app/assets/images/monsters/vampire.jpg'), filename: 'vampire.jpg', content_type: 'image/jpeg')
-    Monster.create!(monster_name: "Skeleton").monster_image.attach(io: File.open('app/assets/images/monsters/skeleton.jpg'), filename: 'skeleton.jpg', content_type: 'image/jpeg')
-    Monster.create!(monster_name: "Centaur").monster_image.attach(io: File.open('app/assets/images/monsters/centaur.jpg'), filename: 'centaur.jpg', content_type: 'image/jpeg')
-    Monster.create!(monster_name: "Demon").monster_image.attach(io: File.open('app/assets/images/monsters/demon.jpg'), filename: 'demon.jpg', content_type: 'image/jpeg')
+    skeleton = Monster.create!(monster_name: "Skeleton")
+    skeleton.monster_image.attach(io: File.open('app/assets/images/monsters/skeleton.jpg'), filename: 'skeleton.jpg', content_type: 'image/jpeg')
+    skeleton.save!
+
+    centaur = Monster.create!(monster_name: "Centaur")
+    centaur.monster_image.attach(io: File.open('app/assets/images/monsters/centaur.jpg'), filename: 'centaur.jpg', content_type: 'image/jpeg')
+    centaur.save!
+
+    demon = Monster.create!(monster_name: "Demon")
+    demon.monster_image.attach(io: File.open('app/assets/images/monsters/demon.jpg'), filename: 'demon.jpg', content_type: 'image/jpeg')
+    demon.save!
     
     def create_hunt(name, experience_reward, monster_id, description, difficulty, level_requirement)
     Hunt.create!(

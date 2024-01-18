@@ -36,7 +36,7 @@
         </div>
         <br>
         <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @accepted_hunt.experience_reward %></span></p>
-        <%= form_tag pve_combat_hunt_path(character_id: @selected_character.id, id: @accepted_hunt.id), method: :get do %>
+        <%= form_tag combat_hunt_hunt_path(@accepted_hunt, character_id: @selected_character.id, id: @accepted_hunt.monster.id), method: :get do %>
           <%= submit_tag 'Start Hunt', class: "btn btn-outline-primary" %>
         <% end %>
         <%= form_tag cancel_hunt_hunt_path(@accepted_hunt), method: :post do %>

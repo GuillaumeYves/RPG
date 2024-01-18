@@ -26,6 +26,7 @@ has_one_attached :race_image
 
 validates :character_class, presence: true
 validates :race, presence: true
+validates :gender, presence: true
 validates :character_name, presence: true
 validates :level, presence: true, numericality: { only_integer: true, greater_than: 0 }
 validates :experience, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -40,18 +41,37 @@ validate :max_characters, on: :create
     def set_race_image
         case race
         when 'human'
-            image_path = 'app/assets/images/races/human.jpg'
+            image_path = case gender
+                        when 'female'
+                        'female_human.jpg'
+                        else
+                        'human.jpg'
+                        end
         when 'elf'
-            image_path = 'app/assets/images/races/elf.jpg'
+            image_path = case gender
+                        when 'female'
+                        'female_elf.jpg'
+                        else
+                        'elf.jpg'
+                        end
         when 'dwarf'
-            image_path = 'app/assets/images/races/dwarf.jpg'
+            image_path = case gender
+                        when 'female'
+                        'female_dwarf.jpg'
+                        else
+                        'dwarf.jpg'
+                        end
         when 'orc'
-            image_path = 'app/assets/images/races/orc.jpg'
+            image_path = case gender
+                        when 'female'
+                        'female_orc.jpg'
+                        else
+                        'orc.jpg'
+                        end
         end
-
         # Check if image is already attached before attaching
         unless race_image.attached?
-            self.race_image.attach(io: File.open(image_path), filename: File.basename(image_path), content_type: 'image/jpeg')
+            self.race_image.attach(io: File.open(Rails.root.join('app', 'assets', 'images', 'races', image_path)), filename: File.basename(image_path), content_type: 'image/jpeg')
         end
     end
 
@@ -91,26 +111,30 @@ validate :max_characters, on: :create
             # Modify attributes for warrior class
             self.strength += 2
             self.intelligence -= 3
+            self.agility -= 3
             self.luck += 1
             self.willpower += 1
         when 'mage'
             # Modify attributes for mage class
             self.strength -= 3
-            self.intelligence += 2
-            self.luck += 1
-            self.willpower -= 2
+            self.intelligence += 3
+            self.agility -= 3
+            self.luck += 2
+            self.willpower -= 3
         when 'rogue'
             # Modify attributes for rogue class
             self.strength += 1
             self.intelligence -= 2
+            self.agility += 2
             self.luck += 2
-            self.willpower -= 1
+            self.willpower -= 3
         when 'paladin'
             # Modify attributes for paladin class
             self.strength += 1
             self.intelligence += 1
-            self.luck -= 3
-            self.willpower += 2
+            self.agility -= 3
+            self.luck += 1
+            self.willpower += 1
         end
     end
     
@@ -118,6 +142,7 @@ validate :max_characters, on: :create
         self.attack += strength_bonus
         self.spellpower += intelligence_bonus
         critical_strike_chance
+        evasion
         ignore_pain_chance
     end
 
@@ -131,6 +156,10 @@ validate :max_characters, on: :create
 
     def critical_strike_chance
         self.luck * 0.05
+    end
+
+    def evasion
+        self.agility * 0.03
     end
 
     def ignore_pain_chance
@@ -188,8 +217,8 @@ validate :max_characters, on: :create
         # Increase level
         update(level: level + 1)
 
-        if [20, 50, 80, 100].include?(level)
-        update(skill_points: skill_points + 1)
+        if [25, 50, 75, 100].include?(level)
+            self.skill_points += 1
         end
 
         # Calculate the remaining experience after leveling up

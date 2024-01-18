@@ -1,102 +1,133 @@
 class CombatController < ApplicationController
 
-    def pve_combat
-        @hunt = Hunt.find(params[:id])
-        @selected_character = current_user.selected_character
-        @monster = Monster.find(@hunt.monster_id)
-
+    def combat
+        @character = current_user.selected_character
+        @opponent = determine_opponent
+        @hunt = @selected_character.accepted_hunt
+        
         # Initialize combat result variables
+        @turn_number = 0
         @combat_log = []
         @combat_result = nil
 
         # Combat loop
-        max_turns = 50 # Set a maximum number of turns
-        turn_count = 0
-
-        while @selected_character.health.positive? && @monster.health.positive? && turn_count < max_turns
-            # Character attacks monster
-            character_turn(@selected_character, @monster)
-            log_turn_results(@selected_character, @monster)
-
-            # Check if monster is defeated
-            break unless @monster.health.positive?
-
-            # Monster attacks character
-            monster_turn(@selected_character, @monster)
-            log_turn_results(@selected_character, @monster)
-
-            turn_count += 1
+        while @character.health.positive? && @opponent.health.positive?
+            @turn_number += 1
+            # Character attacks opponent
+            character_turn(@opponent)
+            # Check if opponent is defeated
+            break unless @opponent.health.positive?
+            # Opponent attacks character
+            opponent_turn(@character)
+            # Check if character is defeated
+            break unless @character.health.positive?
         end
 
+        @combat_log.map! { |entry| entry.is_a?(Array) ? entry : [entry] }
+
         # Set combat result variables based on the outcome
-        @combat_result = @selected_character.health.positive? ? 'victory' : 'defeat'
+        @combat_result = @character.health.positive? ? 'victory' : 'defeat'
 
-        # Render combat result view
-        render 'combat_result'
+        # Render combat result view if the combat loop is finished
+        unless performed?
+            render 'combat_result'
+        end
     end
 
-    private
+    def determine_opponent
+        opponent_id = params[:id]
+        current_character_id = current_user.selected_character.id
 
-    def character_turn(selected_character, monster)
-        damage = calculate_damage(
-            selected_character.attack,
-            monster.armor,
-            selected_character.critical_strike_chance,
-            selected_character.ignore_pain_chance
-        )
-        monster.health -= damage
-    end
-
-    def monster_turn(selected_character, monster)
-        damage = calculate_damage(
-            monster.attack,
-            selected_character.armor,
-            0,  # Setting critical_strike_chance to 0 for monsters
-            0   # Setting ignore_pain_chance to 0 for monsters
-            )
-        selected_character.health -= damage
-    end
-
-    def calculate_damage(attack, armor, critical_strike_chance, ignore_pain_chance)
-        # Check for a critical hit based on critical_strike_chance (which represents a percentage chance)
-        if rand(0..10000) / 100.0 <= critical_strike_chance
-            critical_damage = attack * 1.5  # Adjust the critical hit multiplier as needed
-            damage = [critical_damage - armor, 0].max
+        if Character.exists?(opponent_id) && opponent_id.to_i != current_character_id
+            Character.find(opponent_id)
+        elsif Monster.exists?(opponent_id)
+            Monster.find(opponent_id)
         else
-            normal_damage = attack - armor
-            damage = [normal_damage, 0].max
+            raise ArgumentError, "Invalid opponent id: #{opponent_id}"
+        end
+    end
+
+    def physical_damage(attack, armor, critical_strike_chance, critical_strike_damage, evasion, ignore_pain_chance)
+        # Check for a critical hit based on critical_strike_chance
+        if rand(0..100) <= critical_strike_chance
+        damage = (attack * critical_strike_damage) - armor
+        else
+        damage = attack - armor
         end
 
         # Apply damage reduction based on ignore_pain_chance
-        if rand(0..10000) / 100.0 <= ignore_pain_chance
-            reduced_damage = damage * 0.8  # Reduce incoming damage by 20%
+        if rand(0..100) <= ignore_pain_chance
+        damage *= 0.8  # Reduce incoming damage by 20%
+        end
+
+        # Chance to evade damage
+        damage = 0 if rand(0..100) <= evasion
+
+        damage
+    end
+
+    def magic_damage(spellpower, magic_resistance, critical_strike_chance, critical_strike_damage, evasion, ignore_pain_chance)
+        # Check for a critical hit based on critical_strike_chance
+        if rand(0..100) <= critical_strike_chance
+        damage = (spellpower * critical_strike_damage) - magic_resistance
         else
-            damage
+        damage = spellpower - magic_resistance
+        end
+
+        # Apply damage reduction based on ignore_pain_chance
+        if rand(0..100) <= ignore_pain_chance
+        damage *= 0.8  # Reduce incoming damage by 20%
+        end
+
+        # Chance to evade damage
+        damage = 0 if rand(0..100) <= evasion
+
+        damage
+    end
+
+    def character_turn(opponent)
+        damage = calculate_damage(@character, @opponent)
+        @opponent.health -= damage
+
+        log_entry = "Turn #{@turn_number}: "
+        if @opponent.is_a?(Character)
+            log_entry += "#{@character.character_name} attacked #{@opponent.character_name}"
+        elsif @opponent.is_a?(Monster)
+            log_entry += "#{@character.character_name} attacked #{@opponent.monster_name}"
+        end
+
+        log_entry += " for #{damage} damage." if damage > 0
+        @combat_log << log_entry
+    end
+
+    def opponent_turn(character)
+        damage = calculate_damage(@opponent, @character)
+        @character.health -= damage
+
+        log_entry = "Turn #{@turn_number}: "
+        if @opponent.is_a?(Character)
+            log_entry += "#{@opponent.character_name} attacked #{@character.character_name}"
+        elsif @opponent.is_a?(Monster)
+            log_entry += "#{@opponent.monster_name} attacked #{@character.character_name}"
+        end
+
+        log_entry += " for #{damage} damage." if damage > 0
+        @combat_log << log_entry
+    end
+
+    def calculate_damage(character, opponent)
+        if character.attack > character.spellpower
+            physical_damage(character.attack, opponent.armor, character.critical_strike_chance, character.critical_strike_damage, opponent.evasion, opponent.ignore_pain_chance)
+        else
+            magic_damage(character.spellpower, opponent.magic_resistance, character.critical_strike_chance, character.critical_strike_damage, opponent.evasion, opponent.ignore_pain_chance)
+        end
+
+        if opponent.attack > opponent.spellpower
+            physical_damage(opponent.attack, character.armor, opponent.critical_strike_chance, opponent.critical_strike_damage, character.evasion, character.ignore_pain_chance)
+        else
+            magic_damage(opponent.spellpower, character.magic_resistance, opponent.critical_strike_chance, opponent.critical_strike_damage, character.evasion, character.ignore_pain_chance)
         end
     end
 
-    def log_turn_results(selected_character, monster)
-        character_damage = calculate_damage(selected_character.attack, monster.armor, selected_character.critical_strike_chance, selected_character.ignore_pain_chance)
-        monster_damage = calculate_damage(monster.attack, selected_character.armor, 0, 0)
-
-        character_attack = "#{selected_character.character_name} attacks #{monster.monster_name} for #{character_damage} damage"
-        character_attack += " - CRITICAL STRIKE" if selected_character.critical_strike_chance && character_damage > selected_character.attack - monster.armor
-        character_attack += " - IGNORE PAIN" if selected_character.ignore_pain_chance && character_damage < selected_character.attack - monster.armor
-        character_attack += " - (#{monster.monster_name} health: #{[monster.health - character_damage, 0].max})."
-
-        monster_attack = "#{monster.monster_name} attacks #{selected_character.character_name} for #{monster_damage} damage"
-        monster_attack += " - (#{selected_character.character_name} health: #{[selected_character.health - monster_damage, 0].max})."
-
-        if selected_character.health <= 0
-            defeat_message = ["#{monster.monster_name} has defeated #{selected_character.character_name}"]
-            @combat_log << defeat_message
-        elsif monster.health <= 0
-            victory_message = ["#{selected_character.character_name} has defeated #{monster.monster_name}"]
-            @combat_log << victory_message
-        else
-            @combat_log << [character_attack, monster_attack]
-        end
-    end
-    
 end
 

@@ -14,18 +14,23 @@
     <img id="raceImagePreview" src="#" alt="Race Image Preview" style="width: 100%; height: auto; border-radius: 30%; margin-bottom: 30px; box-shadow: 5px 5px 10px #888888;">
     
     <div class="field" style="margin-bottom: 20px;">
-      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character Name' %>
+      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Name' %>
     </div>
     
     <div class="field">
+      <%= form.label :gender %>
+      <%= form.select :gender, ['male', 'female'].map { |g| [g.capitalize, g] }, { class: 'form-control', id: 'character_gender' } %>
+    </div>
+    <br>
+    <div class="field">
       <%= form.label :race %>
-      <%= form.select :race, ['human', 'elf', 'dwarf', 'orc'], class: 'form-control' %>
-    </div>  
+      <%= form.select :race, ['human', 'elf', 'dwarf', 'orc'].map { |r| [r.capitalize, r] }, { class: 'form-control', id: 'character_race' } %>
+    </div>
     <p id="raceDescription" style="height: 100px; overflow-y: auto;"></p>
 
     <div class="field">
-      <%= form.label :character_class %>
-      <%= form.select :character_class, ['warrior', 'mage', 'rogue', 'paladin'], class: 'form-control' %>
+      <%= form.label :class %>
+       <%= form.select :character_class, ['warrior', 'mage', 'rogue', 'paladin'].map { |c| [c.capitalize, c] }, { class: 'form-control', id: 'character_class' } %>
     </div>
     <p id="classDescription" style="height: 100px; overflow-y: auto;"></p>
 
@@ -42,58 +47,90 @@ $(document).ready(function() {
   var raceDescription = $('#raceDescription');
   var classDescription = $('#classDescription');
 
-  // Set the initial image preview and description to the human race
-  imagePreview.attr('src', '<%= asset_path("races/human.jpg") %>'); // Use asset_path here
-  raceDescription.text('A versatile race known for their adaptability. Humans are capable and willing.');
-  classDescription.text('Masters of combat and physical strength, Warriors are the first to answer the call to war.');
+  // Function to update race image and description
+  function updateRaceImage(selectedRace, selectedGender) {
+    var imageFileName;
 
-  $('#character_race').change(function() {
-    var selectedRace = $(this).val();
-
-    // Update the image preview and description based on the selected race
-    switch(selectedRace) {
+    switch (selectedRace) {
       case 'human':
-        imagePreview.attr('src', '<%= asset_path("races/human.jpg") %>'); // Use asset_path here
-        raceDescription.text('A versatile race known for their adaptability. Humans are capable and willing.');
+        imageFileName = selectedGender === 'female' ? 'female_human.jpg' : 'human.jpg';
         break;
       case 'elf':
-        imagePreview.attr('src', '<%= asset_path("races/elf.jpg") %>'); // Use asset_path here
-        raceDescription.text('Graceful beings with a strong connection to nature. Their wisdom and infinite knowledge is what strikes fear in their opponents.');
+        imageFileName = selectedGender === 'female' ? 'female_elf.jpg' : 'elf.jpg';
         break;
       case 'dwarf':
-        imagePreview.attr('src', '<%= asset_path("races/dwarf.jpg") %>'); // Use asset_path here
-        raceDescription.text('Resilient and skilled warriors, Dwarfs are durable and loyal.');
+        imageFileName = selectedGender === 'female' ? 'female_dwarf.jpg' : 'dwarf.jpg';
         break;
       case 'orc':
-        imagePreview.attr('src', '<%= asset_path("races/orc.jpg") %>'); // Use asset_path here
-        raceDescription.text('Fierce, with a strong sense of honor, Orcs are known to destroy anything on their path if it means the survival of their race.');
+        imageFileName = selectedGender === 'female' ? 'female_orc.jpg' : 'orc.jpg';
         break;
       default:
-        imagePreview.attr('src', '#');
-        raceDescription.text('');
+        imageFileName = 'human.jpg';
     }
+
+    var imagePath = '/assets/races/' + imageFileName;
+
+    // Update the image preview and description based on the selected race
+    imagePreview.attr('src', imagePath);
+
+    switch(selectedRace) {
+      case 'human':
+        raceDescription.text('A versatile race known for their adaptability. Humans are capable and willing, but easily corrupted.');
+        break;
+      case 'elf':
+        raceDescription.text('Graceful beings with a strong connection to nature. Wisdom and infinite knowledge are what they seek above all.');
+        break;
+      case 'dwarf':
+        raceDescription.text('Resilient and skilled, Dwarfs are durable and loyal. Their tumultuous temperament is often what leads them to their doom.');
+        break;
+      case 'orc':
+        raceDescription.text('Fierce, with a strong sense of honor, Orcs are known to destroy anything in their path if it means the survival of their race.');
+        break;
+      default:
+        raceDescription.text('A versatile race known for their adaptability. Humans are capable and willing, but easily corrupted.');
+    }
+  }
+
+  // Set initial values based on the default values in the form
+  var initialRace = $('#character_race').val() || 'human';
+  var initialGender = $('#character_gender').val() || 'male';
+  updateRaceImage(initialRace, initialGender);
+
+  // Function to update class description
+  function updateClassDescription(selectedClass) {
+    // Update the description based on the selected class
+    switch(selectedClass) {
+      case 'warrior':
+        classDescription.text('Masters of combat and physical strength, Warriors are the first to answer the call to war.');
+        break;
+      case 'mage':
+        classDescription.text('Users of powerful arcane magic. The more a mage can learn, the stronger they get.');
+        break;
+      case 'rogue':
+        classDescription.text('Stealthy and skilled in subterfuge. They easily find their target weaknesses.');
+        break;
+      case 'paladin':
+        classDescription.text('Holy warriors dedicated to justice. Their sheer will alone can vanquish the sinners.');
+        break;
+      default:
+        classDescription.text('Masters of combat and physical strength, Warriors are the first to answer the call to war.');
+    }
+  }
+
+  // Call updateClassDescription after defining the function
+  var initialClass = $('#character_character_class').val() || 'warrior';
+  updateClassDescription(initialClass);
+
+  // Event listeners for changes in race, gender, and class
+  $('#character_race, #character_gender').change(function() {
+    var selectedRace = $('#character_race').val();
+    var selectedGender = $('#character_gender').val();
+    updateRaceImage(selectedRace, selectedGender);
   });
 
-    $('#character_class').change(function() {
-      var selectedClass = $(this).val();
-
-      // Update the description based on the selected class
-      switch(selectedClass) {
-        case 'warrior':
-          classDescription.text('Masters of combat and physical strength, Warriors are the first to answer the call to war.');
-          break;
-        case 'mage':
-          classDescription.text('Users of powerful arcane magic. The more a mage can learn, the stronger he gets.');
-          break;
-        case 'rogue':
-          classDescription.text('Stealthy and skilled in subterfuge. They often easily find their target weaknesses.');
-          break;
-        case 'paladin':
-          classDescription.text('Holy warriors dedicated to justice and the protection of their allies.');
-          break;
-        default:
-          classDescription.text('');
-      }
-    });
+  $('#character_character_class').change(function() {
+    var selectedClass = $('#character_character_class').val();
+    updateClassDescription(selectedClass);
   });
+});
 </script>

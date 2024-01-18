@@ -40,14 +40,11 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @selected_character = Character.find(params[:id])
 
         if current_user.selected_character.present?
-              puts "#### Old selected character: #{current_user.selected_character.character_name}"
-              current_user.selected_character.update(user: nil) # Clear the association if it was present
+            current_user.selected_character.update(user: nil) # Clear the association if it was present
         end 
 
         session[:selected_character_id] = @selected_character.id
         current_user.update(selected_character: @selected_character)
-        
-        puts "#### New selected character: #{@selected_character.character_name}"
 
         redirect_to character_path(@selected_character), notice: "You selected #{@selected_character.character_name}."
     end
@@ -70,17 +67,10 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @skills = @character.skills
     end
 
-    def select_skill
-        @selected_character = Character.find(params[:id])
-        @selected_character.select_skill(params[:id])
-        redirect_to character_path(@selected_character)
-    end
-
     def gain_experience
         @selected_character = Character.find(params[:id])
         amount = params[:amount].to_i
 
-        # Gain experience
         # Scale the experience to increase difficulty based on level
         scaling_factor = case @selected_character.level
         # 5% reduction per case up to level 500 and beyond where its 80% reduction 
@@ -120,7 +110,6 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @hunt = Hunt.find(params[:hunt_id])
         amount = params[:experience_reward].to_i
         
-        # Gain experience
         # Scale the experience to increase difficulty based on level
         scaling_factor = case @selected_character.level
         # 5% reduction per case up to level 500 and beyond where its 80% reduction 
@@ -236,12 +225,6 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         redirect_to @selected_character, notice: "#{item.name} unequipped."
     end
 
-    def equip_prompt
-        @selected_character = Character.find(params[:id])
-        @new_item = Item.find(params[:item_id])
-        render layout: false
-    end
-
     def add_to_inventory
     @selected_character = Character.find(session[:selected_character_id])
     inventory = @selected_character.inventory
@@ -259,20 +242,21 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     end
 
     def unlock_skill
-        @character = Character.find(params[:id])
+        @character = current_user.selected_character
         skill_id = params[:skill_id]
         skill = Skill.find(skill_id)
 
-        return unless @character.level >= skill.level_requirement && skill.locked
-
-        if @character.skill_points.zero?
-            flash[:alert] = 'You have no skill points.'
+        if @character.level < skill.level_requirement || !skill.locked
+            flash[:alert] = 'You do not meet the level requirement to unlock this talent.'
         elsif @character.skills.where(row: skill.row, unlocked: true).exists?
-            flash[:alert] = 'You can only unlock one skill from this row.'
+            flash[:alert] = 'You can only unlock one talent from this row.'
+        elsif @character.skill_points.zero?
+            flash[:alert] = 'You have no talent point.'
         else
             skill.update(unlocked: true, locked: false)
             @character.decrement(:skill_points)
-            flash[:notice] = 'Skill unlocked successfully.'
+            @character.save
+            flash[:notice] = 'Talent unlocked.'
         end
 
         redirect_to @character
@@ -313,6 +297,6 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     private
 
     def character_params
-        params.require(:character).permit(:race, :race_image, :character_class, :character_name, :health, :attack, :armor, :spellpower, :magic_resistance, :strength, :intelligence, :luck, :willpower)
+        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :health, :attack, :armor, :spellpower, :magic_resistance, :strength, :intelligence, :luck, :willpower)
     end
 end
