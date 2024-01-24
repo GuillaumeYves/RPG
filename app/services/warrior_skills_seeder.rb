@@ -11,23 +11,31 @@ class WarriorSkillsSeeder
 
     rage = Skill.create(
       name: "Rage",
-      description: "When getting hit, your Attack increases by 0.5%.",
+      description: "After attacking, your Attack increases by 3%.",
+      skill_type: "combat",
       row: 1,
       level_requirement: 25,
       character_class: warrior_class,
       character_id: character.id,
-    )
+      effect: " self.buffed_attack += (self.total_attack * 1.3); "
+      )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'rage.jpg')
     rage.skill_image.attach(io: File.open(image_path), filename: 'rage.jpg', content_type: 'image/jpeg')
     warrior_skills << rage
 
     defensive_stance = Skill.create(
       name: "Defensive stance",
-      description: "You take 10% reduced damage but you deal 10% reduced damage.",
+      description: "Your Armor and Magic resistance are increased by 10%, but your Attack and Spellpower are reduced by 5%.",
+      skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: warrior_class,
       character_id: character.id,
+      effect: 
+        " self.total_armor *= 1.1;
+        self.total_magic_resistance *= 1.1;
+        self.total_spellpower *= 0.95;
+        self.total_attack *= 0.95; "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'defensivestance.jpg')
     defensive_stance.skill_image.attach(io: File.open(image_path), filename: 'defensivestance.jpg', content_type: 'image/jpeg')
@@ -35,43 +43,49 @@ class WarriorSkillsSeeder
 
     skullsplitter = Skill.create(
       name: "Skullsplitter",
-      description: "Your critical strikes now deal 180% increased damage.",
+      description: "Your Critical Strikes now deal 180% increased damage.",
+      skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: warrior_class,
       character_id: character.id,
+      effect: " self.total_critical_strike_damage = (self.critical_strike_damage + 0.3); "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'skullsplitter.jpg')
     skullsplitter.skill_image.attach(io: File.open(image_path), filename: 'skullsplitter.jpg', content_type: 'image/jpeg')
     warrior_skills << skullsplitter
 
-    gushing_wounds = Skill.create(
-      name: "Gushing wounds",
-      description: "When you deal damage to your opponent for the first time, increase its damage taken by 5% for the rest of the fight.",
+    blood_frenzy = Skill.create(
+      name: "Blood frenzy",
+      description: "You gain 2% of your maximum Health as additional Attack, but your Critical Strikes now deal no additional damage.",
+      skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: warrior_class,
       character_id: character.id,
+      effect: 
+      " self.total_critical_strike_damage = 0; 
+        self.total_attack = (self.attack + (self.max_health * 0.02)); "
     )
-    image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'gushingwounds.jpg')
-    gushing_wounds.skill_image.attach(io: File.open(image_path), filename: 'gushingwounds.jpg', content_type: 'image/jpeg')
-    warrior_skills << gushing_wounds
+    image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'bloodfrenzy.jpg')
+    blood_frenzy.skill_image.attach(io: File.open(image_path), filename: 'bloodfrenzy.jpg', content_type: 'image/jpeg')
+    warrior_skills << blood_frenzy
 
-    grip_of_legends = Skill.create(
-      name: "Grip of Legends",
+    titans_offspring = Skill.create(
+      name: "Titans' offspring",
       description: "You can now dual-wield two-handed weapons.",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,
       character_id: character.id,
     )
-    image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'gripoflegends.jpg')
-    grip_of_legends.skill_image.attach(io: File.open(image_path), filename: 'gripoflegends.jpg', content_type: 'image/jpeg')
-    warrior_skills << grip_of_legends
+    image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'titansoffspring.jpg')
+    titans_offspring.skill_image.attach(io: File.open(image_path), filename: 'titansoffspring.jpg', content_type: 'image/jpeg')
+    warrior_skills << titans_offspring
 
     gladitator = Skill.create(
       name: "Gladiator",
-      description: "Dual wielding one-handed weapons grants you 12% increased Attack and 2% critical strike chance.",
+      description: "You can now dual wield one-handed weapons.",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,
@@ -83,11 +97,17 @@ class WarriorSkillsSeeder
 
     berserk = Skill.create(
       name: "Berserk",
-      description: "When reaching 50% Health, Attack starts increasing by 1% for every 1% missing Health.",
+      description: "When reaching 50% Health, Attack is increased by 1% for every 1% missing Health.",
+      skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
+      effect:
+          " health_percentage = self.health / self.max_health
+          if health_percentage <= 0.5
+            self.buffed_attack += (((self.max_health - self.health) / self.max_health) * 0.01 * self.total_attack);
+          end "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'berserk.jpg')
     berserk.skill_image.attach(io: File.open(image_path), filename: 'berserk.jpg', content_type: 'image/jpeg')
@@ -95,11 +115,18 @@ class WarriorSkillsSeeder
 
     last_stand = Skill.create(
       name: "Last stand",
-      description: "When reaching 50% Health, your Armor and Magic resistance are increased by 30% and you recover 10% of your health.",
+      description: "When reaching 50% Health, your Armor and Magic resistance are increased by 40%.",
+      skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
+      effect: 
+          " health_percentage = self.health.to_f / self.max_health
+          if health_percentage <= 0.5
+            self.buffed_armor = self.total_armor + (self.total_armor * 0.4);
+            self.buffed_magic_resistance = self.total_magic_resistance + (self.total_magic_resistance * 0.4);
+          end "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'laststand.jpg')
     last_stand.skill_image.attach(io: File.open(image_path), filename: 'laststand.jpg', content_type: 'image/jpeg')

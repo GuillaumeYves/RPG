@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_17_180501) do
+ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -75,14 +75,20 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_17_180501) do
     t.bigint "waist"
     t.bigint "hands"
     t.bigint "feet"
-    t.text "selected_skills", default: ""
-    t.integer "selected_skill_row_1"
-    t.integer "selected_skill_row_2"
-    t.integer "selected_skill_row_3"
-    t.integer "selected_skill_row_4"
     t.string "gender"
     t.integer "agility", default: 5
     t.float "critical_strike_damage", default: 1.5
+    t.integer "max_health", default: 100
+    t.integer "total_attack"
+    t.integer "total_spellpower"
+    t.integer "total_armor"
+    t.integer "total_magic_resistance"
+    t.float "total_critical_strike_damage"
+    t.integer "strength_bonus", default: 0
+    t.integer "intelligence_bonus", default: 0
+    t.integer "agility_bonus", default: 0
+    t.float "critical_strike_chance", default: 1.0
+    t.float "total_critical_strike_chance"
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
@@ -128,6 +134,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_17_180501) do
     t.string "item_image"
     t.string "inventory_type"
     t.bigint "inventory_id"
+    t.integer "level_requirement"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -148,6 +155,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_17_180501) do
     t.integer "agility", default: 5
     t.integer "level", default: 1
     t.float "critical_strike_damage", default: 1.5
+    t.integer "max_health", default: 100
+    t.integer "total_attack"
+    t.integer "total_spellpower"
+    t.integer "total_armor"
+    t.integer "total_magic_resistance"
+    t.float "critical_strike_chance", default: 1.0
+    t.float "total_critical_strike_chance"
+    t.float "total_critical_strike_damage"
   end
 
   create_table "skills", force: :cascade do |t|
@@ -162,6 +177,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_17_180501) do
     t.bigint "character_id"
     t.boolean "locked", default: true
     t.boolean "unlocked"
+    t.string "effect"
+    t.string "skill_type"
     t.index ["character_id"], name: "index_skills_on_character_id"
   end
 
