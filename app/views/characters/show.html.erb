@@ -178,6 +178,42 @@
       </div>
     </div>
   </div>
+
+    <% opponent = Character.find(params[:id]) %>
+    <% if opponent && opponent != current_user.selected_character %>
+      <div class="container-fluid mt-1">
+        <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <div class="card-body">
+            <div class="row no-gutters">
+
+              <div class="col-md-4 mx-auto">
+                <div class="text-center">
+                    <%= form_tag combat_character_path(@character), method: :post do %>
+                        <%= hidden_field_tag :opponent_id, opponent.id %>
+                        <%= hidden_field_tag :character_id, current_user.selected_character.id %>
+                        <%= submit_tag 'Attack', class: "btn btn-outline-danger" %>
+                    <% end %>
+                </div>
+              </div>
+
+              <div class="col-md-4 mx-auto ">
+                <div class="text-center">
+                  <p class= "btn btn-outline-success"> Add as Ally </p>
+                </div>
+              </div>
+
+              <div class="col-md-4 mx-auto">
+                <div class="text-center">
+                  <p class= "btn btn-outline-primary"> Guild Invite </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+
   <!-- Character stats card -->
   <div class="container-fluid mt-1">
       <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
@@ -188,13 +224,13 @@
             <div class="col-md-4 mx-auto mb-2">
               <div class="text-center">
                 <h4 class="card-header text-white bg-primary">General</h4><br>
-                <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.health %></span><br>
-                <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.attack %></span><br>
-                <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.spellpower %></span><br>
-                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.critical_strike_chance, precision: 2)%>%</span><br>
-                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= (@character.critical_strike_damage * 100).to_i %>%</span><br>
-                <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.armor %></span><br>
-                <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%= @character.magic_resistance %></span><br>
+                <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.max_health %></span><br>
+                <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_attack %></span><br>
+                <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_spellpower %></span><br>
+                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= @character.total_critical_strike_chance%>%</span><br>
+                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= (@character.total_critical_strike_damage * 100) %>%</span><br>
+                <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.total_armor %></span><br>
+                <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%= @character.total_magic_resistance %></span><br>
                 <span data-tooltip="tooltip" title="Evading will allow you to ignore damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
                 <span data-tooltip="tooltip" title="Ignoring pain will reduce damage taken by 20%"><strong>Chance to Ignore Pain:</strong> <%= number_with_precision(@character.ignore_pain_chance, precision: 2)%>%</span><br>
               </div>
@@ -212,6 +248,7 @@
               </div>
             </div>
 
+              <!-- Right column -->
               <div class="col-md-4 mx-auto">
                 <div class="text-center">
                   <h4 class="card-header text-white bg-primary">Talents</h4><br>
@@ -241,58 +278,60 @@
       </div>
   </div>
 
-  <div class="container-fluid mt-1">
-    <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
-      <div class="card-body">
-        <h4 class="card-header text-white bg-primary">Talents</h4>
-        <p><small>Choose your talents wisely, as you can only pick one talent in each row.</small></p><br>
-        <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
-          <h4 class="card-title">Level <%= level %></h4>
-          <div class="row mt-3">
-            <% level_skills.each_slice(2) do |skill1, skill2| %>
-              <div class="col-md-6">
-                <div class="card mb-3">
-                  <div class="card-body" style ="height: 300px;">
-                    <h5 class="card-title"><%= skill1.name %></h5>
-                    <% if skill1.unlocked %>
-                      <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-                      <% else %>
-                        <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
-                        <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
-                          <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
-                        <% end %>
-                    <% end %>
-                    <br>
-                    <p class="card-text"><%= skill1.description %></p>
+  <% if @character.user_id == current_user.id %>
+    <div class="container-fluid mt-1">
+      <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+        <div class="card-body">
+          <h4 class="card-header text-white bg-primary">Talents</h4>
+          <p><small>Choose your talents wisely, as you can only pick one talent in each row.</small></p><br>
+          <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
+            <h4 class="card-title">Level <%= level %></h4>
+            <div class="row mt-3">
+              <% level_skills.each_slice(2) do |skill1, skill2| %>
+                <div class="col-md-6">
+                  <div class="card mb-3">
+                    <div class="card-body" style ="height: 300px;">
+                      <h5 class="card-title"><%= skill1.name %></h5>
+                      <% if skill1.unlocked %>
+                        <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                        <% else %>
+                          <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                          <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
+                            <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
+                          <% end %>
+                      <% end %>
+                      <br>
+                      <p class="card-text"><%= skill1.description %></p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <% if skill2 %>
-              <div class="col-md-6">
-                <div class="card mb-3">
-                  <div class="card-body" style ="height: 300px;">
-                    <h5 class="card-title"><%= skill2.name %></h5>
-                    <% if skill2.unlocked %>
-                      <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-                      <% else %>
-                        <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
-                        <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
-                          <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
-                        <% end %>
-                    <% end %>
-                    <br>
-                    <p class="card-text"><%= skill2.description %></p>
+                <% if skill2 %>
+                <div class="col-md-6">
+                  <div class="card mb-3">
+                    <div class="card-body" style ="height: 300px;">
+                      <h5 class="card-title"><%= skill2.name %></h5>
+                      <% if skill2.unlocked %>
+                        <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                        <% else %>
+                          <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                          <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
+                            <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
+                          <% end %>
+                      <% end %>
+                      <br>
+                      <p class="card-text"><%= skill2.description %></p>
+                    </div>
                   </div>
                 </div>
-              </div>
+                <% end %>
               <% end %>
-            <% end %>
-          </div>
-        <% end %>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
-  </div>
+  <% end %>
 
           <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
           <%= form.hidden_field :amount, value: 5 %>

@@ -13,17 +13,20 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @character = current_user.characters.build(character_params)
 
         @character.set_race_image
-        
+
+        @character.set_default_values_for_buffed_stats
+
         @character.modify_stats_based_on_race
+        @character.set_default_values_for_total_stats
         @character.modify_attributes_based_on_class
         @character.modify_stats_based_on_attributes
 
         if @character.save
             @character.create_inventory
             @character.assign_skills_based_on_class
-
-        redirect_to user_characters_path
+        
         flash[:notice] = 'Character created.'
+        redirect_to user_characters_path
 
         else
         flash[:alert] = 'An error occured. Please try again.'
@@ -180,8 +183,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             # Add mappings for other item types
         else
         end
+        
         @selected_character.modify_stats_based_on_attributes
-        @selected_character.save
+        @selected_character.apply_passive_skills
         # Redirect to the show character page
         redirect_to @selected_character, notice: "#{item.name} equipped."
     end
@@ -220,6 +224,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
 
         @selected_character.modify_stats_based_on_attributes
+        @selected_character.apply_passive_skills
         @selected_character.save
         # Redirect to the show character page
         redirect_to @selected_character, notice: "#{item.name} unequipped."
@@ -254,49 +259,20 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             flash[:alert] = 'You have no talent point.'
         else
             skill.update(unlocked: true, locked: false)
+            @character.apply_passive_skills
+            @character.modify_stats_based_on_attributes
             @character.decrement(:skill_points)
             @character.save
             flash[:notice] = 'Talent unlocked.'
+            puts "Intermediate values - Armor: #{@character.armor}, Magic Resistance: #{@character.magic_resistance}, Spellpower: #{@character.spellpower}, Updated Attack: #{@character.attack}"
         end
 
         redirect_to @character
     end
 
-    def spend_skill_point
-    @selected_character = Character.find(params[:id])
-    attribute = params[:attribute]
-
-        # Check if the character has skill points to spend
-        if @selected_character.skill_points.positive?
-            # Decrement the skill points only once
-            @selected_character.decrement(:skill_points)
-
-            # Increment the corresponding attribute
-            case attribute
-            when 'strength'
-            @selected_character.strength += 1
-            when 'intelligence'
-            @selected_character.intelligence += 1
-            when 'luck'
-            @selected_character.luck += 1
-            when 'willpower'
-            @selected_character.willpower += 1
-            else
-            # Handle other attributes if needed
-            end
-
-            if @selected_character.save
-            redirect_to @selected_character
-            flash[:notice] = "Skill point spent successfully!"
-            else
-            flash[:alert] = "An error occurred when spending your skill point."
-            end
-        end
-    end
-
     private
 
     def character_params
-        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :health, :attack, :armor, :spellpower, :magic_resistance, :strength, :intelligence, :luck, :willpower)
+        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :max_health, :health, :attack, :armor, :spellpower, :magic_resistance, :strength, :intelligence, :luck, :willpower)
     end
 end

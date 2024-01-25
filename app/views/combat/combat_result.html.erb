@@ -4,12 +4,12 @@
         <!-- Character Card -->
             <div class="card text-left" style="border: 2px solid #000; padding: 30px; max-height: auto; width: 500px; margin-right: 200px;">
                 <div class="card-body">
-                    <%= image_tag(@selected_character.race_image, style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: @selected_character.race_image) %>
-                    <h3 class="card-header text-white bg-primary" style="text-align: center;"><%= @selected_character.character_name %></h3>
+                    <%= image_tag(@character.race_image, style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: @character.race_image) %>
+                    <h3 class="card-header text-white bg-primary" style="text-align: center;"><%= @character.character_name %></h3>
                     <div class="progress" style="height: 10px;">
-                        <div id="character-health-bar" class="progress-bar bg-success" role="progressbar" style="width: <%= (@character.health.to_f / 100) * 100 %>%;"></div>
+                        <div id="character-health-bar" class="progress-bar bg-success" role="progressbar" style="width: <%= (@character.health / @character.max_health) %>;"></div>
                     </div>
-                    <p id="character-health">Health: <%= @character.health %></p>
+                    <p id="character-health">Health: <%= @character.health %> / <%= @character.max_health %></p>
                 </div>
             </div>
 
@@ -18,19 +18,16 @@
             <div class="card-body">
                 <% if @opponent.present? %>
                 <% if @opponent.is_a?(Monster) %>
-                    <%= image_tag(@opponent.monster_image, style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: @opponent.monster_image) if @opponent.monster_image.present? %>
+                    <%= image_tag(@opponent.monster_image, style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: @opponent.monster_image) %>
                     <h3 class="card-header text-right text-white bg-primary" style="text-align: center;"><%= @opponent.monster_name %></h3>
                 <% elsif @opponent.is_a?(Character) %>
-                    <%= image_tag(@opponent.race_image, style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: @opponent.race_image) if @opponent.race_image.present? %>
+                    <%= image_tag(@opponent.race_image, style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;', class: 'card-img-top', alt: @opponent.race_image) %>
                     <h3 class="card-header text-right text-white bg-primary" style="text-align: center;"><%= @opponent.character_name %></h3>
                 <% end %>
                 <div class="progress" style="height: 10px;">
-                    <div id="opponent-health-bar" class="progress-bar bg-danger" role="progressbar" style="width: <%= (@opponent.health.to_f / 100) * 100 %>%;"></div>
+                    <div id="opponent-health-bar" class="progress-bar bg-danger" role="progressbar" style="width: <%= (@opponent.health / @opponent.max_health) %>%;"></div>
                 </div>
-                <p id="opponent-health">Health: <%= @opponent.health %></p>
-                <% else %>
-                <!-- Handle the case when @opponent is nil -->
-                <p>No opponent information available.</p>
+                <p id="opponent-health">Health: <%= @opponent.health %> / <%= @opponent.max_health %> </p>
                 <% end %>
             </div>
             </div>
@@ -39,30 +36,46 @@
     <!-- Victory or Defeat Prompt -->
     <% if @combat_result == 'victory' %>
         <h3 class="text-success">Victory</h3>
-        <%= form_tag(complete_hunt_character_path(@selected_character), method: :post) do %>
-            <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
-            <%= hidden_field_tag :hunt_id, @hunt.id %>
-            <%= submit_tag 'Complete Hunt', class: 'btn btn-success' %>
-        <% end %>
+            <%= form_tag(complete_hunt_character_path(@selected_character), method: :post) do %>
+                <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
+                <%= hidden_field_tag :hunt_id, @hunt.id %>
+                <%= submit_tag 'Complete Hunt', class: 'btn btn-success' %>
+            <% end %>
     <% elsif @combat_result == 'defeat' %>
-        <h3 class="text-danger">Defeat Click <a href="<%= hunts_path %>">here</a> to return to hunts.</h3>
+            <h3 class="text-danger">Defeat Click <a href="<%= hunts_path %>">here</a> to return to hunts.</h3>
     <% end %>
     <br>
-<!-- Combat Log Card -->
-<div class="card text-left" style="border: 2px solid #000; padding: 15px; height: 500px; width: 1000px; overflow: auto;">
-  <h3 class="card-header text-white bg-primary" style="text-align: center; margin-bottom: 10px;">Combat log</h3>
-  <div class="combat-log" style="box-shadow: 2px 2px 10px #888888; text-align: center;">
 
-    <% @combat_log.each_with_index do |log_entry, index| %>
-      <% if index.positive? %>
-        <hr style="border-top: 1px solid #ddd; margin: 5px;">
-      <% end %>
-      <div style="padding: 5px; margin: 5px; display: flex; justify-content: center; flex-direction: column;">
-        <p style="margin: 0;"><strong><%= log_entry %></strong></p>
-      </div>
-    <% end %>
+        <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2 mt-4">
+            <div class="card">
+                <div class="card-body">
+                <h2 class="card-title text-center">
+                    Combat Result: <%= @combat_result %>
+                </h2>
 
-  </div>
-</div>
+                <!-- Display combat log -->
+                <div class="combat-log">
+                    <% if @combat_logs.present? %>
+                    <h3 class="text-center mt-4">Combat Log</h3>
+                    <ul>
+                        <% @combat_logs.each do |log_message| %>
+                        <li><%= log_message %></li>
+                        <% end %>
+                    </ul>
+                    <% else %>
+                    <p class="text-center">No combat log available.</p>
+                    <% end %>
+                </div>
+
+                <!-- Other content or redirects go here -->
+
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+
 
 </div>

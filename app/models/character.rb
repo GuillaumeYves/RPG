@@ -1,38 +1,40 @@
 class Character < ApplicationRecord
-belongs_to :user
+    belongs_to :user
 
-belongs_to :hunt, optional: true, dependent: :destroy
-has_one :accepted_hunt, class_name: 'Hunt', foreign_key: 'character_id'
+    belongs_to :hunt, optional: true, dependent: :destroy
+    has_one :accepted_hunt, class_name: 'Hunt', foreign_key: 'character_id'
 
-has_one :inventory, dependent: :destroy
-has_many :items, dependent: :destroy
+    has_one :inventory, dependent: :destroy
+    has_many :items, dependent: :destroy
 
-has_many :skills, dependent: :destroy
-has_many :selected_skills, class_name: "Skill", foreign_key: "character_id", dependent: :destroy
+    has_many :skills, dependent: :destroy
 
-belongs_to :main_hand_item, class_name: 'Item', foreign_key: 'main_hand', optional: true
-belongs_to :off_hand_item, class_name: 'Item', foreign_key: 'off_hand', optional: true
-belongs_to :head_item, class_name: 'Item', foreign_key: 'head', optional: true
-belongs_to :chest_item, class_name: 'Item', foreign_key: 'chest', optional: true
-belongs_to :legs_item, class_name: 'Item', foreign_key: 'legs', optional: true
-belongs_to :neck_item, class_name: 'Item', foreign_key: 'neck', optional: true
-belongs_to :finger1_item, class_name: 'Item', foreign_key: 'finger1', optional: true
-belongs_to :finger2_item, class_name: 'Item', foreign_key: 'finger2', optional: true
-belongs_to :waist_item, class_name: 'Item', foreign_key: 'waist', optional: true
-belongs_to :hands_item, class_name: 'Item', foreign_key: 'hands', optional: true
-belongs_to :feet_item, class_name: 'Item', foreign_key: 'feet', optional: true
+    belongs_to :main_hand_item, class_name: 'Item', foreign_key: 'main_hand', optional: true
+    belongs_to :off_hand_item, class_name: 'Item', foreign_key: 'off_hand', optional: true
+    belongs_to :head_item, class_name: 'Item', foreign_key: 'head', optional: true
+    belongs_to :chest_item, class_name: 'Item', foreign_key: 'chest', optional: true
+    belongs_to :legs_item, class_name: 'Item', foreign_key: 'legs', optional: true
+    belongs_to :neck_item, class_name: 'Item', foreign_key: 'neck', optional: true
+    belongs_to :finger1_item, class_name: 'Item', foreign_key: 'finger1', optional: true
+    belongs_to :finger2_item, class_name: 'Item', foreign_key: 'finger2', optional: true
+    belongs_to :waist_item, class_name: 'Item', foreign_key: 'waist', optional: true
+    belongs_to :hands_item, class_name: 'Item', foreign_key: 'hands', optional: true
+    belongs_to :feet_item, class_name: 'Item', foreign_key: 'feet', optional: true
 
-has_one_attached :race_image
+    has_one_attached :race_image
 
-validates :character_class, presence: true
-validates :race, presence: true
-validates :gender, presence: true
-validates :character_name, presence: true
-validates :level, presence: true, numericality: { only_integer: true, greater_than: 0 }
-validates :experience, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-validates :skill_points, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+    validates :character_class, presence: true
+    validates :race, presence: true
+    validates :gender, presence: true
+    validates :character_name, presence: true
+    validates :level, presence: true, numericality: { only_integer: true, greater_than: 0 }
+    validates :experience, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+    validates :skill_points, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
-validate :max_characters, on: :create
+    validate :max_characters, on: :create
+
+    attr_accessor :buffed_attack, :buffed_spellpower, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_damage
+    attr_accessor :took_damage
 
     def create_inventory
         Inventory.create(character: self)
@@ -70,10 +72,104 @@ validate :max_characters, on: :create
                         end
         end
         # Check if image is already attached before attaching
-        unless race_image.attached?
+        unless self.race_image.attached?
+            puts "Race: #{self.race}, Gender: #{self.gender}, Image Path: #{image_path.inspect}"
             self.race_image.attach(io: File.open(Rails.root.join('app', 'assets', 'images', 'races', image_path)), filename: File.basename(image_path), content_type: 'image/jpeg')
         end
     end
+
+    def set_default_values_for_stat_bonuses
+        self.strength_bonus = 0
+        self.intelligence_bonus = 0
+        self.agility_bonus = 0
+    end
+
+    def set_default_values_for_total_stats
+        if character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
+            self.total_attack = self.attack + self.agility_bonus
+        else 
+            self.total_attack = self.attack + self.strength_bonus
+        end
+        self.total_spellpower = self.spellpower + self.intelligence_bonus
+        self.total_armor = self.armor
+        self.total_magic_resistance = self.magic_resistance
+        self.total_critical_strike_chance = self.critical_strike_chance + calculate_luck_bonus
+        self.total_critical_strike_damage = self.critical_strike_damage
+    end
+
+    def set_default_values_for_buffed_stats
+        self.buffed_attack = 0
+        self.buffed_spellpower = 0
+        self.buffed_armor = 0
+        self.buffed_magic_resistance = 0
+    end
+
+    def apply_combat_skills
+        if self.character_class == 'warrior'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'mage'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'rogue'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'paladin'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        else return
+        end
+    end
+
+    def apply_passive_skills
+        modify_stats_based_on_attributes
+        set_default_values_for_total_stats
+
+        if self.character_class == 'warrior'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'mage'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'rogue'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'paladin'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        else return
+        end
+    end
+
+    def apply_trigger_skills
+        if self.character_class == 'warrior'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'mage'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'rogue'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        elsif self.character_class == 'paladin'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect)
+            end
+        else return
+        end
+    end
+
 
     # Add methods to modify stats based on race
     def modify_stats_based_on_race
@@ -83,6 +179,7 @@ validate :max_characters, on: :create
         when 'elf'
             # Modify stats for elf race
             self.health -= 20
+            self.max_health -= 20
             self.attack -= 3
             self.armor -= 2
             self.spellpower += 3
@@ -90,14 +187,16 @@ validate :max_characters, on: :create
         when 'dwarf'
             # Modify stats for dwarf race
             self.health -= 10
+            self.max_health -= 10
             self.attack += 1
             self.armor += 2
-            self.spellpower -= 1
+            self.spellpower += 1
             self.magic_resistance += 2
         when 'orc'
             # Modify stats for orc race
             self.health += 20
-            self.attack += 5
+            self.max_health += 20
+            self.attack += 4
             self.armor -= 3
             self.spellpower -= 3
             self.magic_resistance -= 3
@@ -137,24 +236,40 @@ validate :max_characters, on: :create
             self.willpower += 1
         end
     end
-    
-    def modify_stats_based_on_attributes
-        self.attack += strength_bonus
-        self.spellpower += intelligence_bonus
-        critical_strike_chance
+
+    def revert_stat_bonuses_based_on_attributes
+        self.strength_bonus = 0
+        self.intelligence_bonus = 0
+        self.agility_bonus = 0
+        calculate_luck_bonus
         evasion
         ignore_pain_chance
     end
 
-    def strength_bonus
-        self.strength * 0.04
+    def modify_stats_based_on_attributes
+        revert_stat_bonuses_based_on_attributes
+            
+            calculate_strength_bonus
+            calculate_intelligence_bonus
+            calculate_agility_bonus
+            calculate_luck_bonus
+            evasion
+            ignore_pain_chance
     end
 
-    def intelligence_bonus
-        self.intelligence * 0.04
+    def calculate_strength_bonus
+            self.strength_bonus = (self.strength * 0.04)
     end
 
-    def critical_strike_chance
+    def calculate_intelligence_bonus
+        self.intelligence_bonus = (self.intelligence * 0.04)
+    end
+
+    def calculate_agility_bonus
+        self.agility_bonus = (self.agility * 0.04)
+    end
+
+    def calculate_luck_bonus
         self.luck * 0.05
     end
 
@@ -184,7 +299,7 @@ validate :max_characters, on: :create
                 # Seed paladin skills
                 paladin_skills_seeder = PaladinSkillsSeeder.new(self)
                 paladin_skills_seeder.seed_skills    
-            end
+        end
     end
 
     def revert_stats_based_on_item(item)
@@ -220,16 +335,37 @@ validate :max_characters, on: :create
         if [25, 50, 75, 100].include?(level)
             self.skill_points += 1
         end
+            case race
+                when 'orc'
+                    self.max_health += 10
+                    self.health += 10
+                    self.strength += 1
+                when 'elf'
+                    self.max_health += 3
+                    self.health += 3
+                    self.intelligence += 2
+                when 'human'
+                    self.max_health += 8
+                    self.health += 8
+                    self.agility += 1
+                when 'dwarf'
+                    self.max_health += 5
+                    self.health += 5
+                    self.strength += 1
+                    self.intelligence += 1
+            end
 
+        self.modify_stats_based_on_attributes
+        self.apply_passive_skills
+        
         # Calculate the remaining experience after leveling up
         remaining_experience = experience - required_experience_for_next_level
-
-        # Increase some stats per level
-        self.health += 10
 
         update_required_experience_for_next_level
 
         update(experience: remaining_experience)
+
+        save
     end
 
     def update_required_experience_for_next_level
@@ -591,8 +727,6 @@ validate :max_characters, on: :create
         end
         Rails.logger.debug("After equipping feet: #{feet_item.inspect}")
     end
-
-
 
     def max_characters
         errors.add(:base, "You can't have more than 3 characters.") if user.characters.count >= 3
