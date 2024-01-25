@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       post 'complete_hunt'
       post 'add_to_inventory/:item_id', to: 'characters#add_to_inventory', as: :add_to_inventory
       delete 'remove_from_inventory/:item_id', to: 'characters#remove_from_inventory', as: :remove_from_inventory
+      post '/combat', to: 'combat#combat', as: :combat
       post 'equip_item/:item_id', to: 'characters#equip_item', as: :equip_item
       post 'equip_prompt'
       post 'spend_skill_point'

@@ -178,6 +178,42 @@
       </div>
     </div>
   </div>
+
+    <% opponent = Character.find(params[:id]) %>
+    <% if opponent && opponent != current_user.selected_character %>
+      <div class="container-fluid mt-1">
+        <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <div class="card-body">
+            <div class="row no-gutters">
+
+              <div class="col-md-4 mx-auto">
+                <div class="text-center">
+                    <%= form_tag combat_character_path(@character), method: :post do %>
+                        <%= hidden_field_tag :opponent_id, opponent.id %>
+                        <%= hidden_field_tag :character_id, current_user.selected_character.id %>
+                        <%= submit_tag 'Attack', class: "btn btn-outline-danger" %>
+                    <% end %>
+                </div>
+              </div>
+
+              <div class="col-md-4 mx-auto ">
+                <div class="text-center">
+                  <p class= "btn btn-outline-success"> Add as Ally </p>
+                </div>
+              </div>
+
+              <div class="col-md-4 mx-auto">
+                <div class="text-center">
+                  <p class= "btn btn-outline-primary"> Guild Invite </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+
   <!-- Character stats card -->
   <div class="container-fluid mt-1">
       <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
@@ -212,6 +248,7 @@
               </div>
             </div>
 
+              <!-- Right column -->
               <div class="col-md-4 mx-auto">
                 <div class="text-center">
                   <h4 class="card-header text-white bg-primary">Talents</h4><br>
