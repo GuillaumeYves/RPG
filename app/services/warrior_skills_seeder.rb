@@ -11,29 +11,29 @@ class WarriorSkillsSeeder
 
     rage = Skill.create(
       name: "Rage",
-      description: "After attacking, your Attack increases by 3%.",
-      skill_type: "combat",
+      description: "After taking damage, your Attack increases by 5%.",
+      skill_type: "trigger",
       row: 1,
       level_requirement: 25,
       character_class: warrior_class,
       character_id: character.id,
-      effect: " self.buffed_attack += (self.total_attack * 1.3); "
+      effect: " puts '##### Rage ##### '; self.buffed_attack += (self.total_attack * 0.05); "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'rage.jpg')
     rage.skill_image.attach(io: File.open(image_path), filename: 'rage.jpg', content_type: 'image/jpeg')
     warrior_skills << rage
 
     defensive_stance = Skill.create(
-      name: "Defensive stance",
-      description: "Your Armor and Magic resistance are increased by 10%, but your Attack and Spellpower are reduced by 5%.",
+      name: "Defensive Stance",
+      description: "Your Armor and Magic resistance are increased by 20%, but your Attack and Spellpower are reduced by 5%.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: warrior_class,
       character_id: character.id,
       effect: 
-        " self.total_armor *= 1.1;
-        self.total_magic_resistance *= 1.1;
+        " self.total_armor *= 1.2;
+        self.total_magic_resistance *= 1.2;
         self.total_spellpower *= 0.95;
         self.total_attack *= 0.95; "
     )
@@ -43,7 +43,7 @@ class WarriorSkillsSeeder
 
     skullsplitter = Skill.create(
       name: "Skullsplitter",
-      description: "Your Critical Strikes now deal 180% increased damage.",
+      description: "Your Critical Strikes now deal 30% increased damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -56,7 +56,7 @@ class WarriorSkillsSeeder
     warrior_skills << skullsplitter
 
     blood_frenzy = Skill.create(
-      name: "Blood frenzy",
+      name: "Blood Frenzy",
       description: "You gain 2% of your maximum Health as additional Attack, but your Critical Strikes now deal no additional damage.",
       skill_type: "passive",
       row: 2,
@@ -72,7 +72,7 @@ class WarriorSkillsSeeder
     warrior_skills << blood_frenzy
 
     titans_offspring = Skill.create(
-      name: "Titans' offspring",
+      name: "Titans offspring",
       description: "You can now dual-wield two-handed weapons.",
       row: 3,
       level_requirement: 75,
@@ -104,9 +104,10 @@ class WarriorSkillsSeeder
       character_class: warrior_class,
       character_id: character.id,
       effect:
-          " health_percentage = self.health / self.max_health
-          if health_percentage <= 0.5
-            self.buffed_attack += (((self.max_health - self.health) / self.max_health) * 0.01 * self.total_attack);
+        " if self.health <= self.max_health / 2
+          missing_health_percentage = ((self.max_health - self.health) / self.max_health) * 100
+            puts '##### Berserk ##### '
+            self.buffed_attack += missing_health_percentage * 1
           end "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'berserk.jpg')
@@ -114,7 +115,7 @@ class WarriorSkillsSeeder
     warrior_skills << berserk
 
     last_stand = Skill.create(
-      name: "Last stand",
+      name: "Last Stand",
       description: "When reaching 50% Health, your Armor and Magic resistance are increased by 40%.",
       skill_type: "trigger",
       row: 4,
@@ -122,8 +123,8 @@ class WarriorSkillsSeeder
       character_class: warrior_class,
       character_id: character.id,
       effect: 
-          " health_percentage = self.health.to_f / self.max_health
-          if health_percentage <= 0.5
+          " if self.health <= self.max_health / 2
+            puts '##### Last Stand ##### '
             self.buffed_armor = self.total_armor + (self.total_armor * 0.4);
             self.buffed_magic_resistance = self.total_magic_resistance + (self.total_magic_resistance * 0.4);
           end "

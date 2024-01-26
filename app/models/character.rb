@@ -33,7 +33,7 @@ class Character < ApplicationRecord
 
     validate :max_characters, on: :create
 
-    attr_accessor :buffed_attack, :buffed_spellpower, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_damage
+    attr_accessor :buffed_attack, :buffed_spellpower, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
     attr_accessor :took_damage
 
     def create_inventory
@@ -102,23 +102,25 @@ class Character < ApplicationRecord
         self.buffed_spellpower = 0
         self.buffed_armor = 0
         self.buffed_magic_resistance = 0
+        self.buffed_critical_strike_chance = 0.0
+        self.buffed_critical_strike_damage = 0.0
     end
 
     def apply_combat_skills
         if self.character_class == 'warrior'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         elsif self.character_class == 'mage'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         elsif self.character_class == 'rogue'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         elsif self.character_class == 'paladin'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         else return
@@ -151,19 +153,19 @@ class Character < ApplicationRecord
 
     def apply_trigger_skills
         if self.character_class == 'warrior'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         elsif self.character_class == 'mage'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         elsif self.character_class == 'rogue'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         elsif self.character_class == 'paladin'
-            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect)
             end
         else return
