@@ -1,3 +1,24 @@
+          <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 5 %>
+          <%= form.submit "Gain 5 XP" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 10 %>
+          <%= form.submit "Gain 10 XP" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 100 %>
+          <%= form.submit "Gain 100 XP" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 1000 %>
+          <%= form.submit "Gain 1000 XP" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 10000 %>
+          <%= form.submit "Gain 10000 XP" %>
+        <% end %>
+
 <!-- Character Info Card -->
 <div class="container-fluid">
   <div class="card text-center mx-auto mt-4" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
@@ -332,27 +353,6 @@
       </div>
     </div>
   <% end %>
-
-          <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 5 %>
-          <%= form.submit "Gain 5 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 10 %>
-          <%= form.submit "Gain 10 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 100 %>
-          <%= form.submit "Gain 100 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 1000 %>
-          <%= form.submit "Gain 1000 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 10000 %>
-          <%= form.submit "Gain 10000 XP" %>
-        <% end %>
 
   <%= render partial: 'inventory', locals: { character: @character } %>
 
