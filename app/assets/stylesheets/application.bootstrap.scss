@@ -94,19 +94,34 @@ body {
   margin-top: 10px;
 }
 
-/* Additional styles for different rarities */
 .legendary .item-rarity {
   font-size: 18px;
-  color: gold; /* Set the color for Legendary rarity */
-  animation: colorChange 1s infinite alternate; /* Add animation for color change */
+  color: gold;
+  animation: legendarycolorChange 1s infinite alternate;
   text-shadow: 1px 1px 1px black;
 }
 
-@keyframes colorChange {
+@keyframes legendarycolorChange {
   from {
     color: gold;
   }
   to {
     color: orange;
+  }
+}
+
+.epic .item-rarity {
+  font-size: 18px;
+  color: rgb(255, 0, 242);
+  animation: epiccolorChange 1s infinite alternate;
+  text-shadow: 1px 1px 1px black;
+}
+
+@keyframes epiccolorChange {
+  from {
+    color: rgb(255, 0, 242);
+  }
+  to {
+    color: rgb(153, 0, 255);
   }
 }

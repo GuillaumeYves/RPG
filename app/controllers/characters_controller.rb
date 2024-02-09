@@ -29,10 +29,15 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         redirect_to user_characters_path
 
         else
-        flash[:alert] = 'An error occured. Please try again.'
-        redirect_to new_character_path
-        end
 
+            character_name_errors = @character.errors[:character_name]
+            if character_name_errors.present?
+                flash[:alert] = "Character name #{character_name_errors.join(' and ')}"
+            else
+                flash[:alert] = 'An error occured. Please try again.'
+            end
+            redirect_to new_character_path
+        end
     end
 
     def user_characters
@@ -73,38 +78,25 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     def gain_experience
         @selected_character = Character.find(params[:id])
         amount = params[:amount].to_i
-
         # Scale the experience to increase difficulty based on level
         scaling_factor = case @selected_character.level
-        # 5% reduction per case up to level 500 and beyond where its 80% reduction 
-            when 10..19 then 0.95
-            when 20..29 then 0.90
-            when 30..39 then 0.85 
-            when 40..49 then 0.80
-            when 50..59 then 0.75
-            when 60..79 then 0.70
-            when 80..99 then 0.65 
-            when 100..149 then 0.60 
-            when 150..199 then 0.55  
-            when 200..249 then 0.50
-            when 250..299 then 0.45
-            when 300..349 then 0.40
-            when 350..399 then 0.35
-            when 400..449 then 0.30
-            when 450..499 then 0.25
-            when 500..Float::INFINITY then 0.20
+            when 9..19 then 0.90
+            when 20..39 then 0.80
+            when 40..49 then 0.70 
+            when 50..59 then 0.60
+            when 60..69 then 0.50
+            when 70..79 then 0.40
+            when 80..99 then 0.30 
+            when 100..Float::INFINITY then 0.20
             else 1.0
         end
         @selected_character.increment(:experience, (amount * (1.1 ** (@selected_character.level - 1)) * scaling_factor).round)           
-        
     # Check if the character can level up
     while @selected_character.experience >= @selected_character.required_experience_for_next_level
             @selected_character.level_up
             flash[:notice] = "You are now level #{@selected_character.level}."
     end
-
         @selected_character.save
-    
     redirect_to @selected_character
     end
 
@@ -112,43 +104,28 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @selected_character = current_user.selected_character
         @hunt = Hunt.find(params[:hunt_id])
         amount = params[:experience_reward].to_i
-        
         # Scale the experience to increase difficulty based on level
         scaling_factor = case @selected_character.level
-        # 5% reduction per case up to level 500 and beyond where its 80% reduction 
-            when 10..19 then 0.95
-            when 20..29 then 0.90
-            when 30..39 then 0.85 
-            when 40..49 then 0.80
-            when 50..59 then 0.75
-            when 60..79 then 0.70
-            when 80..99 then 0.65 
-            when 100..149 then 0.60 
-            when 150..199 then 0.55  
-            when 200..249 then 0.50
-            when 250..299 then 0.45
-            when 300..349 then 0.40
-            when 350..399 then 0.35
-            when 400..449 then 0.30
-            when 450..499 then 0.25
-            when 500..Float::INFINITY then 0.20
+            when 9..19 then 0.90
+            when 20..39 then 0.80
+            when 40..49 then 0.70 
+            when 50..59 then 0.60
+            when 60..69 then 0.50
+            when 70..79 then 0.40
+            when 80..99 then 0.30 
+            when 100..Float::INFINITY then 0.20
             else 1.0
         end
-
         @selected_character.increment(:experience, (amount * (1.1 ** (@selected_character.level - 1)) * scaling_factor).round)           
-        
         # Check if the character can level up
         while @selected_character.experience >= @selected_character.required_experience_for_next_level
             @selected_character.level_up
             flash[:notice] = "You are now level #{@selected_character.level}."
         end
-
         # Drop the completed hunt
         @selected_character.update(accepted_hunt: nil)
-
         # Save character
         @selected_character.save
-
         redirect_to @selected_character
         flash[:notice] = 'Hunt completed.'
     end
@@ -156,38 +133,39 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     def equip_item
         @selected_character = current_user.selected_character
         item = Item.find(params[:item_id])
-
-        case item.item_type
-            when "One-handed Weapon"
-                @selected_character.equip_one_handed_weapon(item)
-            when "Two-handed Weapon"
-                @selected_character.equip_two_handed_weapon(item)
-            when "Shield"
-                @selected_character.equip_shield(item)
-            when "Helmet"
-                @selected_character.equip_helmet(item)
-            when "Chest"
-                @selected_character.equip_chest(item)
-            when "Legs"
-                @selected_character.equip_legs(item)
-            when "Amulet"
-                @selected_character.equip_amulet(item)
-            when "Ring"
-                @selected_character.equip_ring(item)
-            when "Waist"
-                @selected_character.equip_waist(item)
-            when "Gloves"
-                @selected_character.equip_hands(item)
-            when "Boots"
-                @selected_character.equip_feet(item)
-            # Add mappings for other item types
+        if @selected_character.can_equip?(item)
+            case item.item_type
+                when "One-handed Weapon"
+                    Rails.logger.debug("Equipping one-handed weapon")
+                    @selected_character.equip_one_handed_weapon(item)
+                when "Two-handed Weapon"
+                    @selected_character.equip_two_handed_weapon(item)
+                when "Shield"
+                    @selected_character.equip_shield(item)
+                when "Head"
+                    @selected_character.equip_helmet(item)
+                when "Chest"
+                    @selected_character.equip_chest(item)
+                when "Neck"
+                    @selected_character.equip_amulet(item)
+                when "Finger"
+                    @selected_character.equip_ring(item)
+                when "Waist"
+                    @selected_character.equip_waist(item)
+                when "Hands"
+                    @selected_character.equip_hands(item)
+                when "Feet"
+                    @selected_character.equip_feet(item)
+            end
+            @selected_character.modify_stats_based_on_attributes
+            @selected_character.apply_passive_skills
+            @selected_character.save!
+            redirect_to @selected_character, notice: "#{item.name} equipped."
         else
+            Rails.logger.debug("Flash error: #{flash[:alert]}")
+            flash[:alert] = @selected_character.errors.full_messages.join(',')
+            redirect_to @selected_character
         end
-        
-        @selected_character.modify_stats_based_on_attributes
-        @selected_character.apply_passive_skills
-        # Redirect to the show character page
-        redirect_to @selected_character, notice: "#{item.name} equipped."
     end
 
 
@@ -197,36 +175,31 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
 
         case item.item_type
         when "One-handed Weapon"
-            @selected_character.unequip_one_handed_weapon(@selected_character.main_hand_item)
+            @selected_character.unequip_one_handed_weapon(@selected_character.main_hand)
         when "Two-handed Weapon"
-            @selected_character.unequip_two_handed_weapon(@selected_character.main_hand_item)
+            @selected_character.unequip_two_handed_weapon(@selected_character.main_hand)
         when "Shield"
-            @selected_character.unequip_shield(@selected_character.off_hand_item)
-        when "Helmet"
-            @selected_character.unequip_helmet(@selected_character.helmet_item)
+            @selected_character.unequip_shield(@selected_character.off_hand)
+        when "Head"
+            @selected_character.unequip_helmet(@selected_character.helmet)
         when "Chest"
-            @selected_character.unequip_chest(@selected_character.chest_item)
-        when "Legs"
-            @selected_character.unequip_legs(@selected_character.legs_item)
+            @selected_character.unequip_chest(@selected_character.chest)
         when "Amulet"
-            @selected_character.unequip_amulet(@selected_character.neck_item)
+            @selected_character.unequip_amulet(@selected_character.neck)
         when "Ring"
-            @selected_character.unequip_ring(@selected_character.finger1_item)
+            @selected_character.unequip_ring(@selected_character.finger1)
         when "Waist"
-            @selected_character.unequip_waist(@selected_character.waist_item)
+            @selected_character.unequip_waist(@selected_character.waist)
         when "Gloves"
-            @selected_character.unequip_hands(@selected_character.hands_item)
+            @selected_character.unequip_hands(@selected_character.hands)
         when "Boots"
-            @selected_character.unequip_feet(@selected_character.feet_item)
-        # Add mappings for other item types
-        else
-        Rails.logger.warn("Unsupported item type: #{item.item_type}")
+            @selected_character.unequip_feet(@selected_character.feet)
         end
 
         @selected_character.modify_stats_based_on_attributes
         @selected_character.apply_passive_skills
-        @selected_character.save
-        # Redirect to the show character page
+        @selected_character.save!
+
         redirect_to @selected_character, notice: "#{item.name} unequipped."
     end
 

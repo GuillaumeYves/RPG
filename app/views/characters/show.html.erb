@@ -27,7 +27,7 @@
         <!-- Left column with helmet, chest, hands, and feet -->
         <div class="col-md-3">
 
-          <% head_item = @character.head_item %>
+          <% head_item = @character.head %>
           <% if head_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= head_item.id %>)" onmouseover="showTooltip(<%= head_item.id %>)" onmouseout="hideTooltip(<%= head_item.id %>)">
               <!-- Tooltip content -->
@@ -40,7 +40,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% chest_item = @character.chest_item %>
+          <% chest_item = @character.chest %>
           <% if chest_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= chest_item.id %>)" onmouseover="showTooltip(<%= chest_item.id %>)" onmouseout="hideTooltip(<%= chest_item.id %>)">
               <!-- Tooltip content -->
@@ -53,7 +53,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% hands_item = @character.hands_item %>
+          <% hands_item = @character.hands %>
           <% if hands_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= hands_item.id %>)" onmouseover="showTooltip(<%= hands_item.id %>)" onmouseout="hideTooltip(<%= hands_item.id %>)">
               <!-- Tooltip content -->
@@ -66,7 +66,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% feet_item = @character.feet_item %>
+          <% feet_item = @character.feet %>
           <% if feet_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= feet_item.id %>)" onmouseover="showTooltip(<%= feet_item.id %>)" onmouseout="hideTooltip(<%= feet_item.id %>)">
               <!-- Tooltip content -->
@@ -109,7 +109,7 @@
         <!-- Right column with amulet, waist, finger1, and finger2 -->
         <div class="col-md-3">
 
-          <% neck_item = @character.neck_item %>
+          <% neck_item = @character.neck %>
           <% if neck_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= neck_item.id %>)" onmouseover="showTooltip(<%= neck_item.id %>)" onmouseout="hideTooltip(<%= neck_item.id %>)">
               <!-- Tooltip content -->
@@ -122,7 +122,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% waist_item = @character.waist_item %>
+          <% waist_item = @character.waist %>
           <% if waist_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= waist_item.id %>)" onmouseover="showTooltip(<%= waist_item.id %>)" onmouseout="hideTooltip(<%= waist_item.id %>)">
               <!-- Tooltip content -->
@@ -135,7 +135,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
           
-          <% finger1_item = @character.finger1_item %>
+          <% finger1_item = @character.finger1 %>
           <% if finger1_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger1_item.id %>)" onmouseover="showTooltip(<%= finger1_item.id %>)" onmouseout="hideTooltip(<%= finger1_item.id %>)">
               <!-- Tooltip content -->
@@ -148,7 +148,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% finger2_item = @character.finger2_item %>
+          <% finger2_item = @character.finger2 %>
           <% if finger2_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger2_item.id %>)" onmouseover="showTooltip(<%= finger2_item.id %>)" onmouseout="hideTooltip(<%= finger2_item.id %>)">
               <!-- Tooltip content -->
@@ -168,7 +168,7 @@
           
           <div class="row justify-content-center">
 
-            <% main_hand_item = @character.main_hand_item %>
+            <% main_hand_item = @character.main_hand %>
             <% if main_hand_item.present? %>
             <div class="hover-item col-2 text-center" onmousemove="updateTooltipPosition(event, <%= main_hand_item.id %>)" onmouseover="showTooltip(<%= main_hand_item.id %>)" onmouseout="hideTooltip(<%= main_hand_item.id %>)">
                 <!-- Tooltip content -->
@@ -181,7 +181,7 @@
               <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey; margin-right:30px;"></span>
             <% end %>
               
-            <% off_hand_item = @character.off_hand_item %> 
+            <% off_hand_item = @character.off_hand %> 
             <% if off_hand_item.present? %>
             <div class="hover-item col-2 text-center" onmousemove="updateTooltipPosition(event, <%= off_hand_item.id %>)" onmouseover="showTooltip(<%= off_hand_item.id %>)" onmouseout="hideTooltip(<%= off_hand_item.id %>)">
                 <!-- Tooltip content -->
@@ -248,8 +248,8 @@
                 <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.max_health %></span><br>
                 <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_attack %></span><br>
                 <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_spellpower %></span><br>
-                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= @character.total_critical_strike_chance%>%</span><br>
-                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= (@character.total_critical_strike_damage * 100) %>%</span><br>
+                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
+                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
                 <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.total_armor %></span><br>
                 <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%= @character.total_magic_resistance %></span><br>
                 <span data-tooltip="tooltip" title="Evading will allow you to ignore damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
@@ -315,14 +315,14 @@
                       <h5 class="card-title"><%= skill1.name %></h5>
                       <% if skill1.unlocked %>
                         <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                        <p class="card-text"><%= skill1.description %></p>
                         <% else %>
                           <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                          <p class="card-text"><%= skill1.description %></p>
                           <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
                             <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
                           <% end %>
                       <% end %>
-                      <br>
-                      <p class="card-text"><%= skill1.description %></p>
                     </div>
                   </div>
                 </div>
@@ -334,14 +334,14 @@
                       <h5 class="card-title"><%= skill2.name %></h5>
                       <% if skill2.unlocked %>
                         <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                        <p class="card-text"><%= skill2.description %></p>
                         <% else %>
                           <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                          <p class="card-text"><%= skill2.description %></p>
                           <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
                             <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
                           <% end %>
                       <% end %>
-                      <br>
-                      <p class="card-text"><%= skill2.description %></p>
                     </div>
                   </div>
                 </div>

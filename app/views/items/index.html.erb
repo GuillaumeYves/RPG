@@ -1,5 +1,4 @@
   <div style="display: flex; flex-direction: row;">
-    <!-- Left Column - Image and Text -->
     <div class="card text-left" style="border: 2px solid #000; padding: 30px; max-height: 700px; max-width: 500px; margin-right: 20px;">
       <div class="card-body">
         <%= image_tag('npcs/merchant.jpg', style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;') %>
@@ -15,13 +14,12 @@
 
 
     <div style="flex-grow: 1;">
-      <!-- Right Columns - Items -->
       <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
         <h4 class="card-header text-center text-white bg-primary">Weapons</h4>
         <div class="card-body text-center">
           <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
             <% @random_weapon_items.each do |item| %>
-              <div class="merchant-item text-center">
+                <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= item.id %>)" onmouseover="showTooltip(<%= item.id %>, 'Weapon')" onmouseout="hideTooltip(<%= item.id %>)">
                 <% if item %>
                   <%= image_tag(item.item_image, style: 'width: 80px; height: 80px; border-radius: 10%; box-shadow: 2px 2px 10px #888888; margin: 0 auto;') %>
                   <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: item.id), method: :post, class: "btn btn-outline-primary btn-sm mt-2" %>
@@ -63,23 +61,42 @@
           </div>
         </div>
       </div>
-
-      <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
-        <h4 class="card-header text-center text-white bg-primary">Potions</h4>
-        <div class="card-body text-center">
-          <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-            <% @random_jewelry_items.each do |item| %>
-              <div class="merchant-item text-center">
-                <% if item %>
-                  <%= image_tag(item.item_image, style: 'width: 80px; height: 80px; border-radius: 10%; box-shadow: 2px 2px 10px #888888; margin: 0 auto;') %>
-                  <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: item.id), method: :post, class: "btn btn-outline-primary btn-sm mt-2" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
-
-
     </div>
   </div>
+
+
+<script>
+  function showTooltip(itemId, itemType) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    if (tooltip) tooltip.style.display = 'block';
+    
+    // You can customize the tooltip content based on the item type if needed
+    // Example: tooltip.innerHTML = `Tooltip content for ${itemType}`;
+  }
+
+  function hideTooltip(itemId) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    if (tooltip) tooltip.style.display = 'none';
+  }
+
+  function updateTooltipPosition(event, itemId) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    const offset = 10;
+    const x = event.clientX + offset;
+    const y = event.clientY + offset;
+
+    // Check if the cursor is in the bottom half of the page
+    const isBottomHalf = event.clientY > window.innerHeight / 2;
+
+    // Adjust the tooltip position based on the cursor's location
+    if (isBottomHalf) {
+      tooltip.style.left = `${x}px`;
+      tooltip.style.bottom = `${window.innerHeight - y}px`;
+      tooltip.style.top = ''; // Reset top property
+    } else {
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+      tooltip.style.bottom = ''; // Reset bottom property
+    }
+  }
+</script>

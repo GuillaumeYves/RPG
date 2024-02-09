@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -77,7 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.bigint "feet"
     t.string "gender"
     t.integer "agility", default: 5
-    t.float "critical_strike_damage", default: 1.5
+    t.float "critical_strike_damage", default: 1.2
     t.integer "max_health", default: 100
     t.integer "total_attack"
     t.integer "total_spellpower"
@@ -135,6 +135,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.string "inventory_type"
     t.bigint "inventory_id"
     t.integer "level_requirement"
+    t.string "item_class"
+    t.integer "upgrade", default: 0
+    t.float "critical_strike_chance"
+    t.float "critical_strike_damage"
+    t.integer "agility"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -154,7 +159,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.integer "willpower", default: 5
     t.integer "agility", default: 5
     t.integer "level", default: 1
-    t.float "critical_strike_damage", default: 1.5
+    t.float "critical_strike_damage", default: 1.2
     t.integer "max_health", default: 100
     t.integer "total_attack"
     t.integer "total_spellpower"
@@ -199,6 +204,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "characters", "hunts"
+  add_foreign_key "characters", "items", column: "chest"
+  add_foreign_key "characters", "items", column: "feet"
+  add_foreign_key "characters", "items", column: "finger1"
+  add_foreign_key "characters", "items", column: "finger2"
+  add_foreign_key "characters", "items", column: "hands"
+  add_foreign_key "characters", "items", column: "head"
+  add_foreign_key "characters", "items", column: "legs"
+  add_foreign_key "characters", "items", column: "main_hand"
+  add_foreign_key "characters", "items", column: "neck"
+  add_foreign_key "characters", "items", column: "off_hand"
+  add_foreign_key "characters", "items", column: "waist"
   add_foreign_key "characters", "users"
   add_foreign_key "hunts", "characters"
   add_foreign_key "inventories", "characters"
