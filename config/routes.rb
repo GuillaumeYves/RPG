@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     member do
       get '/combat_result/:id', to: 'combat#combat_result', as: :combat_result
       post 'select', to: 'characters#select'
+      get 'talents'
       post 'gain_experience'
       post 'unlock_skill'
       post 'complete_hunt'
@@ -25,6 +26,7 @@ Rails.application.routes.draw do
       delete 'remove_from_inventory/:item_id', to: 'characters#remove_from_inventory', as: :remove_from_inventory
       post '/combat', to: 'combat#combat', as: :combat
       post 'equip_item/:item_id', to: 'characters#equip_item', as: :equip_item
+      post 'sell_item/:item_id', to: 'characters#sell_item', as: :sell_item
       post 'equip_prompt'
       post 'spend_skill_point'
       patch 'select_hunt'
@@ -35,7 +37,7 @@ Rails.application.routes.draw do
 
   resources :hunts, only: [:index] do
     member do
-      get '/combat_hunt', to: 'combat#combat', as: :combat_hunt
+      post '/combat', to: 'combat#combat', as: :combat
       post 'accept_hunt', to: 'hunts#accept_hunt'
       post 'cancel_hunt', to: 'hunts#cancel_hunt'
     end
@@ -44,6 +46,4 @@ Rails.application.routes.draw do
   get '/user_characters', to: 'characters#user_characters', as: 'user_characters'
   get '/combat_result', to: 'combat#combat_result', as: :combat_result
   get 'update_health_bars', to: 'combat_controller#update_health_bars'
-
 end
-

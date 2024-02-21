@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_20_195934) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,28 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "audits", force: :cascade do |t|
+    t.integer "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.integer "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.text "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
   end
 
   create_table "characters", force: :cascade do |t|
@@ -89,6 +111,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
     t.integer "agility_bonus", default: 0
     t.float "critical_strike_chance", default: 1.0
     t.float "total_critical_strike_chance"
+    t.integer "gold", default: 0
+    t.integer "total_health"
+    t.integer "total_max_health"
+    t.integer "energy", default: 100
+    t.integer "max_energy", default: 100
+    t.integer "arena_ticket", default: 10
+    t.integer "max_arena_ticket", default: 10
+    t.integer "daily_quest", default: 10
+    t.integer "max_daily_quest", default: 10
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
@@ -103,6 +134,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.bigint "character_id"
+    t.integer "gold_reward"
     t.index ["character_id"], name: "index_hunts_on_character_id"
   end
 
@@ -124,7 +156,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
     t.integer "spellpower"
     t.integer "magic_resistance"
     t.string "name", null: false
-    t.text "description", null: false
+    t.text "description"
     t.string "item_type", null: false
     t.string "rarity", null: false
     t.integer "character_id"
@@ -140,6 +172,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
     t.float "critical_strike_chance"
     t.float "critical_strike_damage"
     t.integer "agility"
+    t.integer "gold_price"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -168,6 +201,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_01_111730) do
     t.float "critical_strike_chance", default: 1.0
     t.float "total_critical_strike_chance"
     t.float "total_critical_strike_damage"
+    t.integer "strength_bonus", default: 0
+    t.integer "intelligence_bonus", default: 0
+    t.integer "agility_bonus", default: 0
+    t.integer "total_health"
+    t.integer "total_max_health"
   end
 
   create_table "skills", force: :cascade do |t|

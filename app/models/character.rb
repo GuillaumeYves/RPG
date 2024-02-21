@@ -19,7 +19,7 @@ class Character < ApplicationRecord
     belongs_to :finger2, class_name: 'Item', foreign_key: 'finger2', optional: true
 
     has_many :skills, dependent: :destroy
- 
+
     has_one_attached :race_image
 
     before_save :ensure_non_negative_attributes
@@ -37,6 +37,7 @@ class Character < ApplicationRecord
 
     attr_accessor :buffed_attack, :buffed_spellpower, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
     attr_accessor :took_damage
+    attr_accessor :piety
     attr_accessor :nullify
 
     def create_inventory
@@ -66,6 +67,13 @@ class Character < ApplicationRecord
                         else
                         'dwarf.jpg'
                         end
+        when 'troll'
+            image_path = case gender
+                        when 'female'
+                        'female_troll.jpg'
+                        else
+                        'troll.jpg'
+                        end
         when 'orc'
             image_path = case gender
                         when 'female'
@@ -73,10 +81,16 @@ class Character < ApplicationRecord
                         else
                         'orc.jpg'
                         end
+        when 'goblin'
+            image_path = case gender
+                        when 'female'
+                        'female_goblin.jpg'
+                        else
+                        'goblin.jpg'
+                        end
         end
         # Check if image is already attached before attaching
         unless self.race_image.attached?
-            puts "Race: #{self.race}, Gender: #{self.gender}, Image Path: #{image_path.inspect}"
             self.race_image.attach(io: File.open(Rails.root.join('app', 'assets', 'images', 'races', image_path)), filename: File.basename(image_path), content_type: 'image/jpeg')
         end
     end
@@ -88,29 +102,35 @@ class Character < ApplicationRecord
     end
 
     def set_default_values_for_total_stats
-        if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
-            self.total_attack = self.attack + self.agility_bonus
-        elsif self.character_class == 'rogue' && skills.find_by(name: 'From the Shadows', unlocked: true)
-            self.total_attack = self.attack + ((self.strength_bonus * 0.8)+(self.intelligence_bonus * 0.8))
-        elsif self.character_class == 'paladin' && skills.find_by(name: 'Judgement', unlocked: true)
-            self.total_attack = self.attack + (self.strength_bonus + self.intelligence_bonus)
-        else 
-            self.total_attack = self.attack + self.strength_bonus
-        end
+            if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
+                self.total_attack = self.attack + self.agility_bonus
+            elsif self.character_class == 'rogue' && skills.find_by(name: 'From the Shadows', unlocked: true)
+                self.total_attack = self.attack + ((self.strength_bonus * 0.8)+(self.intelligence_bonus * 0.8))
+            else
+                self.total_attack = self.attack + self.strength_bonus
+            end
         self.total_spellpower = self.spellpower + self.intelligence_bonus
-        if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
-            self.total_armor = self.armor + self.strength_bonus
-        else
-            self.total_armor = self.armor
-        end
-        if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
-            self.total_magic_resistance = (self.magic_resistance + self.intelligence_bonus)
-        else 
-            self.total_magic_resistance = self.magic_resistance
-        end
+            if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
+                self.total_armor = self.armor + self.strength_bonus
+            else
+                self.total_armor = self.armor
+            end
+            if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
+                self.total_magic_resistance = (self.magic_resistance + self.intelligence_bonus)
+            elsif self.character_class == 'paladin' && skills.find_by(name: 'Judgement', unlocked: true)
+                self.total_magic_resistance = self.magic_resistance + self.intelligence_bonus
+            else
+                self.total_magic_resistance = self.magic_resistance
+            end
         self.total_critical_strike_chance = (self.critical_strike_chance + calculate_luck_bonus).round(2)
         self.total_critical_strike_damage = self.critical_strike_damage.round(2)
         self.max_health = self.health
+            if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
+                self.total_health = (self.health + self.strength_bonus)
+            else
+                self.total_health = self.health
+            end
+        self.total_max_health = self.total_health
     end
 
     def set_default_values_for_buffed_stats
@@ -125,19 +145,19 @@ class Character < ApplicationRecord
     def apply_combat_skills
         if self.character_class == 'warrior'
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'mage'
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'rogue'
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'paladin'
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         else return
         end
@@ -148,19 +168,19 @@ class Character < ApplicationRecord
         set_default_values_for_total_stats
         if self.character_class == 'warrior'
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'mage'
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'rogue'
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'paladin'
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         else return
         end
@@ -169,24 +189,23 @@ class Character < ApplicationRecord
     def apply_trigger_skills
         if self.character_class == 'warrior'
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'mage'
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'rogue'
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'paladin'
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
-            instance_eval(skill.effect)
+            instance_eval(skill.effect) if skill.effect.present?
             end
         else return
         end
     end
-
 
     # Add methods to modify stats based on race
     def modify_stats_based_on_race
@@ -195,25 +214,58 @@ class Character < ApplicationRecord
             # Human race will keep base stats
         when 'elf'
             # Modify stats for elf race
-            self.health -= 20
+            self.health -= 5
+            self.strength -= 3
+            self.intelligence += 2
+            self.agility += 2
+            self.willpower -= 2
             self.attack -= 3
-            self.armor -= 2
             self.spellpower += 3
             self.magic_resistance += 2
         when 'dwarf'
             # Modify stats for dwarf race
             self.health -= 10
+            self.strength -= 2
+            self.intelligence += 1
+            self.agility -= 1
+            self.willpower += 1
             self.attack += 1
             self.armor += 2
             self.spellpower += 1
             self.magic_resistance += 2
+        when 'troll'
+            # Modify stats for troll race
+            self.health += 10
+            self.strength += 1
+            self.intelligence += 1
+            self.agility -= 3
+            self.willpower += 1
+            self.attack += 1
+            self.spellpower += 1
+            self.armor += 5
+            self.magic_resistance += 5
         when 'orc'
             # Modify stats for orc race
             self.health += 20
+            self.strength += 4
+            self.intelligence -= 3
+            self.agility -= 3
+            self.willpower += 1
             self.attack += 4
             self.armor -= 3
             self.spellpower -= 3
             self.magic_resistance -= 3
+        when 'goblin'
+            # Modify stats for goblin race
+            self.health -= 20
+            self.strength += 1
+            self.intelligence += 1
+            self.agility += 2
+            self.willpower -= 2
+            self.attack += 1
+            self.armor -= 1
+            self.spellpower += 1
+            self.magic_resistance -= 1
         end
     end
 
@@ -222,31 +274,31 @@ class Character < ApplicationRecord
         case character_class
         when 'warrior'
             # Modify attributes for warrior class
-            self.strength += 2
-            self.intelligence -= 3
-            self.agility -= 3
+            self.strength += 1
+            self.intelligence -= 1
+            self.agility -= 1
             self.luck += 1
-            self.willpower += 1
+            self.willpower -= 1
         when 'mage'
             # Modify attributes for mage class
-            self.strength -= 3
-            self.intelligence += 3
-            self.agility -= 3
-            self.luck += 2
-            self.willpower -= 3
+            self.strength -= 1
+            self.intelligence += 1
+            self.agility -= 1
+            self.luck += 1
+            self.willpower -= 1
         when 'rogue'
             # Modify attributes for rogue class
             self.strength += 1
-            self.intelligence -= 2
-            self.agility += 2
-            self.luck += 2
-            self.willpower -= 3
+            self.intelligence -= 1
+            self.agility += 1
+            self.luck += 1
+            self.willpower -= 1
         when 'paladin'
             # Modify attributes for paladin class
             self.strength += 1
             self.intelligence += 1
-            self.agility -= 3
-            self.luck += 1
+            self.agility -= 1
+            self.luck -= 1
             self.willpower += 1
         end
     end
@@ -271,17 +323,17 @@ class Character < ApplicationRecord
     end
 
     def calculate_strength_bonus
-        if self.character_class == 'warrior' && skills.find_by(name: 'Fury Incarnate', unlocked: true)
-            self.strength_bonus = (self.strength * 0.4)
-        else 
+        if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
+            self.strength_bonus = (self.strength * 0.1)
+        else
             self.strength_bonus = (self.strength * 0.04)
         end
     end
 
     def calculate_intelligence_bonus
         if self.character_class == 'mage' && skills.find_by(name: 'Enlighten', unlocked: true)
-            self.intelligence_bonus = (self.intelligence * 0.4)
-        else 
+            self.intelligence_bonus = (self.intelligence * 0.1)
+        else
             self.intelligence_bonus = (self.intelligence * 0.04)
         end
     end
@@ -295,11 +347,19 @@ class Character < ApplicationRecord
     end
 
     def evasion
-        self.agility * 0.03
+        if self.character_class == 'warrior' && skills.find_by(name: 'Undeniable', unlocked: true)
+            evasion = 0.0
+        else
+            self.agility * 0.03
+        end
     end
 
     def ignore_pain_chance
-        self.willpower * 0.03
+        if self.character_class == 'warrior' && skills.find_by(name: 'Undeniable', unlocked: true)
+            ignore_pain_chance = 0.0
+        else
+            self.willpower * 0.03
+        end
     end
 
     def assign_skills_based_on_class
@@ -319,7 +379,7 @@ class Character < ApplicationRecord
             when 'paladin'
                 # Seed paladin skills
                 paladin_skills_seeder = PaladinSkillsSeeder.new(self)
-                paladin_skills_seeder.seed_skills    
+                paladin_skills_seeder.seed_skills
         end
     end
 
@@ -358,30 +418,32 @@ class Character < ApplicationRecord
     def level_up
         # Increase level
         update(level: level + 1)
+
+        # Check if skill point should be added at specific levels
         if [25, 50, 75, 100].include?(level)
             self.skill_points += 1
         end
-            case character_class
-                when 'warrior'
-                    self.health += 8
-                    self.strength += 1
-                when 'mage'
-                    self.health += 4
-                    self.intelligence += 2
-                when 'rogue'
-                    self.health += 6
-                    self.agility += 1
-                when 'paladin'
-                    self.health += 10
-                    self.strength += 1
-                    self.intelligence += 1
-            end
+
+        # Modify health based on character class
+        case character_class
+        when 'warrior'
+            self.health += 8
+        when 'mage'
+            self.health += 4
+        when 'rogue'
+            self.health += 6
+        when 'paladin'
+            self.health += 10
+        end
 
         self.modify_stats_based_on_attributes
         self.apply_passive_skills
+
         # Calculate the remaining experience after leveling up
         remaining_experience = experience - required_experience_for_next_level
         update_required_experience_for_next_level
+
+        # Update the character's experience with the remaining experience
         update(experience: remaining_experience)
         save
     end
@@ -400,52 +462,61 @@ class Character < ApplicationRecord
     end
 
     def can_equip?(item)
-        case item.item_class
-            when 'Sword'
-                # All characters can equip one-handed swords
-                return true if item.item_type == 'One-handed Weapon'
-                # For two-handed swords, restrict to warriors and paladins
-                return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin].include?(character_class)
-                errors.add(:base, "Only Warriors and Paladins can equip Two-handed Swords.")
-                return false
-            when 'Great Shield'
-                return true if %w[warrior paladin].include?(character_class)
-                errors.add(:base, "Only Warriors and Paladins can equip Great Shields.")
-                return false
-            when 'Axe'
-                return true if character_class == 'warrior'
-                errors.add(:base, "Only Warriors can equip Axes.")
-                return false
-            when 'Mace'
-                return true if character_class == 'paladin'
-                errors.add(:base, "Only Paladins can equip Maces.")
-                return false
-            when 'Dagger'
-                return true if character_class == 'rogue'
-                errors.add(:base, "Only Rogues can equip Daggers.")
-                return false
-            when 'Staff'
-                return true if character_class == 'mage'
-                errors.add(:base, "Only Mages can equip Staves.")
-                return false
-            when 'Plate'
-                return true if %w[warrior paladin].include?(character_class)
-                errors.add(:base, "Only Warriors and Paladins can equip Plate.")
-                return false
-            when 'Leather'
-                return true if character_class == 'rogue'
-                errors.add(:base, "Only Rogues can equip leather.")
-                return false
-            when 'Cloth'
-                return true if character_class == 'mage'
-                errors.add(:base, "Only Mages can equip cloth.")
-                return false
-            when 'Ring'
-                return true
-            when 'Amulet'
-                return true
-            when 'Belt'
-                return true
+        if self.level >= item.level_requirement
+            case item.item_class
+                when 'Sword'
+                    # All characters can equip one-handed swords
+                    return true if item.item_type == 'One-handed Weapon'
+                    # For two-handed swords, restrict to warriors and paladins
+                    return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin].include?(character_class)
+                    errors.add(:base, "Only Warriors and Paladins can equip Two-handed Swords.")
+                    return false
+                when 'Great Shield'
+                    return true if character_class == 'paladin'
+                    errors.add(:base, "Only Paladins can equip Great Shields.")
+                    return false
+                when 'Small Shield'
+                    return true if %w[warrior paladin mage].include?(character_class)
+                    errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
+                    return false
+                when 'Axe'
+                    return true if character_class == 'warrior'
+                    errors.add(:base, "Only Warriors can equip Axes.")
+                    return false
+                when 'Mace'
+                    return true if character_class == 'paladin'
+                    errors.add(:base, "Only Paladins can equip Maces.")
+                    return false
+                when 'Dagger'
+                    return true if character_class == 'rogue'
+                    errors.add(:base, "Only Rogues can equip Daggers.")
+                    return false
+                when 'Staff'
+                    return true if character_class == 'mage'
+                    errors.add(:base, "Only Mages can equip Staves.")
+                    return false
+                when 'Plate'
+                    return true if %w[warrior paladin].include?(character_class)
+                    errors.add(:base, "Only Warriors and Paladins can equip Plate.")
+                    return false
+                when 'Leather'
+                    return true if character_class == 'rogue'
+                    errors.add(:base, "Only Rogues can equip leather.")
+                    return false
+                when 'Cloth'
+                    return true if character_class == 'mage'
+                    errors.add(:base, "Only Mages can equip cloth.")
+                    return false
+                when 'Ring'
+                    return true
+                when 'Amulet'
+                    return true
+                when 'Belt'
+                    return true
+            end
+        else
+            errors.add(:base, "You do not have the required level to equip that item.")
+            return false
         end
     end
 
@@ -550,7 +621,7 @@ class Character < ApplicationRecord
             end
         end
     end
-    
+
     def equip_shield(item)
         # Case 1: No existing weapon in the off hand or main hand
         if self.main_hand.nil? && self.off_hand.nil?
@@ -617,18 +688,18 @@ class Character < ApplicationRecord
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
             elsif self.main_hand.item_type == 'Two-handed Weapon'
-                if skills.find_by(name: 'Titans offspring', unlocked: true).present?
-                    # Equip the weapon in the off hand if two-handed and Titans offspring talent
+                if skills.find_by(name: 'Forged in Battle', unlocked: true).present?
+                    # Equip the weapon in the off hand if two-handed and Forged in Battle talent
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
-                else 
+                else
                     unequip_main_hand(self.main_hand)
                     self.main_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
-            else 
+            else
                 errors.add(:base, "You cannot dual wield Two-handed weapons.")
             end
         # Case 3: Only off hand has a weapon
@@ -644,19 +715,19 @@ class Character < ApplicationRecord
                     self.main_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
-                end           
+                end
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 # Remove the main hand and off hand then equip the item in main hand
                 unequip_off_hand(self.off_hand)
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
-            elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Titans offspring', unlocked: true)
-                # Equip the item in main hand if titans offspring talent
+            elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
+                # Equip the item in main hand if Forged in Battle talent
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
-            else 
+            else
                 errors.add(:base, "You cannot dual wield Two-handed weapons.")
             end
         # Case 4: Both main hand and off hand have weapons
@@ -682,8 +753,8 @@ class Character < ApplicationRecord
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
-            elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Titans offspring', unlocked: true)
-                # Equip the item in off hand if titans offspring talent
+            elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
+                # Equip the item in off hand if Forged in Battle talent
                 unequip_off_hand(self.off_hand)
                 self.off_hand = item
                 remove_item_from_inventory(item)
@@ -857,7 +928,7 @@ class Character < ApplicationRecord
         end
     end
 
-    private 
+    private
 
     def max_characters
         errors.add(:base, "You can't have more than 3 characters.") if user.characters.count >= 3

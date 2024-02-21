@@ -1,0 +1,119 @@
+<% if @character.user_id == current_user.id %>
+  <div class="mt-5">
+    <div style="display: flex; flex-direction: row;">
+      <!-- First column -->
+      <div class="col" style="margin-right: 20px;">
+        <div class="card text-center mx-auto" style="width: 800px; height: 1200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; overflow: auto;">
+          <div class="card-body">
+              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Talents</h4>
+            <p><small>Choose your talents wisely, as you can only pick one talent in each row.</small></p><br>
+              <div>
+                <% if @character.user_id == current_user.id %>
+                  <% if @character.skill_points == 1 %>
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have 1 Talent Point to spend.</strong><br>
+                  <% elsif @character.skill_points > 1 %>
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have <%= @character.skill_points %> Talent Points to spend.</strong><br>
+                  <% end %>
+                <% end %>
+              </div>
+            <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
+              <h4 class="card-title mt-2">Level <%= level %></h4>
+              <div class="row mt-3">
+                <% level_skills.each_slice(2) do |skill1, skill2| %>
+                  <div class="col-md-6">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title"><%= skill1.name %></h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px"><%= skill1.skill_type&.capitalize %></p>
+                        <% if skill1.unlocked %>
+                          <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                          <p class="card-text"><%= skill1.description %></p>
+                        <% else %>
+                          <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                          <p class="card-text"><%= skill1.description %></p>
+                          <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
+                            <%= form.submit 'Unlock', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <% if skill2 %>
+                    <div class="col-md-6">
+                      <div class="card mb-3">
+                        <div class="card-body" style="height: 320px;">
+                          <h5 class="card-title"><%= skill2.name %></h5>
+                          <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px"><%= skill2.skill_type&.capitalize %></p>
+                          <% if skill2.unlocked %>
+                            <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                            <p class="card-text"><%= skill2.description %></p>
+                          <% else %>
+                            <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                            <p class="card-text"><%= skill2.description %></p>
+                            <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
+                              <%= form.submit 'Unlock', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                            <% end %>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second column -->
+      <div class="col">
+        <div class="card text-center mx-auto" style="width: 800px; height: 1200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; overflow: auto;">
+          <div class="card-body">
+            <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Paragon</h4>
+            <p><small>From level 100 and onwards, you can spend Paragon points to unleash your true power.</small></p><br>
+              <div class="mb-2">
+                <% if @character.user_id == current_user.id %>
+                  <% if @character.skill_points == 1 %>
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have 1 Talent Point to spend.</strong><br>
+                  <% elsif @character.skill_points > 1 %>
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have <%= @character.skill_points %> Talent Points to spend.</strong><br>
+                  <% end %>
+                <% end %>
+              </div>
+            <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
+              <h4 class="card-title">Level <%= level %></h4>
+              <div class="row mt-3">
+                <div class="col-md-6">
+                  <div class="card mb-3">
+                    <div class="card-body" style="height: 320px;">
+                      <h5 class="card-title">Strength</h5>
+                      <p class="card-text">
+
+                        Current Strength: <%= @character.strength %>
+                      </p>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="card mb-3">
+                    <div class="card-body" style="height: 320px;">
+                      <h5 class="card-title">Strength</h5>
+                      <p class="card-text">
+                        Current Strength: <%= @character.strength %>
+                      </p>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+<% end %>

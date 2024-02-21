@@ -24,9 +24,13 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         if @character.save
             @character.create_inventory
             @character.assign_skills_based_on_class
-        
+
         flash[:notice] = 'Character created.'
         redirect_to user_characters_path
+
+        if current_user.characters.count == 1
+            flash[:tutorial] = true
+        end
 
         else
 
@@ -40,21 +44,26 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
-    def user_characters
-        @characters = current_user.characters
-    end
-
     def select
         @selected_character = Character.find(params[:id])
 
         if current_user.selected_character.present?
-            current_user.selected_character.update(user: nil) # Clear the association if it was present
-        end 
+            current_user.selected_character.update(user: nil)
+        end
 
         session[:selected_character_id] = @selected_character.id
         current_user.update(selected_character: @selected_character)
 
-        redirect_to character_path(@selected_character), notice: "You selected #{@selected_character.character_name}."
+        redirect_to character_path(@selected_character)
+    end
+
+    def user_characters
+        @characters = current_user.characters
+        if current_user.selected_character.present?
+            current_user.selected_character.update(user: nil)
+            session[:selected_character_id] = nil
+            current_user.update(selected_character: nil)
+        end
     end
 
     def destroy
@@ -70,64 +79,106 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
 
     def show
         @character = Character.find(params[:id])
+        @selected_character = current_user.selected_character if current_user.selected_character.present?
         @items = Item.all
         @hunts = Hunt.all
         @skills = @character.skills
     end
 
+    def talents
+        @character = current_user.selected_character
+        @skills = @character.skills
+    end
+
     def gain_experience
-        @selected_character = Character.find(params[:id])
-        amount = params[:amount].to_i
-        # Scale the experience to increase difficulty based on level
-        scaling_factor = case @selected_character.level
-            when 9..19 then 0.90
+        @character = current_user.selected_character
+
+        scaling_factor = case @character.level
+            when 1..9 then 1.0
+            when 10..19 then 0.90
             when 20..39 then 0.80
-            when 40..49 then 0.70 
+            when 40..49 then 0.70
             when 50..59 then 0.60
             when 60..69 then 0.50
             when 70..79 then 0.40
-            when 80..99 then 0.30 
-            when 100..Float::INFINITY then 0.20
+            when 80..99 then 0.30
+            when 100..199 then 0.20
+            when 200..299 then 0.10
+            when 300..Float::INFINITY then 0.05
             else 1.0
         end
-        @selected_character.increment(:experience, (amount * (1.1 ** (@selected_character.level - 1)) * scaling_factor).round)           
-    # Check if the character can level up
-    while @selected_character.experience >= @selected_character.required_experience_for_next_level
-            @selected_character.level_up
-            flash[:notice] = "You are now level #{@selected_character.level}."
-    end
-        @selected_character.save
-    redirect_to @selected_character
+
+        amount = ((params[:amount].to_i * @character.level) * scaling_factor).round
+        gold_reward = (params[:gold_reward].to_i)
+
+        @character.increment(:experience, amount)
+        @character.increment(:gold, gold_reward)
+
+        flash[:notice] = "You gained #{amount} EXP and #{gold_reward} gold"
+        puts "######################### #{@character.gold}"
+        # Check if the character can level up
+        while @character.experience >= @character.required_experience_for_next_level
+                @character.level_up
+                flash[:notice] = "You are now level #{@character.level}."
+        end
+            @character.save
+        redirect_to @character
     end
 
     def complete_hunt
-        @selected_character = current_user.selected_character
-        @hunt = Hunt.find(params[:hunt_id])
-        amount = params[:experience_reward].to_i
-        # Scale the experience to increase difficulty based on level
-        scaling_factor = case @selected_character.level
-            when 9..19 then 0.90
+        @character = current_user.selected_character
+        @hunt = @character.accepted_hunt
+        gold_reward = @hunt.gold_reward
+
+        scaling_factor = case @character.level
+            when 1..9 then 1.0
+            when 10..19 then 0.90
             when 20..39 then 0.80
-            when 40..49 then 0.70 
+            when 40..49 then 0.70
             when 50..59 then 0.60
             when 60..69 then 0.50
             when 70..79 then 0.40
-            when 80..99 then 0.30 
-            when 100..Float::INFINITY then 0.20
+            when 80..99 then 0.30
+            when 100..199 then 0.20
+            when 200..299 then 0.10
+            when 300..Float::INFINITY then 0.05
             else 1.0
         end
-        @selected_character.increment(:experience, (amount * (1.1 ** (@selected_character.level - 1)) * scaling_factor).round)           
+        amount = ((params[:experience_reward].to_i * @character.level) * scaling_factor).round
+        level_difference = @character.level - @hunt.level_requirement
+            if level_difference <= 5
+                # Character level <= Hunt level + 5: XP = (100 %)
+                amount
+            elsif level_difference == 6
+                # Character level = Hunt level + 6: XP = (80 %)
+                amount = (amount * 0.8 / 5).round * 5
+            elsif level_difference == 7
+                # Character level = Hunt level + 7: XP = (60 %)
+                amount = (amount * 0.6 / 5).round * 5
+            elsif level_difference == 8
+                # Character level = Hunt level + 8: XP = (40 %)
+                amount = (amount * 0.4 / 5).round * 5
+            elsif level_difference == 9
+                # Character level = Hunt level + 9: XP = (20 %)
+                amount = (amount * 0.2 / 5).round * 5
+            else
+                # Character level >= Hunt level + 10: XP = (10 %)
+                amount = (amount * 0.1 / 5).round * 5
+            end
+        # Add EXP and Gold to character
+        @character.increment(:experience, amount)
+        @character.increment(:gold, gold_reward)
         # Check if the character can level up
-        while @selected_character.experience >= @selected_character.required_experience_for_next_level
-            @selected_character.level_up
-            flash[:notice] = "You are now level #{@selected_character.level}."
+        while @character.experience >= @character.required_experience_for_next_level
+            @character.level_up
+            flash[:notice] = "You are now level #{@character.level}."
         end
         # Drop the completed hunt
-        @selected_character.update(accepted_hunt: nil)
+        @character.update(accepted_hunt: nil)
         # Save character
-        @selected_character.save
-        redirect_to @selected_character
-        flash[:notice] = 'Hunt completed.'
+        @character.save
+        redirect_to @character
+        flash[:notice] = "Hunt completed. You gained #{amount} experience and #{gold_reward} gold"
     end
 
     def equip_item
@@ -136,33 +187,41 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         if @selected_character.can_equip?(item)
             case item.item_type
                 when "One-handed Weapon"
-                    Rails.logger.debug("Equipping one-handed weapon")
                     @selected_character.equip_one_handed_weapon(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Two-handed Weapon"
                     @selected_character.equip_two_handed_weapon(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Shield"
                     @selected_character.equip_shield(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Head"
                     @selected_character.equip_helmet(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Chest"
                     @selected_character.equip_chest(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Neck"
                     @selected_character.equip_amulet(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Finger"
                     @selected_character.equip_ring(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Waist"
                     @selected_character.equip_waist(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Hands"
                     @selected_character.equip_hands(item)
+                    flash[:notice] = "#{item.name} equipped."
                 when "Feet"
                     @selected_character.equip_feet(item)
+                    flash[:notice] = "#{item.name} equipped."
             end
             @selected_character.modify_stats_based_on_attributes
             @selected_character.apply_passive_skills
             @selected_character.save!
-            redirect_to @selected_character, notice: "#{item.name} equipped."
+            redirect_to @selected_character
         else
-            Rails.logger.debug("Flash error: #{flash[:alert]}")
             flash[:alert] = @selected_character.errors.full_messages.join(',')
             redirect_to @selected_character
         end
@@ -204,17 +263,42 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     end
 
     def add_to_inventory
-    @selected_character = Character.find(session[:selected_character_id])
-    inventory = @selected_character.inventory
-    item = Item.find(params[:item_id])
+        @selected_character = Character.find(session[:selected_character_id])
+        inventory = @selected_character.inventory
+        item = Item.find(params[:item_id])
 
-        if inventory.items.count < 10
-        flash[:notice] = "#{item.name} added to inventory."
-        inventory.items << item
-        inventory.save
-        redirect_back fallback_location: root_path
+        if @selected_character.gold >= item.gold_price
+            if inventory.items.count < 10
+                @selected_character.gold -= item.gold_price
+                flash[:notice] = "#{item.name} bought for #{item.gold_price} gold."
+                inventory.items << item
+                inventory.save
+                @selected_character.save
+                redirect_back fallback_location: root_path
+            else
+                flash[:alert] = 'Inventory is full.'
+                redirect_back fallback_location: root_path
+            end
         else
-            flash[:alert] = 'Inventory is full.'
+            flash[:alert] = 'You do not have enough gold for this item.'
+            redirect_back fallback_location: root_path
+        end
+    end
+
+    def sell_item
+        @selected_character = Character.find(session[:selected_character_id])
+        inventory = @selected_character.inventory
+        item = Item.find(params[:item_id])
+
+        if inventory.items.include?(item)
+            @selected_character.gold += item.gold_price
+            flash[:notice] = "#{item.name} sold for #{item.gold_price} gold."
+            inventory.items.delete(item)
+            inventory.save
+            @selected_character.save
+            redirect_back fallback_location: root_path
+        else
+            flash[:alert] = 'Item not found in inventory.'
             redirect_back fallback_location: root_path
         end
     end
@@ -237,10 +321,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             @character.decrement(:skill_points)
             @character.save
             flash[:notice] = 'Talent unlocked.'
-            puts "Intermediate values - Armor: #{@character.armor}, Magic Resistance: #{@character.magic_resistance}, Spellpower: #{@character.spellpower}, Updated Attack: #{@character.attack}"
         end
 
-        redirect_to @character
+        redirect_to talents_character_path
     end
 
     private

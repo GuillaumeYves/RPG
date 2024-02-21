@@ -11,7 +11,8 @@ module ApplicationHelper
             concat(display_item_attributes(item))
             concat(content_tag(:br))
             concat(content_tag(:hr, '', style: 'width: 50%; margin: auto; margin-bottom: 10px;'))
-            concat(content_tag(:div, item.description, class: 'item-description', style: 'font-size: smaller; font-style: italic;'))
+            concat(content_tag(:div, item.description, class: 'item-description', style: 'font-size: smaller; font-style: italic;')) if item.description.present?
+            concat(content_tag(:div, number_with_delimiter(item.gold_price), style: 'margin-top: 20px;' , class: 'item-gold_price'))
         end
     end
 

@@ -76,3 +76,7 @@ gem "cssbundling-rails", "~> 1.3"
 gem "jsbundling-rails", "~> 1.2"
 
 gem "pg", "~> 1.5"
+
+gem "sidekiq", "~> 7.2"
+
+gem "whenever", "~> 1.0"

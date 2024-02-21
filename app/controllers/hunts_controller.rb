@@ -16,18 +16,16 @@ before_action :authenticate_user!
             @hunt = Hunt.find(params[:id])
 
             if @selected_character.level < @hunt.level_requirement
-            redirect_to hunts_path, alert: 'Your level is too low for this hunt.'
+                redirect_to hunts_path, alert: 'Your level is too low for this hunt.'
             else
             # Update the character_id for the accepted hunt
             @hunt.update(character_id: @selected_character.id)
 
-            # Set the @hunt variable explicitly
             @hunt = Hunt.find(params[:id])
 
             redirect_to hunts_path, notice: 'Your hunt begins.'
             end
         end
-        Rails.logger.debug("@hunt after accepting: #{@hunt.inspect}")
     end
 
     def cancel_hunt

@@ -11,7 +11,8 @@ class PaladinSkillsSeeder
 
     piety = Skill.create(
       name: "Piety",
-      description: "Your Strength also increases your Armor.",
+      skill_type: "trigger",
+      description: "When reaching 50% Health you recover 20% of your maximum Health. This can only happen once per combat.",
       row: 1,
       level_requirement: 25,
       character_class: paladin_class,
@@ -23,7 +24,8 @@ class PaladinSkillsSeeder
 
     judgement = Skill.create(
       name: "Judgement",
-      description: "Your Intelligence also increases your Attack.",
+      skill_type: "passive",
+      description: "You deal 5% of your damage as additional true damage.",
       row: 1,
       level_requirement: 25,
       character_class: paladin_class,
@@ -35,17 +37,17 @@ class PaladinSkillsSeeder
 
     blessingofkings = Skill.create(
       name: "Blessing of Kings",
-      description: "When reaching 30% Health your Armor and Magic Resistance are doubled.",
-      skill_type: "trigger",
+      description: "Your Attack and Spellpower are increased by 50% but your Armor and Magic Resistance are reduced by 30%.",
+      skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: paladin_class,
       character_id: character.id,
       effect:
-        " if self.health <= 0.3 * self.max_health
-            self.buffed_armor = self.total_armor ;
-            self.buffed_magic_resistance = self.total_magic_resistance;
-          end "
+        " self.total_attack *= 1.5;
+          self.total_spellpower *= 1.5;
+          self.total_armor *= 0.70;
+          self.total_magic_resistance *= 0.70; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'blessingofkings.jpg')
     blessingofkings.skill_image.attach(io: File.open(image_path), filename: 'blessingofkings.jpg', content_type: 'image/jpeg')
@@ -53,20 +55,18 @@ class PaladinSkillsSeeder
 
     surge_of_light = Skill.create(
       name: "Surge of Light",
-      description: "After taking damage you recover 10% of your Maximum Health.",
+      description: "After taking damage you recover 2% of your maximum Health.",
       skill_type: "trigger",
       row: 2,
       level_requirement: 50,
       character_class: paladin_class,
       character_id: character.id,
-      effect:
-        " self.health += (self.max_health * 0.10)"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'surgeoflight.jpg')
     surge_of_light.skill_image.attach(io: File.open(image_path), filename: 'surgeoflight.jpg', content_type: 'image/jpeg')
     paladin_skills << surge_of_light
 
-    consecrate = Skill.create(
+    smite = Skill.create(
       name: "Smite",
       description: "100% of your Attack is converted into Spellpower. Your Spellpower is increased by 50%.",
       skill_type: "passive",
@@ -79,11 +79,11 @@ class PaladinSkillsSeeder
           self.total_spellpower *= 1.5;
           self.total_attack = 0 "
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'consecrate.jpg')
-    consecrate.skill_image.attach(io: File.open(image_path), filename: 'consecrate.jpg', content_type: 'image/jpeg')
-    paladin_skills << consecrate
+    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'smite.jpg')
+    smite.skill_image.attach(io: File.open(image_path), filename: 'smite.jpg', content_type: 'image/jpeg')
+    paladin_skills << smite
 
-    divine_wrath = Skill.create(
+    dcondemn = Skill.create(
       name: "Condemn",
       description: "100% of your Spellpower is converted into Attack. Your Attack is increased by 50%.",
       skill_type: "passive",
@@ -96,26 +96,27 @@ class PaladinSkillsSeeder
           self.total_attack *= 1.5;
           self.total_spellpower = 0 "
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'divinewrath.jpg')
-    divine_wrath.skill_image.attach(io: File.open(image_path), filename: 'divinewrath.jpg', content_type: 'image/jpeg')
-    paladin_skills << divine_wrath
+    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'condemn.jpg')
+    dcondemn.skill_image.attach(io: File.open(image_path), filename: 'condemn.jpg', content_type: 'image/jpeg')
+    paladin_skills << dcondemn
 
-    aspect_of_justice = Skill.create(
+    divine_strength = Skill.create(
       name: "Divine Strength",
+      skill_type: "passive",
       description: "You can wield a Two-handed Weapon while having a Shield.",
       row: 4,
       level_requirement: 100,
       character_class: paladin_class,
       character_id: character.id,
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'aspectofjustice.jpg')
-    aspect_of_justice.skill_image.attach(io: File.open(image_path), filename: 'aspectofjustice.jpg', content_type: 'image/jpeg')
-    paladin_skills << aspect_of_justice
+    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'divinestrength.jpg')
+    divine_strength.skill_image.attach(io: File.open(image_path), filename: 'divinestrength.jpg', content_type: 'image/jpeg')
+    paladin_skills << divine_strength
 
-    retribution = Skill.create(
+    fervor = Skill.create(
       name: "Fervor",
-      description: "Increase your Attack by 20% if your Attack is superior to your Spellpower. 
-                    Increase your Spellpower by 20% if your Spellpower is superior to your Attack.",
+      description: "Increase your Attack by 30% if your Attack is superior to your Spellpower.
+                    Increase your Spellpower by 30% if your Spellpower is superior to your Attack.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
@@ -123,13 +124,13 @@ class PaladinSkillsSeeder
       character_id: character.id,
       effect:
         " if self.total_attack > self.total_spellpower
-            self.total_attack *= 1.2;
+            self.total_attack *= 1.3;
           elsif self.total_spellpower > self.total_attack
-            self.total_spellpower *= 1.2;
+            self.total_spellpower *= 1.3;
         end "
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'retribution.jpg')
-    retribution.skill_image.attach(io: File.open(image_path), filename: 'retribution.jpg', content_type: 'image/jpeg')
-    paladin_skills << retribution
+    image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'fervor.jpg')
+    fervor.skill_image.attach(io: File.open(image_path), filename: 'fervor.jpg', content_type: 'image/jpeg')
+    paladin_skills << fervor
   end
 end

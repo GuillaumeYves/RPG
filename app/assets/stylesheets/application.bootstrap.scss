@@ -3,8 +3,7 @@
 @import "bootstrap-icons/font/bootstrap-icons"; // Bootstrap Icons
 
 body {
-  margin-top: 20px; /* Adjust the value to add the desired space at the top */
-  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 /* Flash alerts are the center of the screen and on top of other elements */
@@ -35,7 +34,8 @@ body {
   transition: 0.5s;
   background-color: rgb(255, 255, 255);
   border-right: 2px solid #000;
-  backdrop-filter: blur(10px);
+  box-shadow: 5px 5px 10px #888888;
+  backdrop-filter: blur(50%);
 }
 
 /* The navigation menu links */
@@ -74,6 +74,9 @@ body {
   margin-left: 50px;
 }
 
+.footer {
+  z-index: 1;
+}
 .tooltip-content {
   position: fixed;
   display: none;

@@ -1,4 +1,4 @@
-<div class="card text-left" style="border: 2px solid #000; padding: 30px; max-height: auto; max-width: 500px; margin-right: 20px; position: relative;">
+<div class="card text-left mt-5 mx-auto" style=" border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; width: 500px; margin-right: 20px; position: relative;">
   <%= form_with(model: @character, local: true) do |form| %>
     <% if @character.errors.any? %>
       <div id="error_explanation">
@@ -11,31 +11,31 @@
       </div>
     <% end %>
       
-    <img id="raceImagePreview" src="#" alt="Race Image Preview" style="width: 100%; height: auto; border-radius: 30%; margin-bottom: 30px; box-shadow: 5px 5px 10px #888888;">
+    <img id="raceImagePreview" src="#" alt="Race Image Preview" style='max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 20px;'>
     
     <div class="field" style="margin-bottom: 20px;">
-      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Name' %>
+      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name' %>
     </div>
     
-    <div class="field">
-      <%= form.label :gender %>
+    <div class="field" style="margin-bottom: 20px;">
+      <%= form.label :"gender: " %>
       <%= form.select :gender, ['male', 'female'].map { |g| [g.capitalize, g] }, { class: 'form-control', id: 'character_gender' } %>
     </div>
-    <br>
-    <div class="field">
-      <%= form.label :race %>
-      <%= form.select :race, ['human', 'elf', 'dwarf', 'orc'].map { |r| [r.capitalize, r] }, { class: 'form-control', id: 'character_race' } %>
-    </div>
-    <p id="raceDescription" style="height: 100px; overflow-y: auto;"></p>
 
-    <div class="field">
-      <%= form.label :class %>
+    <div class="field mt-2" >
+      <%= form.label :"race: " %>
+      <%= form.select :race, ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin'].map { |r| [r.capitalize, r] }, { class: 'form-control', id: 'character_race' } %>
+    </div>
+    <p class ="mt-2 mb-5" id="raceDescription" style="height: auto; overflow-y: auto;"></p>
+
+    <div class="field mt-2">
+      <%= form.label :"class: " %>
        <%= form.select :character_class, ['warrior', 'mage', 'rogue', 'paladin'].map { |c| [c.capitalize, c] }, { class: 'form-control', id: 'character_class' } %>
     </div>
-    <p id="classDescription" style="height: 100px; overflow-y: auto;"></p>
+    <p class ="mt-2 mb-5" id="classDescription" style="height: 100px; overflow-y: auto;"></p>
 
     <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px; ">
-      <%= form.submit 'Create Character', class: "btn btn-outline-primary" %>
+      <%= form.submit 'Create', class: "btn btn-outline-primary" %>
     </div>
   <% end %>
 </div>
@@ -61,8 +61,14 @@ $(document).ready(function() {
       case 'dwarf':
         imageFileName = selectedGender === 'female' ? 'female_dwarf.jpg' : 'dwarf.jpg';
         break;
+      case 'troll':
+        imageFileName = selectedGender === 'female' ? 'female_troll.jpg' : 'troll.jpg';
+        break;
       case 'orc':
         imageFileName = selectedGender === 'female' ? 'female_orc.jpg' : 'orc.jpg';
+        break;
+      case 'goblin':
+        imageFileName = selectedGender === 'female' ? 'female_goblin.jpg' : 'goblin.jpg';
         break;
       default:
         imageFileName = 'human.jpg';
@@ -75,7 +81,7 @@ $(document).ready(function() {
 
     switch(selectedRace) {
       case 'human':
-        raceDescription.text('A versatile race known for their adaptability. Humans are agile and can show remarkable resilience.');
+        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience.');
         break;
       case 'elf':
         raceDescription.text('Graceful beings with a strong connection to magic. Wisdom and knowledge are what they seek above all.');
@@ -83,11 +89,17 @@ $(document).ready(function() {
       case 'dwarf':
         raceDescription.text('Durable and loyal, Dwarfs are willing to give their life to save another. Their tumultuous temperament often leads them to take on unreasonable fights.');
         break;
+      case 'troll':
+        raceDescription.text('Trolls are peaceful and avoid combat as much as possible, however do not underestimate them, as they proved to be incredible warriors in the past.');
+        break;
       case 'orc':
         raceDescription.text('Fierce, brutal and with a strong sense of honor, Orcs are known to destroy anything in their path if it means the survival of their race.');
         break;
+      case 'goblin':
+        raceDescription.text('Quick and cunning, Goblins have been under the protection of Orcs for centuries, in exchange for being the most effective war advisors.');
+        break;
       default:
-        raceDescription.text('A versatile race known for their adaptability. Humans are agile and can show remarkable resilience.');
+        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience.');
     }
   }
 

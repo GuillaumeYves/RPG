@@ -20,103 +20,367 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-  
-  </head>
-
-  <body>
-
-    <div id="flash-container">
-      <% if flash.key?(:notice) %>
-        <div class="alert alert-dismissible alert-warning">
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>  
-          <%= flash[:notice] %>
-        </div>
-      <% end %>
-
-      <% if flash.key?(:alert) %>
-        <div class="alert alert-dismissible alert-danger">
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          <%= flash[:alert] %>
-        </div>
-      <% end %>
-    </div>
-
-    <!-- Menu button positioned where the sidebar would be -->
-    <button id="menuButton" type="button" class="btn btn-outline-primary" onclick="openNav()" style="position: absolute; top: 10px; left: 10px;">Menu</button>
-    <!-- Sidebar -->
-    <div id="mySidenav" class="sidenav">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <%= link_to "Select Character", user_characters_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
-      <%= link_to "Create Character", new_character_path, class: "btn btn-outline-primary" %>
-      <% if current_page?(user_characters_characters_path) || @selected_character.nil? %>
-        <!-- You are on the user_characters page or @selected_character is nil, don't render the link -->
-      <% else %>
-        <%= link_to "Profile", character_path(@selected_character), class: "btn btn-outline-primary" %>
-        <%= link_to "Hunt", hunts_path, class: "btn btn-outline-primary" %>
-        <%= link_to "Merchant", items_path(character_id: @selected_character.id), class: "btn btn-outline-primary" %>
-      <% end %>
-      <%= link_to "Leaderboard", leaderboard_characters_path, class: "btn btn-outline-primary" %>
-      <br>
-      <br>
-      <% if user_signed_in? %>
-      <div class="text-center">
-          <%= form_tag(destroy_user_session_path, method: :delete) do %>
-            <%= submit_tag "Log out", class: "btn btn-outline-danger" %>
-          <% end %>
-        <% else %>
-          <%= link_to "Log In", new_user_session_path, class:"btn btn-outline-info" %>
-        <% end %>
-      </div>
-    </div>
-      
-    <%= yield %>
-
-<script>
-  function openNav() {
-    var sidenav = document.getElementById("mySidenav");
-    sidenav.style.width = "400px";
-    sidenav.classList.add("open");
-    document.getElementById("menuButton").style.display = "none";
-  }
-
-  function closeNav() {
-    var sidenav = document.getElementById("mySidenav");
-    sidenav.style.width = "0";
-    sidenav.classList.remove("open");
-    sidenav.classList.add("closing"); // Add the "closing" class
-    document.getElementById("menuButton").style.display = "block";
-
-    // Remove the "closing" class after a short delay
-    setTimeout(function() {
-      sidenav.classList.remove("closing");
-    }, 100); // Adjust the delay to match the closing transition duration
-  }
-</script>
-
-  
-<script>
-    $(document).ready(function() {
-      // Function to close the alert
-      function closeAlert() {
-        $('.alert').alert('close');
+    <style>
+      body {
+        display: none;
+      }
+      body, html, * {
+        scrollbar-width: thin; /* For Firefox */
+        scrollbar-color: transparent transparent; /* For Firefox */
+        overflow: -moz-scrollbars-none; /* For Firefox */
       }
 
-      // Check if the alert is already closed manually
-      $('.alert button.btn-close').on('click', function() {
-        clearTimeout(timeoutId);
+      /* Hide scrollbars for elements with overflow:auto in Webkit browsers */
+      ::-webkit-scrollbar {
+        width: 0.5em;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: transparent;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+      .fade-in {
+        animation: fadeIn 0.2s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .message-container {
+        width: 80%;
+        overflow: hidden;
+        margin: auto;
+        text-align: center;
+      }
+      .footer-text {
+        display: none;
+      }
+      
+      #user-characters-display.on-top {
+        position: relative;
+        z-index: 9999;
+      }
+
+      #character-profile-display.on-top {
+        position: relative;
+        z-index: 9999;
+      }
+      
+      #character-stats-display.on-top {
+        position: relative;
+        z-index: 9999;       
+      }
+
+      #character-inventory-display.on-top {
+        position: relative;
+        z-index: 9999;       
+      }
+
+      #menuButton.on-top {
+        position: relative;
+        z-index: 9999;       
+      }
+
+      #SelectCharacterTutorial {    
+      }
+
+      #character-resources-display.on-top {
+        position: absolute;
+        z-index: 9999;       
+      }
+
+      #mySidenav.on-top {
+        position: absolute;
+        z-index: 9999;       
+      }
+
+    </style>
+  </head>
+
+  <body class="fade-in">
+    <div class="container">
+      <div style="display: flex; justify-content: center; width: 100%; height: auto; ">
+        
+        <div id="flash-container">
+          <% if flash.key?(:notice) %>
+            <div class="alert alert-dismissible alert-warning">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>  
+              <%= flash[:notice] %>
+            </div>
+          <% end %> 
+          <% if flash.key?(:alert) %>
+            <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              <%= flash[:alert] %>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if user_signed_in? && current_user.selected_character.present? %>
+        <div id="character-resources-display" class="bg-white text-black p-3 fixed-top text-center mx-auto" style="width: 800px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; margin-top:-5px;">
+          <span style="margin-right: 50px;">Gold: <%= number_with_delimiter(current_user.selected_character.gold) %></span>
+          <span style="margin-right: 50px;">Energy : <%= current_user.selected_character.energy %>/<%= current_user.selected_character.max_energy %></span>
+          <span style="margin-right: 50px;">Daily Quests : <%= current_user.selected_character.daily_quest %>/<%= current_user.selected_character.max_daily_quest%></span>
+          <span>Arena : <%= current_user.selected_character.arena_ticket %>/<%= current_user.selected_character.max_arena_ticket%></span>
+        </div>
+        <% end %>
+
+        <button id="menuButton" type="button" class="btn btn-outline-primary" onclick="openNav()" style="position: absolute; top: 10px; left: 10px;">Menu</button>
+        <!-- Sidebar -->
+        <div id="mySidenav" class="sidenav">
+          <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+          <% if user_signed_in? && current_user.selected_character.nil? && current_user.present? %>
+            <% if current_user.characters.count == 3 %>
+              <%= link_to "Select Character", user_characters_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
+            <% else %>
+              <%= link_to "Create Character", new_character_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
+              <%= link_to "Select Character", user_characters_path, class: "btn btn-outline-primary" %>
+            <% end %>
+          <% elsif user_signed_in? && current_user.selected_character.present? %>
+            <%= link_to "Select Character", user_characters_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
+            <%= link_to "Profile", character_path(@selected_character), class: "btn btn-outline-primary" %>
+            <%= link_to "Talents", talents_character_path(@selected_character), class: "btn btn-outline-primary" %>
+            <%= link_to "Merchant", items_path(character_id: @selected_character.id), class: "btn btn-outline-primary" %>
+            <%= link_to "Hunt", hunts_path, class: "btn btn-outline-primary" %>
+            <%= link_to "Leaderboard", leaderboard_characters_path, class: "btn btn-outline-primary" %>
+          <% end %>
+          <br>
+          <% if user_signed_in? %>
+          <div class="text-center">
+              <%= form_tag(destroy_user_session_path, method: :delete) do %>
+                <%= submit_tag "Log out", class: "btn btn-outline-danger" %>
+              <% end %>
+            <% else %>
+              <%= link_to "Log In", new_user_session_path, class:"btn btn-outline-info" %>
+            <% end %>
+          </div>
+        </div>
+        <%= yield %>
+      </div>
+
+      <!-- First modal -->
+      <div class="modal" style="margin-top: 100px;" id="tutorialModal" role="dialog" aria-labelledby="tutorialModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content card text-center" style="width: auto; height: 200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+            <h5 class="mx-auto mt-2">Tutorial</h5>
+              <div class="modal-body">
+                <p>
+                Welcome to the world of Tedorha! 
+                <br>  
+                This quick tutorial will guide you through the interface.</p>
+                <br>
+                <button type="button" class="btn btn-outline-primary mb-1" style= "position: absolute; bottom: 0; left: 90%; transform: translateX(-50%);" id="showModal2button">Next</button>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second modal -->
+      <div class="modal" style="margin-top: 200px; margin-left: 500px" id="tutorialModal2" role="dialog" aria-labelledby="tutorialModal2Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content card text-center" style="width: auto; height: 200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+            <h5 class="mx-auto mt-2">Tutorial</h5>
+              <div class="modal-body">
+                <p>
+                This is your characters page. 
+                <br>
+                You can have a maximum of 3 characters and select only one to connect with.
+                <br>
+                Select a character to continue the tutorial. </p>
+                <br>
+              </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <audio id="backgroundAudio"><source src="/assets/background_audio.mp3" type="audio/mpeg"></audio>
+
+    <audio id="clickAudio"><source src="/assets/click_sound.mp3" type="audio/mpeg"></audio>
+
+    <div class="footer bg-white text-black fixed-bottom" style="width: 100%; height: 30px; border-top: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="row" style="width: 100%; margin: 0; padding: 0;">
+        <div class="col-1 text-left" style="width: 10%;" id="timeDisplay">
+          <p><%= Time.now.strftime('%d-%m-%Y, %H:%M:%S') %></p>
+        </div>
+        <div class="col text-center overflow: hidden" style="width: 80%;">
+          <div class="message-container">
+            <p class="footer-text"></p>
+          </div>
+        </div>
+        <div class="col-1 text-right" style="width: 10%;">
+          <span>BGM</span>
+          <button onclick="playAudio()"class= "btn btn-outline-primary btn-sm ">Play</button>
+          <button onclick="pauseAudio()"class= "btn btn-outline-primary btn-sm ">Pause</button>
+          <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="setVolume(this.value)" style="width: 25%">
+        </div>
+      </div>
+    </div>
+
+  <!-- Click sound -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('mousedown', function() {
+        var audio = new Audio('/assets/click_sound.mp3');
+        audio.play();
       });
-
-      // Set automatic timeout only if the alert is not manually closed
-      var timeoutId = setTimeout(closeAlert, 10000);
     });
-</script>
+  </script>
 
-<script>
-document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-});
-</script>
+  <!-- Start of the tutorial -->
+  <script>
+    $(document).ready(function () {
+    if (localStorage.getItem('user_tutorial') === 'true') {
+      // Exit the script if the user tutorial is completed
+      return;
+    }
 
-  </body>
+        if (<%= flash[:tutorial] %> == true) {
+          $('#tutorialModal').modal('show');
+        }
+
+        // Modal 1 to Modal 2 transition
+        $('#showModal2button').on('click', function () {
+          $('#tutorialModal').modal('hide');
+          $('#tutorialModal2').modal('show');
+          $('#user-characters-display').addClass('on-top');
+          $('#character-select-button').addClass('on-top').removeClass('btn-outline-primary').addClass('btn-primary');
+        });
+
+        // Close Modal 2
+        $('#SelectCharacterTutorial').on('click', function () {
+          $('#tutorialModal2').modal('hide');
+        });
+        $('#tutorialModal2').on('hidden.bs.modal', function () {
+          $('#user-characters-display').removeClass('on-top');
+        });
+
+        // Handle form submission and set the variable
+        $('#SelectCharacterTutorial').on('submit', function () {
+          localStorage.setItem('select_character_tutorial', 'true');
+          $('#character-select-button').removeClass('on-top').removeClass('btn-primary').addClass('btn-outline-primary');
+        });
+
+        if (localStorage.getItem('select_character_tutorial') == 'true') {
+          $('#tutorialModal3').modal('show');
+        }
+    });
+  </script>
+
+  <!-- Footer clock --> 
+  <script>
+    function updateTime() {
+      const timeDisplay = document.getElementById('timeDisplay');
+      timeDisplay.innerHTML = new Date().toLocaleString();
+    }
+    setInterval(updateTime, 1000);
+  </script>
+
+  <!-- Footer tips and messages --> 
+  <script>
+    $(document).ready(function() {
+      var messages = [
+        "Welcome to the Closed Beta of Tedorha!",
+        "Rogues can achieve incredible Critical Strike Damage, keep an eye out for the backstabs.",
+        "Talent points are aquired at levels 25, 50, 75 and 100.",
+        "Paladins and Warriors have access to Plate armor, giving them more durability than other classes.",
+        "Mages can be deadly if a combat lasts for too long.",
+        "Legendary items are obtainable through Bosses... and a bit of luck.",
+        "At level 100 and beyond, you unlock a Paragon point each level and you can spend them on your Paragon tree.",
+        "Damage reduction occurs after all damage modifiers have been applied.",
+        "Warriors are amazing damage dealers, but sometimes too angry to visualize danger.",
+        "Hunts are a great way to gain experience along Quests.",
+        'Found a bug? Want to submit a suggestion? Contact : <span style="text-decoration: underline;">guillaume-las@hotmail.fr</span>',
+        "A character cannot dual wield a One-handed Weapon and a Two-handed Weapon simultaneously.",
+        "Having more Spellpower than Attack will allow you to deal Magic damage.",
+        "True damage cannot be reduced by any source of damage reduction.",
+        "There's a 50% chance for you or your opponent to start first during a combat.",
+        "Paladins can easily heal during combat, allowing them to deal more damage and turn the tide of a battle.",
+        "Passive talents apply all the time to your character, trigger passives apply when condition is met and combat talents apply during your combat turn.",
+      ];
+
+      var messageIndex = parseInt(localStorage.getItem("messageIndex")) || 0;
+      var $footerText = $(".footer-text");
+
+      function showNextMessage() {
+        $footerText.fadeOut(1000, function() {
+          $footerText.html(messages[messageIndex]).fadeIn(1000);
+        });
+
+        messageIndex = (messageIndex + 1) % messages.length;
+
+        localStorage.setItem("messageIndex", messageIndex);
+      }
+
+      showNextMessage();
+      setInterval(showNextMessage, 15000);
+    });
+  </script>
+
+  <!-- Body fade on load --> 
+  <script>
+    $(document).ready(function () {
+      $('body').css('display', 'block');
+    });
+  </script>
+
+  <!-- Sidenav --> 
+  <script>
+    function openNav() {
+      var sidenav = document.getElementById("mySidenav");
+      sidenav.style.width = "400px";
+      sidenav.classList.add("open");
+      document.getElementById("menuButton").style.display = "none";
+    }
+
+    function closeNav() {
+      var sidenav = document.getElementById("mySidenav");
+      sidenav.style.width = "0";
+      sidenav.classList.remove("open");
+      sidenav.classList.add("closing"); // Add the "closing" class
+      document.getElementById("menuButton").style.display = "block";
+
+      // Remove the "closing" class after a short delay
+      setTimeout(function() {
+        sidenav.classList.remove("closing");
+      }, 100); // Adjust the delay to match the closing transition duration
+    }
+  </script>
+
+  <!-- Auto closing alerts -->  
+  <script>
+      $(document).ready(function() {
+        // Function to close the alert
+        function closeAlert() {
+          $('.alert').alert('close');
+        }
+
+        // Check if the alert is already closed manually
+        $('.alert button.btn-close').on('click', function() {
+          clearTimeout(timeoutId);
+        });
+
+        // Set automatic timeout only if the alert is not manually closed
+        var timeoutId = setTimeout(closeAlert, 5000);
+      });
+  </script>
+
+  <script>
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+  </script>
+
+</body>
 
 </html>

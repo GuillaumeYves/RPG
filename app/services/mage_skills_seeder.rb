@@ -11,7 +11,7 @@ class MageSkillsSeeder
 
     arcane_protection = Skill.create(
       name: "Arcane Protection",
-      description: "20% of your Magic Resistance also applies to your Armor.",
+      description: "20% of your Magic Resistance applies to your Armor.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
@@ -25,6 +25,7 @@ class MageSkillsSeeder
 
     book_of_edim = Skill.create(
       name: "Book of Edim",
+      skill_type: "passive",
       description: "Your Intelligence also increases your Magic Resistance.",
       row: 1,
       level_requirement: 25,
@@ -52,6 +53,7 @@ class MageSkillsSeeder
 
     nullify = Skill.create(
       name: "Nullify",
+      skill_type: "trigger",
       description: "During combat if your Health drops to 0, you nullify your death, keeping you at 1 Health. This can only happen once per combat.",
       row: 2,
       level_requirement: 50,
@@ -64,16 +66,13 @@ class MageSkillsSeeder
 
     runic_empowerment = Skill.create(
       name: "Runic Empowerment",
-      description: "While wielding a Staff, your Spellpower is increased by 40%.",
-      skill_type: "passive",
+      description: "After taking damage, your Spellpower is increased by 2%.",
+      skill_type: "trigger",
       row: 3,
       level_requirement: 75,
       character_class: mage_class,
       character_id: character.id,
-      effect: "
-        if self.main_hand.present? && self.main_hand.item_class == 'Staff'
-        self.total_spellpower *= 1.4;
-      end "
+      effect: " self.buffed_spellpower += (self.total_spellpower * 0.02) "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'runicempowerment.jpg')
     runic_empowerment.skill_image.attach(io: File.open(image_path), filename: 'runicempowerment.jpg', content_type: 'image/jpeg')
