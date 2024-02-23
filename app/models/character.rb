@@ -35,10 +35,11 @@ class Character < ApplicationRecord
     validate :max_characters, on: :create
     validate :valid_character_name, on: :create
 
-    attr_accessor :buffed_attack, :buffed_spellpower, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
+    attr_accessor :buffed_attack, :buffed_spellpower, :buffed_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
     attr_accessor :took_damage
     attr_accessor :piety
     attr_accessor :nullify
+    attr_accessor :ephemeral_rebirth
 
     def create_inventory
         Inventory.create(character: self)
@@ -99,6 +100,7 @@ class Character < ApplicationRecord
         self.strength_bonus = 0
         self.intelligence_bonus = 0
         self.agility_bonus = 0
+        self.dreadmight_bonus = 0
     end
 
     def set_default_values_for_total_stats
@@ -115,6 +117,7 @@ class Character < ApplicationRecord
             else
                 self.total_armor = self.armor
             end
+        self.total_necrosurge = self.necrosurge + self.dreadmight_bonus
             if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
                 self.total_magic_resistance = (self.magic_resistance + self.intelligence_bonus)
             elsif self.character_class == 'paladin' && skills.find_by(name: 'Judgement', unlocked: true)
@@ -137,6 +140,7 @@ class Character < ApplicationRecord
         self.buffed_attack = 0
         self.buffed_spellpower = 0
         self.buffed_armor = 0
+        self.buffed_necrosurge = 0
         self.buffed_magic_resistance = 0
         self.buffed_critical_strike_chance = 0.0
         self.buffed_critical_strike_damage = 0.0
@@ -156,6 +160,10 @@ class Character < ApplicationRecord
             instance_eval(skill.effect) if skill.effect.present?
             end
         elsif self.character_class == 'paladin'
+            skills.where(skill_type: "combat", unlocked: true).each do |skill|
+            instance_eval(skill.effect) if skill.effect.present?
+            end
+        elsif self.character_class == 'deathwalker'
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
@@ -182,6 +190,10 @@ class Character < ApplicationRecord
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
+        elsif self.character_class == 'deathwalker'
+            skills.where(skill_type: "passive", unlocked: true).each do |skill|
+            instance_eval(skill.effect) if skill.effect.present?
+            end
         else return
         end
     end
@@ -203,6 +215,10 @@ class Character < ApplicationRecord
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
+        elsif self.character_class == 'deathwalker'
+            skills.where(skill_type: "trigger", unlocked: true).each do |skill|
+            instance_eval(skill.effect) if skill.effect.present?
+            end
         else return
         end
     end
@@ -211,23 +227,38 @@ class Character < ApplicationRecord
     def modify_stats_based_on_race
         case race
         when 'human'
-            # Human race will keep base stats
+            self.health += 2
+            self.strength -= 1
+            self.intelligence -= 1
+            self.agility += 1
+            self.dreadmight -= 2
+            self.necrosurge -= 2
+            self.willpower -= 2
+            self.attack += 1
+            self.spellpower -= 1
+            self.armor += 1
+            self.magic_resistance += 1
         when 'elf'
             # Modify stats for elf race
             self.health -= 5
             self.strength -= 3
             self.intelligence += 2
             self.agility += 2
+            self.dreadmight -= 3
+            self.necrosurge -= 3
             self.willpower -= 2
             self.attack -= 3
             self.spellpower += 3
+            self.armor -= 2
             self.magic_resistance += 2
         when 'dwarf'
             # Modify stats for dwarf race
-            self.health -= 10
+            self.health -= 6
             self.strength -= 2
             self.intelligence += 1
             self.agility -= 1
+            self.dreadmight -= 2
+            self.necrosurge -= 2
             self.willpower += 1
             self.attack += 1
             self.armor += 2
@@ -235,10 +266,12 @@ class Character < ApplicationRecord
             self.magic_resistance += 2
         when 'troll'
             # Modify stats for troll race
-            self.health += 10
+            self.health += 12
             self.strength += 1
             self.intelligence += 1
             self.agility -= 3
+            self.dreadmight -= 1
+            self.necrosurge -= 1
             self.willpower += 1
             self.attack += 1
             self.spellpower += 1
@@ -246,10 +279,12 @@ class Character < ApplicationRecord
             self.magic_resistance += 5
         when 'orc'
             # Modify stats for orc race
-            self.health += 20
+            self.health += 10
             self.strength += 4
             self.intelligence -= 3
             self.agility -= 3
+            self.dreadmight += 1
+            self.necrosurge += 1
             self.willpower += 1
             self.attack += 4
             self.armor -= 3
@@ -257,15 +292,17 @@ class Character < ApplicationRecord
             self.magic_resistance -= 3
         when 'goblin'
             # Modify stats for goblin race
-            self.health -= 20
-            self.strength += 1
-            self.intelligence += 1
+            self.health -= 8
+            self.strength -= 2
+            self.intelligence += 2
             self.agility += 2
+            self.dreadmight += 1
+            self.necrosurge += 1
             self.willpower -= 2
-            self.attack += 1
-            self.armor -= 1
-            self.spellpower += 1
-            self.magic_resistance -= 1
+            self.attack -= 2
+            self.armor -= 2
+            self.spellpower += 2
+            self.magic_resistance -= 2
         end
     end
 
@@ -279,6 +316,7 @@ class Character < ApplicationRecord
             self.agility -= 1
             self.luck += 1
             self.willpower -= 1
+            self.dreadmight -= 1
         when 'mage'
             # Modify attributes for mage class
             self.strength -= 1
@@ -286,6 +324,7 @@ class Character < ApplicationRecord
             self.agility -= 1
             self.luck += 1
             self.willpower -= 1
+            self.dreadmight -= 1
         when 'rogue'
             # Modify attributes for rogue class
             self.strength += 1
@@ -293,6 +332,7 @@ class Character < ApplicationRecord
             self.agility += 1
             self.luck += 1
             self.willpower -= 1
+            self.dreadmight += 1
         when 'paladin'
             # Modify attributes for paladin class
             self.strength += 1
@@ -300,6 +340,15 @@ class Character < ApplicationRecord
             self.agility -= 1
             self.luck -= 1
             self.willpower += 1
+            self.dreadmight -= 1
+        when 'deathwalker'
+            # Modify attributes for deathwalker class
+            self.strength -= 1
+            self.intelligence += 1
+            self.agility -= 1
+            self.luck -= 1
+            self.willpower += 1
+            self.dreadmight += 1
         end
     end
 
@@ -307,6 +356,7 @@ class Character < ApplicationRecord
         self.strength_bonus = 0
         self.intelligence_bonus = 0
         self.agility_bonus = 0
+        self.dreadmight_bonus = 0
         calculate_luck_bonus
         evasion
         ignore_pain_chance
@@ -317,6 +367,7 @@ class Character < ApplicationRecord
         calculate_strength_bonus
         calculate_intelligence_bonus
         calculate_agility_bonus
+        calculate_dreadmight_bonus
         calculate_luck_bonus
         evasion
         ignore_pain_chance
@@ -340,6 +391,10 @@ class Character < ApplicationRecord
 
     def calculate_agility_bonus
         self.agility_bonus = (self.agility * 0.04)
+    end
+
+    def calculate_dreadmight_bonus
+        self.dreadmight_bonus = (self.dreadmight * 0.04)
     end
 
     def calculate_luck_bonus
@@ -380,12 +435,17 @@ class Character < ApplicationRecord
                 # Seed paladin skills
                 paladin_skills_seeder = PaladinSkillsSeeder.new(self)
                 paladin_skills_seeder.seed_skills
+            when 'deathwalker'
+                # Seed deathwalker skills
+                deathwalker_skills_seeder = DeathwalkerSkillsSeeder.new(self)
+                deathwalker_skills_seeder.seed_skills
         end
     end
 
     def revert_stats_based_on_item(item)
         # Subtract stats of the unequipped item
         self.attack -= item.attack unless item.attack.nil?
+        self.necrosurge -= item.necrosurge unless item.necrosurge.nil?
         self.health -= item.health unless item.health.nil?
         self.armor -= item.armor unless item.armor.nil?
         self.spellpower -= item.spellpower unless item.spellpower.nil?
@@ -393,6 +453,7 @@ class Character < ApplicationRecord
         self.strength -= item.strength unless item.strength.nil?
         self.intelligence -= item.intelligence unless item.intelligence.nil?
         self.agility -= item.agility unless item.agility.nil?
+        self.dreadmight -= item.dreadmight unless item.dreadmight.nil?
         self.luck -= item.luck unless item.luck.nil?
         self.willpower -= item.willpower unless item.willpower.nil?
         self.critical_strike_chance -= item.critical_strike_chance unless item.critical_strike_chance.nil?
@@ -402,6 +463,7 @@ class Character < ApplicationRecord
     def modify_stats_based_on_item(item)
         # Adds stats of the equipped item
         self.attack += item.attack unless item.attack.nil?
+        self.necrosurge += item.necrosurge unless item.necrosurge.nil?
         self.health += item.health unless item.health.nil?
         self.armor += item.armor unless item.armor.nil?
         self.spellpower += item.spellpower unless item.spellpower.nil?
@@ -409,6 +471,7 @@ class Character < ApplicationRecord
         self.strength += item.strength unless item.strength.nil?
         self.intelligence += item.intelligence unless item.intelligence.nil?
         self.agility += item.agility unless item.agility.nil?
+        self.dreadmight += item.dreadmight unless item.dreadmight.nil?
         self.luck += item.luck unless item.luck.nil?
         self.willpower += item.willpower unless item.willpower.nil?
         self.critical_strike_chance += item.critical_strike_chance unless item.critical_strike_chance.nil?
@@ -429,10 +492,12 @@ class Character < ApplicationRecord
         when 'warrior'
             self.health += 8
         when 'mage'
-            self.health += 4
+            self.health += 5
         when 'rogue'
-            self.health += 6
+            self.health += 7
         when 'paladin'
+            self.health += 9
+        when 'deathwalker'
             self.health += 10
         end
 
@@ -464,6 +529,10 @@ class Character < ApplicationRecord
     def can_equip?(item)
         if self.level >= item.level_requirement
             case item.item_class
+                when 'Scythe'
+                    return true if character_class == 'deathwalker'
+                    errors.add(:base, "Only Deathwalkers can equip Scythes.")
+                    return false
                 when 'Sword'
                     # All characters can equip one-handed swords
                     return true if item.item_type == 'One-handed Weapon'
@@ -480,8 +549,8 @@ class Character < ApplicationRecord
                     errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
                     return false
                 when 'Axe'
-                    return true if character_class == 'warrior'
-                    errors.add(:base, "Only Warriors can equip Axes.")
+                    return true if %w[warrior deathwalker].include?(character_class)
+                    errors.add(:base, "Only Warriors and Deathwalkers can equip Axes.")
                     return false
                 when 'Mace'
                     return true if character_class == 'paladin'
@@ -496,8 +565,8 @@ class Character < ApplicationRecord
                     errors.add(:base, "Only Mages can equip Staves.")
                     return false
                 when 'Plate'
-                    return true if %w[warrior paladin].include?(character_class)
-                    errors.add(:base, "Only Warriors and Paladins can equip Plate.")
+                    return true if %w[warrior paladin deathwalker].include?(character_class)
+                    errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
                     return false
                 when 'Leather'
                     return true if character_class == 'rogue'

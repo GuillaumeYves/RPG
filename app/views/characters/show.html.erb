@@ -201,6 +201,7 @@
                 <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.total_max_health %></span><br>
                 <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_attack %></span><br>
                 <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_spellpower %></span><br>
+                <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_necrosurge %></span><br>
                 <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
                 <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
                 <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.total_armor %></span><br>
@@ -216,6 +217,7 @@
                 <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Attributes</h4><br>
                 <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= @character.strength %></span><br>
                 <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= @character.intelligence %></span><br>
+                <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= @character.dreadmight %></span><br>
                 <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= @character.agility %></span><br>
                 <span data-tooltip="tooltip" title="Increases your critical strike chance"><strong>Luck:</strong> <%= @character.luck %></span><br>
                 <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= @character.willpower %></span><br>

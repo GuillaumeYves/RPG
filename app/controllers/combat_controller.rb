@@ -43,6 +43,8 @@ class CombatController < ApplicationController
         @opponent.piety = false if @opponent.is_a?(Character)
         @character.nullify = false
         @opponent.nullify = false if @opponent.is_a?(Character)
+        @character.ephemeral_rebirth = false
+        @opponent.ephemeral_rebirth = false if @opponent.is_a?(Character)
         @character.took_damage = false
         @opponent.took_damage = false if @opponent.is_a?(Character)
 
@@ -64,7 +66,7 @@ class CombatController < ApplicationController
         while @character.total_health.positive? && @opponent.total_health.positive?
             # Character's turn
             if @character_turn
-            character_turn    
+            character_turn
             # Opponent's turn
             elsif @opponent_turn
             opponent_turn
@@ -99,13 +101,13 @@ class CombatController < ApplicationController
 
         @character.set_default_values_for_buffed_stats
         @opponent.set_default_values_for_buffed_stats
-        
+
         redirect_to combat_result_path(character_id: @character.id, opponent_id: @opponent.id, combat_logs: @combat_logs, combat_result: @combat_result)
     end
 
     def physical_damage(total_attack, buffed_attack, total_armor, buffed_armor, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, evasion, ignore_pain_chance)
         @is_crit = false
-        
+
         # Check for a critical hit based on critical_strike_chance
         if rand(0.0..100.0) <= (total_critical_strike_chance + buffed_critical_strike_chance)
                 damage = ((total_attack + buffed_attack) * (total_critical_strike_damage + buffed_critical_strike_damage >= 1.0 ? total_critical_strike_damage + buffed_critical_strike_damage: 1.0)) - (total_armor + buffed_armor)
@@ -114,7 +116,7 @@ class CombatController < ApplicationController
             @is_crit = true
         else
             damage = (total_attack + buffed_attack) - (total_armor + buffed_armor)
-            
+
             # Apply damage reduction based on ignore_pain_chance
             if rand(0.0..100.0) <= ignore_pain_chance
                 damage *= 0.8  # Reduce incoming damage by 20%
@@ -124,7 +126,7 @@ class CombatController < ApplicationController
 
             # Chance to evade damage
             if rand(0.0..100.0) <= evasion
-                damage = 0 
+                damage = 0
             log_message = '<span style="color: yellow; text-shadow: 1px 1px 2px #000000;">EVADED</span>'
             @combat_logs << log_message
             end
@@ -153,7 +155,36 @@ class CombatController < ApplicationController
 
             # Chance to evade damage
             if rand(0.0..100.0) <= evasion
-                damage = 0 
+                damage = 0
+            log_message = '<span style="color: yellow; text-shadow: 1px 1px 2px #000000;">EVADED</span>'
+            @combat_logs << log_message
+            end
+        end
+
+        damage.round
+    end
+
+    def shadow_damage(total_necrosurge, buffed_necrosurge, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, evasion, ignore_pain_chance)
+        @is_crit = false
+        # Check for a critical hit based on critical strike chance
+        if rand(0.0..100.0) <= (total_critical_strike_chance + buffed_critical_strike_chance)
+            damage = ((total_necrosurge + buffed_necrosurge) * (total_critical_strike_damage + buffed_critical_strike_damage >= 1.0 ? total_critical_strike_damage + buffed_critical_strike_damage : 1.0))
+            log_message = '<span style="color: red; text-shadow: 1px 1px 2px #000000;">CRITICAL STRIKE</span>'
+            @combat_logs << log_message
+            @is_crit = true
+        else
+            damage = (total_necrosurge + buffed_necrosurge)
+
+            # Apply damage reduction based on ignore_pain_chance
+            if rand(0.0..100.0) <= ignore_pain_chance
+                damage *= 0.8  # Reduce incoming damage by 20%
+            log_message = '<span style="color: blue; text-shadow: 1px 1px 2px #000000;">IGNORE PAIN</span>'
+            @combat_logs << log_message
+            end
+
+            # Chance to evade damage
+            if rand(0.0..100.0) <= evasion
+                damage = 0
             log_message = '<span style="color: yellow; text-shadow: 1px 1px 2px #000000;">EVADED</span>'
             @combat_logs << log_message
             end
@@ -184,6 +215,21 @@ class CombatController < ApplicationController
         end
 
         deal_damage(@character, @opponent)
+            if @character.skills.find_by(name:'Lifetap', unlocked:true).present?
+                lifetap = (@character.total_max_health * 0.01).round
+                @character.total_health -= lifetap
+                @character.buffed_necrosurge += lifetap
+                log_message = "#{@character.character_name} sacrificed <strong>#{lifetap}</strong> Health to gain <strong>#{lifetap}</strong> Necrosurge with 'Lifetap' "
+                log_message += "- #{@character.character_name} : #{@character.total_health} / #{@character.total_max_health} Health "
+                @combat_logs << log_message
+            end
+            if @character.skills.find_by(name: 'Crimson Torrent', unlocked:true).present?
+                crimson_torrent = (@character.total_max_health * 0.05).round
+                @opponent.total_health -= crimson_torrent
+                log_message = "#{@character.character_name} dealt <strong>#{crimson_torrent}</strong> shadow damage with 'Crimson Torrent' "
+                log_message += "- #{@opponent.character_name} : #{@opponent.total_health} / #{@opponent.total_max_health} Health "
+                @combat_logs << log_message
+            end
         @character.apply_combat_skills
         @character.took_damage = false
     end
@@ -210,21 +256,47 @@ class CombatController < ApplicationController
         end
 
         deal_damage(@opponent, @character)
+            if @opponent.is_a?(Character) && @opponent.skills.find_by(name:'Lifetap', unlocked:true).present?
+                lifetap = (@opponent.total_max_health * 0.01).round
+                @opponent.total_health -= lifetap
+                @opponent.buffed_necrosurge += lifetap
+                log_message = "#{@opponent.character_name} sacrificed <strong>#{lifetap}</strong> Health to gain <strong>#{lifetap}</strong> Necrosurge with 'Lifetap' "
+                log_message += "- #{@opponent.character_name} : #{@opponent.total_health} / #{@opponent.total_max_health} Health "
+                @combat_logs << log_message
+            end
+            if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Crimson Torrent', unlocked:true).present?
+                crimson_torrent = (@opponent.total_max_health * 0.05).round
+                @character.total_health -= crimson_torrent
+                log_message = "#{@opponent.character_name} dealt <strong>#{crimson_torrent}</strong> shadow damage with 'Crimson Torrent' "
+                log_message += "- #{@character.character_name} : #{@character.total_health} / #{@character.total_max_health} Health "
+                @combat_logs << log_message
+            end
         @opponent.apply_combat_skills if @opponent.is_a?(Character)
         @opponent.took_damage = false
     end
 
     def deal_damage(character, opponent)
         if @character_turn
-            if @character.total_attack >= @character.total_spellpower
+            damage_type = ''
+
+            if @character.total_attack > @character.total_spellpower && @character.total_attack > @character.total_necrosurge
                 damage = [physical_damage(@character.total_attack, @character.buffed_attack, @opponent.total_armor, @opponent.buffed_armor, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @opponent.evasion, @opponent.ignore_pain_chance).round, 0].max
-            elsif @character.total_spellpower > @character.total_attack
+                damage_type = 'physical'
+            elsif @character.total_spellpower > @character.total_attack && @character.total_spellpower > @character.total_necrosurge
                 damage = [magic_damage(@character.total_spellpower, @character.buffed_spellpower, @opponent.total_magic_resistance, @opponent.buffed_magic_resistance, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @opponent.evasion, @opponent.ignore_pain_chance).round, 0].max
-            end 
+                damage_type = 'magic'
+            elsif @character.total_necrosurge > @character.total_attack && @character.total_necrosurge > @character.total_spellpower
+                damage = [shadow_damage(@character.total_necrosurge, @character.buffed_necrosurge, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @opponent.evasion, @opponent.ignore_pain_chance).round, 0].max
+                damage_type = 'shadow'
+            end
 
             if damage.positive?
-                @opponent.total_health -= damage
-                log_message = "#{@character.character_name} attacked for <strong>#{damage}</strong> damage "
+                if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Blood Monarch', unlocked: true).present?
+                    @opponent.total_health -= (damage * 1.2).round
+                else
+                    @opponent.total_health -= damage
+                end
+                log_message = "#{@character.character_name} attacked for <strong>#{damage}</strong> #{damage_type} damage "
 
             if rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
                 sharpened_blade = ((@character.total_attack + @character.buffed_attack) * 0.5).round
@@ -257,6 +329,12 @@ class CombatController < ApplicationController
                 log_message += ". #{@opponent.character_name} has triggered 'Nullify' " if @opponent.nullify == true
             end
 
+            if @character.total_health == 0 && @character.skills.find_by(name: 'Ephemeral Rebirth', unlocked: true).present? && @character.ephemeral_rebirth  == false
+                @character.total_health += @character.total_max_health
+                @character.ephemeral_rebirth = true
+                log_message += ". #{@character.character_name} has triggered 'Ephemeral Rebirth' " if @character.ephemeral_rebirth == true
+            end
+
             if @opponent.is_a?(Character)
                 log_message += "- #{@opponent.character_name} : #{@opponent.total_health} / #{@opponent.total_max_health} Health "
             elsif @opponent.is_a?(Monster)
@@ -264,64 +342,90 @@ class CombatController < ApplicationController
             end
 
                 @combat_logs << log_message
-            
+
             else
                 log_message = "#{@character.character_name} dealt no damage "
                 @combat_logs << log_message
             end
-        
+
         elsif @opponent_turn
-            if @opponent.total_attack >= @opponent.total_spellpower
-            damage = [physical_damage(@opponent.total_attack, @opponent.buffed_attack, @character.total_armor, @character.buffed_armor, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
-            elsif @opponent.total_spellpower > @opponent.total_attack
-            damage = [magic_damage(@opponent.total_spellpower, @opponent.buffed_spellpower, @character.total_magic_resistance, @character.buffed_magic_resistance, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
-            end 
+            damage_type = ''
+
+            if @opponent.total_attack > @opponent.total_spellpower && @opponent.total_attack > @opponent.total_necrosurge
+                damage = [physical_damage(@opponent.total_attack, @opponent.buffed_attack, @character.total_armor, @character.buffed_armor, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
+                damage_type = 'physical'
+            elsif @opponent.total_spellpower > @opponent.total_attack  && @opponent.total_spellpower > @opponent.total_necrosurge
+                damage = [magic_damage(@opponent.total_spellpower, @opponent.buffed_spellpower, @character.total_magic_resistance, @character.buffed_magic_resistance, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
+                damage_type = 'magic'
+            elsif @opponent.total_necrosurge > @opponent.total_attack && @opponent.total_necrosurge > @opponent.total_spellpower
+                damage = [shadow_damage(@opponent.total_necrosurge, @opponent.buffed_necrosurge, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
+                damage_type = 'shadow'
+            end
 
             if damage.positive?
-            if @opponent.is_a?(Character)
-                    @character.total_health -= damage
-                log_message = "#{@opponent.character_name} attacked for <strong>#{damage}</strong> damage "
-            elsif @opponent.is_a?(Monster)
-                    @character.total_health -= damage
-                log_message = "#{@opponent.monster_name} attacked for <strong>#{damage}</strong> damage "
-            end
-            
-            if rand(0.0..100.0) <= 30.0 && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
-                sharpened_blade = ((@opponent.total_attack + @opponent.buffed_attack) * 0.5).round
-                @character.total_health -= (sharpened_blade - (@character.total_armor + @character.buffed_armor))
-                log_message += ", <strong>#{sharpened_blade}</strong> physical damage with 'Sharpened Blade' "
-            elsif rand(0.0..100.0) <= 30.0 && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
-                poisoned_blade = ((@opponent.total_attack + @opponent.buffed_attack) * 0.5).round
-                @character.total_health -= (poisoned_blade - (@character.total_magic_resistance + @character.buffed_magic_resistance))
-                log_message += ", <strong>#{poisoned_blade}</strong> magic damage with 'Poisoned Blade' "
-            end
-            
-            if @is_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
-                from_the_shadows = (damage * 0.1).round
-                @character.total_health -= from_the_shadows
-                log_message += ", <strong>#{from_the_shadows}</strong> true damage with 'From the Shadows' "
+                if @opponent.is_a?(Character)
+                    if @character.skills.find_by(name: 'Blood Monarch', unlocked: true).present?
+                        @character.total_health -= (damage * 1.2).round
+                    else
+                        @character.total_health -= damage
+                    end
+                    log_message = "#{@opponent.character_name} attacked for <strong>#{damage}</strong> #{damage_type} damage "
+                elsif @opponent.is_a?(Monster)
+                        @character.total_health -= damage
+                    log_message = "#{@opponent.monster_name} attacked for <strong>#{damage}</strong> #{damage_type} damage "
+                end
+
+                if rand(0.0..100.0) <= 30.0 && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
+                    sharpened_blade = ((@opponent.total_attack + @opponent.buffed_attack) * 0.5).round
+                    @character.total_health -= (sharpened_blade - (@character.total_armor + @character.buffed_armor))
+                    log_message += ", <strong>#{sharpened_blade}</strong> physical damage with 'Sharpened Blade' "
+                elsif rand(0.0..100.0) <= 30.0 && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
+                    poisoned_blade = ((@opponent.total_attack + @opponent.buffed_attack) * 0.5).round
+                    @character.total_health -= (poisoned_blade - (@character.total_magic_resistance + @character.buffed_magic_resistance))
+                    log_message += ", <strong>#{poisoned_blade}</strong> magic damage with 'Poisoned Blade' "
+                end
+
+                if @is_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
+                    from_the_shadows = (damage * 0.1).round
+                    @character.total_health -= from_the_shadows
+                    log_message += ", <strong>#{from_the_shadows}</strong> true damage with 'From the Shadows' "
+                end
+
+                if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Judgement', unlocked: true).present?
+                    judgement = (damage * 0.05).round
+                    @character.total_health -= judgement
+                    log_message += ", <strong>#{judgement}</strong> true damage with 'Judgement' "
+                end
+
+                @character.total_health = [@character.total_health, 0].max
+                @character.took_damage = true if damage.positive?
+
+                if @character.total_health == 0 && @character.skills.find_by(name: 'Nullify', unlocked: true).present? && @character.nullify == false
+                    @character.total_health += 1
+                    @character.nullify = true
+                    log_message += ". #{@character.character_name} has triggered 'Nullify' " if @character.nullify == true
+                end
+
+                if @opponent.is_a?(Character) && @opponent.total_health == 0 && @opponent.skills.find_by(name: 'Ephemeral Rebirth', unlocked: true).present? && @opponent.ephemeral_rebirth  == false
+                    @opponent.total_health += @opponent.total_max_health
+                    @opponent.ephemeral_rebirth = true
+                    log_message += ". #{@opponent.character_name} has triggered 'Ephemeral Rebirth' " if @opponent.ephemeral_rebirth == true
+                end
+
+                log_message += "- #{@character.character_name} : #{@character.total_health} / #{@character.total_max_health} Health "
+                @combat_logs << log_message
+
+            else
+                if @opponent.is_a?(Character)
+                    log_message = "#{@opponent.character_name} dealt no damage "
+                elsif @opponent.is_a?(Monster)
+                      log_message = "#{@opponent.monster_name} dealt no damage "
+                end
+
+                @combat_logs << log_message
             end
 
-            if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Judgement', unlocked: true).present?
-                judgement = (damage * 0.05).round
-                @character.total_health -= judgement
-                log_message += ", <strong>#{judgement}</strong> true damage with 'Judgement' "
-            end
-
-            @character.total_health = [@character.total_health, 0].max
-            @character.took_damage = true if damage.positive? 
-
-            if @character.total_health == 0 && @character.skills.find_by(name: 'Nullify', unlocked: true).present? && @character.nullify == false
-                @character.total_health += 1
-                @character.nullify = true
-                log_message += ". #{@character.character_name} has triggered 'Nullify' " if @character.nullify == true
-            end
-
-            log_message += "- #{@character.character_name} : #{@character.total_health} / #{@character.total_max_health} Health "
-            @combat_logs << log_message
-            end
         end
     end
 
 end
-

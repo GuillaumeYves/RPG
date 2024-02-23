@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_20_195934) do
+ActiveRecord::Schema[7.1].define(version: 2024_02_22_194037) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -120,6 +120,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_20_195934) do
     t.integer "max_arena_ticket", default: 10
     t.integer "daily_quest", default: 10
     t.integer "max_daily_quest", default: 10
+    t.integer "necrosurge", default: 10
+    t.integer "total_necrosurge"
+    t.integer "dreadmight", default: 5
+    t.integer "dreadmight_bonus", default: 0
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
@@ -135,6 +139,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_20_195934) do
     t.text "description"
     t.bigint "character_id"
     t.integer "gold_reward"
+    t.integer "energy_cost"
     t.index ["character_id"], name: "index_hunts_on_character_id"
   end
 
@@ -173,6 +178,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_20_195934) do
     t.float "critical_strike_damage"
     t.integer "agility"
     t.integer "gold_price"
+    t.integer "necrosurge"
+    t.integer "dreadmight"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -206,6 +213,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_20_195934) do
     t.integer "agility_bonus", default: 0
     t.integer "total_health"
     t.integer "total_max_health"
+    t.integer "necrosurge", default: 10
+    t.integer "total_necrosurge"
+    t.integer "dreadmight", default: 5
+    t.integer "dreadmight_bonus", default: 0
   end
 
   create_table "skills", force: :cascade do |t|

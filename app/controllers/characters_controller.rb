@@ -118,10 +118,10 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         puts "######################### #{@character.gold}"
         # Check if the character can level up
         while @character.experience >= @character.required_experience_for_next_level
-                @character.level_up
-                flash[:notice] = "You are now level #{@character.level}."
+            @character.level_up
+            flash[:notice] = "You are now level #{@character.level}."
         end
-            @character.save
+        @character.save
         redirect_to @character
     end
 
@@ -130,55 +130,27 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @hunt = @character.accepted_hunt
         gold_reward = @hunt.gold_reward
 
-        scaling_factor = case @character.level
-            when 1..9 then 1.0
-            when 10..19 then 0.90
-            when 20..39 then 0.80
-            when 40..49 then 0.70
-            when 50..59 then 0.60
-            when 60..69 then 0.50
-            when 70..79 then 0.40
-            when 80..99 then 0.30
-            when 100..199 then 0.20
-            when 200..299 then 0.10
-            when 300..Float::INFINITY then 0.05
-            else 1.0
-        end
-        amount = ((params[:experience_reward].to_i * @character.level) * scaling_factor).round
-        level_difference = @character.level - @hunt.level_requirement
-            if level_difference <= 5
-                # Character level <= Hunt level + 5: XP = (100 %)
-                amount
-            elsif level_difference == 6
-                # Character level = Hunt level + 6: XP = (80 %)
-                amount = (amount * 0.8 / 5).round * 5
-            elsif level_difference == 7
-                # Character level = Hunt level + 7: XP = (60 %)
-                amount = (amount * 0.6 / 5).round * 5
-            elsif level_difference == 8
-                # Character level = Hunt level + 8: XP = (40 %)
-                amount = (amount * 0.4 / 5).round * 5
-            elsif level_difference == 9
-                # Character level = Hunt level + 9: XP = (20 %)
-                amount = (amount * 0.2 / 5).round * 5
-            else
-                # Character level >= Hunt level + 10: XP = (10 %)
-                amount = (amount * 0.1 / 5).round * 5
-            end
+        # Use the scaled_experience_reward method from the Hunt model
+        amount = @hunt.scaled_experience_reward(@character.level)
+
         # Add EXP and Gold to character
         @character.increment(:experience, amount)
         @character.increment(:gold, gold_reward)
+
         # Check if the character can level up
         while @character.experience >= @character.required_experience_for_next_level
             @character.level_up
             flash[:notice] = "You are now level #{@character.level}."
         end
+
         # Drop the completed hunt
         @character.update(accepted_hunt: nil)
+
         # Save character
         @character.save
-        redirect_to @character
+
         flash[:notice] = "Hunt completed. You gained #{amount} experience and #{gold_reward} gold"
+        redirect_to @character
     end
 
     def equip_item
@@ -329,6 +301,6 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     private
 
     def character_params
-        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :max_health, :health, :attack, :armor, :spellpower, :magic_resistance, :strength, :intelligence, :luck, :willpower)
+        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :max_health, :health, :attack, :armor, :spellpower, :necrosurge, :magic_resistance, :strength, :intelligence, :agility, :dreadmight, :luck, :willpower)
     end
 end

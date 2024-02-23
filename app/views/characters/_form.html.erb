@@ -13,26 +13,26 @@
       
     <img id="raceImagePreview" src="#" alt="Race Image Preview" style='max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 20px;'>
     
-    <div class="field" style="margin-bottom: 20px;">
+    <div class="field">
       <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name' %>
     </div>
     
-    <div class="field" style="margin-bottom: 20px;">
+    <div class="field mt-3 ">
       <%= form.label :"gender: " %>
       <%= form.select :gender, ['male', 'female'].map { |g| [g.capitalize, g] }, { class: 'form-control', id: 'character_gender' } %>
     </div>
 
-    <div class="field mt-2" >
+    <div class="field mt-3 mb-2">
       <%= form.label :"race: " %>
       <%= form.select :race, ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin'].map { |r| [r.capitalize, r] }, { class: 'form-control', id: 'character_race' } %>
     </div>
-    <p class ="mt-2 mb-5" id="raceDescription" style="height: auto; overflow-y: auto;"></p>
+    <p class ="" id="raceDescription" style="height: 100px; overflow-y: auto;"></p>
 
-    <div class="field mt-2">
+    <div class="field  mb-2">
       <%= form.label :"class: " %>
-       <%= form.select :character_class, ['warrior', 'mage', 'rogue', 'paladin'].map { |c| [c.capitalize, c] }, { class: 'form-control', id: 'character_class' } %>
+       <%= form.select :character_class, ['warrior', 'mage', 'rogue', 'paladin', 'deathwalker'].map { |c| [c.capitalize, c] }, { class: 'form-control', id: 'character_class' } %>
     </div>
-    <p class ="mt-2 mb-5" id="classDescription" style="height: 100px; overflow-y: auto;"></p>
+    <p class ="" id="classDescription" style="height: 100px; overflow-y: auto;"></p>
 
     <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px; ">
       <%= form.submit 'Create', class: "btn btn-outline-primary" %>
@@ -81,10 +81,10 @@ $(document).ready(function() {
 
     switch(selectedRace) {
       case 'human':
-        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience.');
+        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience but are easily corrupted.');
         break;
       case 'elf':
-        raceDescription.text('Graceful beings with a strong connection to magic. Wisdom and knowledge are what they seek above all.');
+        raceDescription.text('Graceful beings with a strong connection to arcane magic. Wisdom, knowledge and power are what they seek above all.');
         break;
       case 'dwarf':
         raceDescription.text('Durable and loyal, Dwarfs are willing to give their life to save another. Their tumultuous temperament often leads them to take on unreasonable fights.');
@@ -99,7 +99,7 @@ $(document).ready(function() {
         raceDescription.text('Quick and cunning, Goblins have been under the protection of Orcs for centuries, in exchange for being the most effective war advisors.');
         break;
       default:
-        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience.');
+        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience but are easily corrupted.');
     }
   }
 
@@ -123,6 +123,9 @@ $(document).ready(function() {
         break;
       case 'paladin':
         classDescription.text('Holy warriors dedicated to justice. Their sheer will alone can vanquish the sinners.');
+        break;
+      case 'deathwalker':
+        classDescription.text('They manipulate death, blood and bind life itself to their will. Deathwalkers do not seek to kill, but to enslave.');
         break;
       default:
         classDescription.text('Specialists of physical strength, Warriors are battlemasters ready to take on the mightiest foes.');

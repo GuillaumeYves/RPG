@@ -32,11 +32,12 @@
         <h4 class="card-header text-white text-center bg-primary" style="width: auto; margin: 0 auto;">Hunt in progress</h4>
         <div class="card-body">
           <h5 class="card-title"><%= @accepted_hunt.name %></h5>
+          <p class="card-text text-center mt-1">Level required : <%= @accepted_hunt.level_requirement %></p>
           <p class="card-text"><%= @accepted_hunt.description %></p>
         </div>
         <br>
-        <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @experience_gain %></span></p>
-        <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @experience_gain %></span></p>
+        <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @accepted_hunt.scaled_experience_reward(@selected_character.level) %></span></p>
+        <p class="card-text">Gold : <span class="badge rounded-pill bg-warning" style="color: black;"><%= @accepted_hunt.gold_reward %></span></p>
         <%= form_tag combat_hunt_path(@accepted_hunt, character_id: @selected_character.id, opponent_id: @accepted_hunt.monster_id), method: :post do %>
           <%= submit_tag 'Start Hunting', class: "btn btn-outline-primary" %>
         <% end %>
@@ -48,12 +49,13 @@
       <% @available_hunts.each do |hunt| %>
         <div class="card text-left" style="border: 2px solid #000; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 15px; margin-bottom: 10px; width: 500px; height: 400px; ">
           <h4 class="card-header text-center text-white bg-primary" style="width: auto; margin: 0 auto;"><%= hunt.name %></h4>
+          <p class="card-text text-center mt-1">Level required : <%= hunt.level_requirement %></p>
           <div class="card-body" style= "overflow-y: show;">
             <p class="card-text"><%= hunt.description %></p>
           </div>
           <br>
-          <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @experience_gain %></span></p>
-          <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @experience_gain %></span></p>
+          <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= hunt.scaled_experience_reward(@selected_character.level) %></span></p>
+          <p class="card-text">Gold : <span class="badge rounded-pill bg-warning" style="color: black;"><%= hunt.gold_reward %></span></p>
           <%= form_tag accept_hunt_hunt_path(hunt), method: :post do %>
             <%= submit_tag 'Accept', class: "btn btn-outline-primary" %>
           <% end %>

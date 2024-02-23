@@ -43,7 +43,7 @@ class RogueSkillsSeeder
       level_requirement: 50,
       character_class: rogue_class,
       character_id: character.id,
-      effect: " 
+      effect: "
       if self.main_hand.present? && self.off_hand.present? && self.main_hand.item_class == 'Dagger' && self.off_hand.item_class == 'Dagger'
         self.total_attack *= 1.2;
         self.total_critical_strike_chance += 5.0;
@@ -105,7 +105,7 @@ class RogueSkillsSeeder
       level_requirement: 100,
       character_class: rogue_class,
       character_id: character.id,
-      effect: " if self.health <= self.max_health / 2
+      effect: " if self.total_health <= self.max_health / 2
             self.buffed_critical_strike_damage += 0.50
             self.buffed_attack = (self.total_attack * 0.3) ;
           end  "
@@ -122,7 +122,7 @@ class RogueSkillsSeeder
       level_requirement: 100,
       character_class: rogue_class,
       character_id: character.id,
-      effect: " self.buffed_attack += (self.total_attack * 0.02); 
+      effect: " self.buffed_attack += (self.total_attack * 0.02);
                 self.buffed_critical_strike_chance += 2.0;"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'rogue_skills', 'deathmark.jpg')
