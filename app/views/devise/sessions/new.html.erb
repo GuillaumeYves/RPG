@@ -1,0 +1,32 @@
+<div class="text-center mt-5">
+
+  <%= image_tag('misc/favicon.png', style: 'max-width:400px; height:400px', class: 'card-img-top', alt: "tedorha_image") %>
+  <div class="card text-center mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 30px; height: 400px; width: 400px">
+    <h2 class="mb-3">Log in</h2>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="field">
+        <%= f.label :email %><br />
+        <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :password %><br />
+        <%= f.password_field :password, autocomplete: "current-password" %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div class="field">
+          <%= f.check_box :remember_me %>
+          <%= f.label :remember_me %>
+        </div>
+      <% end %>
+
+      <div class="actions mb-3 mt-3">
+        <%= f.submit "Log in", class:"btn btn-outline-primary" %>
+      </div>
+    <% end %>
+
+    <%= render "devise/shared/links" %>
+  </div>
+</div>

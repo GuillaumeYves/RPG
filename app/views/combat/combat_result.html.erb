@@ -1,69 +1,91 @@
-
-<div class="container">
-    <div style="display: flex; flex-direction: row; margin-bottom: 20px; ">
-        <!-- Character Card -->
-        <div class="card text-left" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 500px; width: 500px; margin-right: 200px;">
+  <div class="text-center mt-5 ">
+    <div class="row justify-content-center">
+      <!-- Character Card -->
+      <div class="col">
+        <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: auto; width: 500px;">
           <div style="position: relative; max-width: 100%;">
             <%= image_tag(@character.race_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
-            <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= @character.character_name %></h5>
+            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 90%; text-align: center;">
+              <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> <%= @character.character_name %></h5>
+              <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> < Defenders of Tedorha ></h5>
+            </div>
           </div>
-            <div class="progress" style="height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top : 20px;">
-              <div class="progress-bar bg-success" role="progressbar" style="width: <%= (@character.health.to_f / @character.max_health) * 100 %>%;"></div>
-              <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @character.health %> / <%= @character.max_health %></h6>
+          <div id="character-health-bar" class="progress" style="height: 30px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top : 20px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: <%= (@character.total_health.to_f / @character.total_max_health) * 100 %>%;"></div>
+            <h5 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @character.total_health.to_i %> / <%= @character.total_max_health %></h5>
+          </div>
+        </div>
+      </div>
+        <div class="col">
+            <div class="row justify-content-center">
+                <div class="col">
+                    <h1 class="text-danger" style="margin-top: 275px;">VS</h1>
+                </div>
             </div>
         </div>
-                   
-            <!-- Opponent Card -->
-            <div class="card text-left" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 500px; width: 500px; margin-right: 200px;">
-                <% if @opponent.is_a?(Monster) %>
-                <div style="position: relative; max-width: 100%;">
-                    <%= image_tag(@opponent.monster_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "opponent_image") %>
-                    <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= @opponent.monster_name %></h5>
-                </div>
-                <% elsif @opponent.is_a?(Character) %>
-                <div style="position: relative; max-width: 100%;">
-                    <%= image_tag(@opponent.race_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "opponent_image") %>
-                    <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= @opponent.character_name %></h5>
-                </div>
-                <% end %>
-                    <div class="progress" style="height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top : 20px;">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: <%= (@opponent.health.to_f / @opponent.max_health) * 100 %>%;"></div>
-                        <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @opponent.health %> / <%= @opponent.max_health %></h6>
-                    </div>
+      <!-- Opponent Card -->
+      <div class="col">
+        <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: auto; width: 500px;">
+          <% if @opponent.is_a?(Monster) %>
+          <div style="position: relative; max-width: 100%;">
+            <%= image_tag(@opponent.monster_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "opponent_image") %>
+            <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= @opponent.monster_name %></h5>
+          </div>
+          <% elsif @opponent.is_a?(Character) %>
+          <div style="position: relative; max-width: 100%;">
+            <%= image_tag(@opponent.race_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "opponent_image") %>
+            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 90%; text-align: center;">
+              <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> <%= @opponent.character_name %></h5>
+              <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> < Defenders of Tedorha ></h5>
             </div>
-           
+          </div>
+          <% end %>
+            <div id="opponent-health-bar" class="progress" style="height: 30px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top: 20px;">
+              <div class="progress-bar bg-danger" role="progressbar" style="width: <%= (@opponent_health_in_combat.to_f / @opponent.total_max_health) * 100 %>%;"></div>
+              <h5 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @opponent_health_in_combat.to_i %> / <%= @opponent.total_max_health %></h5>
+            </div>
+        </div>
+      </div>
     </div>
 
     <!-- Victory or Defeat Prompt -->
-    <% if @combat_result == 'Victory' %>
-        <h3 class="text-success">Victory</h3>
-            <%= form_tag(complete_hunt_character_path(@selected_character), method: :post) do %>
-                <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
-                <%= hidden_field_tag :hunt_id, @hunt.id %>
-                <%= submit_tag 'Complete Hunt', class: 'btn btn-success' %>
-            <% end %>
-    <% elsif @combat_result == 'Defeat' %>
-            <h3 class="text-danger">Defeat Click <a href="<%= hunts_path %>">here</a> to return to hunts.</h3>
-    <% end %>
-    <br>
-        <!-- Display combat log -->
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 offset-md-2 mt-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h2 class="card-title text-center">
-                                Combat Result: <%= @combat_result %>
-                            </h2>
-                                <div class="combat-log">
-                                    <% @combat_logs.each do |log| %>
-                                    <p><%= log %></p>
-                                    <hr>
-                                    <% end %>
-                                </div>
-                        </div>
+    <div class="row justify-content-center mt-5 mb-3">
+      <div id="combat-result" class="col-md-6">
+        <% if @result == '<strong style="font-size: 18px;">Victory</strong>' && @hunt.present? %>
+          <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
+          <h3>- <span class="text-success">Victory</span> -</h3>
+          <%= form_tag(complete_hunt_character_path(@character), method: :post) do %>
+            <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
+            <%= hidden_field_tag :hunt_id, @hunt.id %>
+            <%= submit_tag 'Complete', class: 'btn btn-outline-success mt-2' %>
+          <% end %>
+        <% elsif @result == '<strong style="font-size: 18px;">Victory</strong>'%>
+          <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
+          <h3>- <span class="text-success">Victory</span> -</h3>
+        <% elsif @result == '<strong style="font-size: 18px;">Defeat</strong>' %>
+          <audio autoplay id="defeatAudio"><source src="/assets/defeat.mp3" type="audio/mpeg"></audio>
+          <h3>- <span class="text-danger">Defeat</span> -<br style="mb-5"><a href="<%= character_path(@character) %>" style="font-size:18px;">Retreat</a></h3>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Combat Log -->
+    <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding-top: 15px; height: auto; width: auto;">
+        <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Combat details</h4>
+        <hr style="margin-bottom: 0;">
+        <div class="row justify-content-center" style="width: auto; height: 400px; overflow: auto;">
+            <div>
+                <div class="card-body">
+                    <div id="combat-log-container" class="combat-log">
+                        <% @combat_logs.each_with_index do |log, index| %>
+                            <p><%= log.html_safe %></p>
+                            <% unless index == @combat_logs.size - 1 %>
+                                <hr class="mx-auto" style="width: 20%">
+                            <% end %>
+                        <% end %>
                     </div>
                 </div>
             </div>
         </div>
-</div>
+    </div>
+  </div>

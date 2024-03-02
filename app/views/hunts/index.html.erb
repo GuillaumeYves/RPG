@@ -1,59 +1,62 @@
-<div style="display: flex; flex-direction: row;">
-
+<div class="mt-5" style="display: flex; flex-direction: row;">
   <!-- Left Column - Image and Text -->
-  <div class="card text-left" style="border: 2px solid #000; padding: 30px; height: 700px; width: 500px; margin-right: 20px;">
+  <div class="card text-left " style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 600px; width: 500px; margin-right: 20px;">
     <div class="card-body">
-      <%= image_tag('npcs/milena.jpg', style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;') %>
-      <br>
-      <h4 class="card-header text-white bg-primary">Milena the Huntress</h4>
+        <div style="position: relative; max-width: 100%;">
+          <%= image_tag('npcs/milena.jpg', style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+          <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;">Milena</h5>
+        </div>
       <br>
 
       <% if @accepted_hunt.present? %>
-        <p class="card-text">
-          Come back to me when your task is done.
-          <br>
-          Blessings on your hunt.
-        </p>
+        <p class="card-text">Come back to me when your task is done.</p>
+        <p class="card-text">Blessings on your hunt.</p>
+        
       <% else %>
-        <p class="card-text">
-          I have a couple of problems that need to be taken care of.
-          <br>
-          Do you mind giving it a look?
-        </p>
+        <p class="card-text">I have a couple of problems that need to be taken care of.</p>
+        <p class="card-text"> Do you mind taking a look?</p>
       <% end %>
     </div>
   </div>
 
   <!-- Right Column - Accepted and Available Hunts -->
-  <div style="flex-grow: 1;">
+  <div style="flex-grow: 1; overflow: auto; height: 1218px;">
 
     <% if @accepted_hunt %>
-      <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 700px; ">
-        <h4 class="card-header text-white bg-primary">Hunt in progress</h4>
-        <div class="card-body" style= "box-shadow: 2px 2px 10px #888888;">
+      <div class="card text-left" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 15px; margin-bottom: 20px; width: 500px; height: 700px; ">
+        <h4 class="card-header text-white text-center bg-primary" style="width: auto; margin: 0 auto;">Hunt in progress</h4>
+        <div class="card-body">
           <h5 class="card-title"><%= @accepted_hunt.name %></h5>
+          <p class="card-text text-center mt-1">Level required : <%= @accepted_hunt.level_requirement %></p>
           <p class="card-text"><%= @accepted_hunt.description %></p>
         </div>
         <br>
-        <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @accepted_hunt.experience_reward %></span></p>
-        <%= form_tag combat_hunt_hunt_path(@accepted_hunt, character_id: @selected_character.id, opponent_id: @accepted_hunt.monster.id), method: :get do %>
-          <%= submit_tag 'Start Hunt', class: "btn btn-outline-primary" %>
+        <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= @accepted_hunt.scaled_experience_reward(@selected_character.level) %></span></p>
+        <p class="card-text">Gold : <span class="badge rounded-pill bg-warning" style="color: black;"><%= @accepted_hunt.gold_reward %></span></p>
+        <% if @accepted_hunt.combat_result %>
+          <%= link_to 'Resume', combat_result_path(combat_result_id: @accepted_hunt.combat_result.id)%> 
+        <% else %>
+          <%= form_tag combat_hunt_path(@accepted_hunt, character_id: @selected_character.id, opponent_id: @accepted_hunt.monster_id), method: :post, remote: true do %>
+            <%= submit_tag 'Start Hunting', class: "btn btn-outline-primary" %>
+          <% end %>
         <% end %>
         <%= form_tag cancel_hunt_hunt_path(@accepted_hunt), method: :post do %>
-          <%= submit_tag 'Cancel Hunt', class: "btn btn-outline-danger" %>
+          <%= submit_tag 'Cancel', class: "btn btn-outline-danger" %>
         <% end %>
       </div>
     <% else %>
       <% @available_hunts.each do |hunt| %>
-        <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
-          <h4 class="card-header text-center text-white bg-primary"><%= hunt.name %></h4>
-          <div class="card-body" style= "overflow-y: auto; box-shadow: 2px 2px 10px #888888;">
-            <p class="card-text"><%= hunt.description %></p>
+        <div class="card text-left" style="border: 2px solid #000; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 15px; margin-bottom: 10px; width: 500px; height: 400px; ">
+          <h4 class="card-header text-center text-white bg-primary" style="width: auto; margin: 0 auto;"><%= hunt.name %></h4>
+          <p class="card-text text-center mt-1">Level required : <%= hunt.level_requirement %></p>
+          <div class="card-body" style= "overflow-y: show;">
+            <p class="card-text" style= "overflow-y: scroll; height: 100px"><%= hunt.description %></p>
           </div>
           <br>
-          <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= hunt.experience_reward %></span></p>
+          <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= hunt.scaled_experience_reward(@selected_character.level) %></span></p>
+          <p class="card-text">Gold : <span class="badge rounded-pill bg-warning" style="color: black;"><%= hunt.gold_reward %></span></p>
           <%= form_tag accept_hunt_hunt_path(hunt), method: :post do %>
-            <%= submit_tag 'Accept Hunt', class: "btn btn-outline-primary" %>
+            <%= submit_tag 'Accept', class: "btn btn-outline-primary "%>
           <% end %>
         </div>
       <% end %>

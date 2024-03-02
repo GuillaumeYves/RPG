@@ -6,7 +6,31 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     end
 
     def leaderboard
-        @characters = Character.order(level: :desc).limit(20)
+        @characters = Character.order(level: :desc)
+    end
+
+    def thaumaturge
+        @character = current_user.selected_character
+    end
+
+    def heal
+        @character = current_user.selected_character
+        healing_cost = 10
+
+        if @character.total_health < @character.total_max_health
+            if @character.gold >= healing_cost
+                @character.total_health = @character.total_max_health
+                @character.gold -= healing_cost
+                @character.save
+                flash[:notice] = "You feel refreshed."
+            else
+                flash[:alert] = "You do not have enough gold."
+            end
+        else
+            flash[:alert] = "Your health is already full."
+        end
+
+        redirect_back fallback_location: root_path
     end
 
     def create
@@ -17,39 +41,53 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @character.set_default_values_for_buffed_stats
 
         @character.modify_stats_based_on_race
-        @character.set_default_values_for_total_stats
         @character.modify_attributes_based_on_class
+        @character.set_default_values_for_total_stats
         @character.modify_stats_based_on_attributes
 
         if @character.save
             @character.create_inventory
             @character.assign_skills_based_on_class
-        
+
         flash[:notice] = 'Character created.'
         redirect_to user_characters_path
 
-        else
-        flash[:alert] = 'An error occured. Please try again.'
-        redirect_to new_character_path
+        if current_user.characters.count == 1
+            flash[:tutorial] = true
         end
 
-    end
+        else
 
-    def user_characters
-        @characters = current_user.characters
+            character_name_errors = @character.errors[:character_name]
+            if character_name_errors.present?
+                flash[:alert] = "Character name #{character_name_errors.join(' and ')}"
+            else
+                flash[:alert] = 'An error occured. Please try again.'
+            end
+            redirect_to new_character_path
+        end
     end
 
     def select
         @selected_character = Character.find(params[:id])
 
         if current_user.selected_character.present?
-            current_user.selected_character.update(user: nil) # Clear the association if it was present
-        end 
+            current_user.selected_character.update(user: nil)
+        end
 
         session[:selected_character_id] = @selected_character.id
         current_user.update(selected_character: @selected_character)
 
-        redirect_to character_path(@selected_character), notice: "You selected #{@selected_character.character_name}."
+        redirect_to character_path(@selected_character)
+    end
+
+    def user_characters
+        @characters = current_user.characters
+        if current_user.selected_character.present?
+            current_user.selected_character.update(user: nil)
+            session[:selected_character_id] = nil
+            current_user.update(selected_character: nil)
+        end
     end
 
     def destroy
@@ -65,129 +103,311 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
 
     def show
         @character = Character.find(params[:id])
+        @selected_character = current_user.selected_character if current_user.selected_character.present?
         @items = Item.all
         @hunts = Hunt.all
         @skills = @character.skills
     end
 
-    def gain_experience
-        @selected_character = Character.find(params[:id])
-        amount = params[:amount].to_i
-
-        # Scale the experience to increase difficulty based on level
-        scaling_factor = case @selected_character.level
-        # 5% reduction per case up to level 500 and beyond where its 80% reduction 
-            when 10..19 then 0.95
-            when 20..29 then 0.90
-            when 30..39 then 0.85 
-            when 40..49 then 0.80
-            when 50..59 then 0.75
-            when 60..79 then 0.70
-            when 80..99 then 0.65 
-            when 100..149 then 0.60 
-            when 150..199 then 0.55  
-            when 200..249 then 0.50
-            when 250..299 then 0.45
-            when 300..349 then 0.40
-            when 350..399 then 0.35
-            when 400..449 then 0.30
-            when 450..499 then 0.25
-            when 500..Float::INFINITY then 0.20
-            else 1.0
-        end
-        @selected_character.increment(:experience, (amount * (1.1 ** (@selected_character.level - 1)) * scaling_factor).round)           
-        
-    # Check if the character can level up
-    while @selected_character.experience >= @selected_character.required_experience_for_next_level
-            @selected_character.level_up
-            flash[:notice] = "You are now level #{@selected_character.level}."
+    def talents
+        @character = current_user.selected_character
+        @skills = @character.skills
     end
 
-        @selected_character.save
-    
-    redirect_to @selected_character
+    def paragon_increase_attack
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_attack_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_attack += 0.01
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_attack_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_armor
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_armor_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_armor += 0.005
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_armor_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_spellpower
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_spellpower_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_spellpower += 0.01
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_spellpower_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_magic_resistance
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_magic_resistance_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_magic_resistance += 0.005
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_magic_resistance_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_critical_strike_chance
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_critical_strike_chance_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_critical_strike_chance += 0.10
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_critical_strike_chance_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_critical_strike_damage
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_critical_strike_damage_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_critical_strike_damage += 0.01
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_critical_strike_damage_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_total_health
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_total_health_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_total_health += 0.004
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_total_health_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_global_damage
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_global_damage_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_global_damage += 0.004
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_global_damage_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def gain_experience
+        @character = current_user.selected_character
+
+        scaling_factor = case @character.level
+            when 1..9 then 1.0
+            when 10..19 then 0.90
+            when 20..39 then 0.80
+            when 40..49 then 0.70
+            when 50..59 then 0.60
+            when 60..69 then 0.50
+            when 70..79 then 0.40
+            when 80..99 then 0.30
+            when 100..199 then 0.20
+            when 200..299 then 0.10
+            when 300..Float::INFINITY then 0.05
+            else 1.0
+        end
+
+        amount = ((params[:amount].to_i * @character.level) * scaling_factor).round
+        gold_reward = (params[:gold_reward].to_i)
+
+        @character.increment(:experience, amount)
+        @character.increment(:gold, gold_reward)
+
+        flash[:notice] = "You gained #{amount} EXP and #{gold_reward} gold"
+        puts "######################### #{@character.gold}"
+        # Check if the character can level up
+        while @character.experience >= @character.required_experience_for_next_level
+            @character.level_up
+            flash[:notice] = "You are now level #{@character.level}."
+        end
+        @character.save
+        redirect_to @character
     end
 
     def complete_hunt
-        @selected_character = current_user.selected_character
-        @hunt = Hunt.find(params[:hunt_id])
-        amount = params[:experience_reward].to_i
-        
-        # Scale the experience to increase difficulty based on level
-        scaling_factor = case @selected_character.level
-        # 5% reduction per case up to level 500 and beyond where its 80% reduction 
-            when 10..19 then 0.95
-            when 20..29 then 0.90
-            when 30..39 then 0.85 
-            when 40..49 then 0.80
-            when 50..59 then 0.75
-            when 60..79 then 0.70
-            when 80..99 then 0.65 
-            when 100..149 then 0.60 
-            when 150..199 then 0.55  
-            when 200..249 then 0.50
-            when 250..299 then 0.45
-            when 300..349 then 0.40
-            when 350..399 then 0.35
-            when 400..449 then 0.30
-            when 450..499 then 0.25
-            when 500..Float::INFINITY then 0.20
-            else 1.0
-        end
+        @character = current_user.selected_character
+        @hunt = @character.accepted_hunt
+        gold_reward = @hunt.gold_reward
 
-        @selected_character.increment(:experience, (amount * (1.1 ** (@selected_character.level - 1)) * scaling_factor).round)           
-        
+        # Use the scaled_experience_reward method from the Hunt model
+        amount = @hunt.scaled_experience_reward(@character.level)
+
+        # Add EXP and Gold to character
+        @character.increment(:experience, amount)
+        @character.increment(:gold, gold_reward)
+
         # Check if the character can level up
-        while @selected_character.experience >= @selected_character.required_experience_for_next_level
-            @selected_character.level_up
-            flash[:notice] = "You are now level #{@selected_character.level}."
+        while @character.experience >= @character.required_experience_for_next_level
+            @character.level_up
+            flash[:notice] = "You are now level #{@character.level}."
         end
 
         # Drop the completed hunt
-        @selected_character.update(accepted_hunt: nil)
+        @character.update(accepted_hunt: nil)
+
+        # Drop the combat result
+        @hunt.update(combat_result: nil)
 
         # Save character
-        @selected_character.save
+        @character.save
 
-        redirect_to @selected_character
-        flash[:notice] = 'Hunt completed.'
+        flash[:notice] = "Hunt completed. You gained #{amount} experience and #{gold_reward} gold"
+        redirect_to @character
     end
 
     def equip_item
         @selected_character = current_user.selected_character
         item = Item.find(params[:item_id])
-
-        case item.item_type
-            when "One-handed Weapon"
-                @selected_character.equip_one_handed_weapon(item)
-            when "Two-handed Weapon"
-                @selected_character.equip_two_handed_weapon(item)
-            when "Shield"
-                @selected_character.equip_shield(item)
-            when "Helmet"
-                @selected_character.equip_helmet(item)
-            when "Chest"
-                @selected_character.equip_chest(item)
-            when "Legs"
-                @selected_character.equip_legs(item)
-            when "Amulet"
-                @selected_character.equip_amulet(item)
-            when "Ring"
-                @selected_character.equip_ring(item)
-            when "Waist"
-                @selected_character.equip_waist(item)
-            when "Gloves"
-                @selected_character.equip_hands(item)
-            when "Boots"
-                @selected_character.equip_feet(item)
-            # Add mappings for other item types
+        if @selected_character.can_equip?(item)
+            case item.item_type
+                when "One-handed Weapon"
+                    @selected_character.equip_one_handed_weapon(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Two-handed Weapon"
+                    @selected_character.equip_two_handed_weapon(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Shield"
+                    @selected_character.equip_shield(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Head"
+                    @selected_character.equip_helmet(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Chest"
+                    @selected_character.equip_chest(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Neck"
+                    @selected_character.equip_amulet(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Finger"
+                    @selected_character.equip_ring(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Waist"
+                    @selected_character.equip_waist(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Hands"
+                    @selected_character.equip_hands(item)
+                    flash[:notice] = "#{item.name} equipped."
+                when "Feet"
+                    @selected_character.equip_feet(item)
+                    flash[:notice] = "#{item.name} equipped."
+            end
+            @selected_character.modify_stats_based_on_attributes
+            @selected_character.apply_passive_skills
+            @selected_character.save
+            redirect_to @selected_character
         else
+            flash[:alert] = @selected_character.errors.full_messages.join(',')
+            redirect_to @selected_character
         end
-        
-        @selected_character.modify_stats_based_on_attributes
-        @selected_character.apply_passive_skills
-        # Redirect to the show character page
-        redirect_to @selected_character, notice: "#{item.name} equipped."
     end
 
 
@@ -197,51 +417,72 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
 
         case item.item_type
         when "One-handed Weapon"
-            @selected_character.unequip_one_handed_weapon(@selected_character.main_hand_item)
+            @selected_character.unequip_one_handed_weapon(@selected_character.main_hand)
         when "Two-handed Weapon"
-            @selected_character.unequip_two_handed_weapon(@selected_character.main_hand_item)
+            @selected_character.unequip_two_handed_weapon(@selected_character.main_hand)
         when "Shield"
-            @selected_character.unequip_shield(@selected_character.off_hand_item)
-        when "Helmet"
-            @selected_character.unequip_helmet(@selected_character.helmet_item)
+            @selected_character.unequip_shield(@selected_character.off_hand)
+        when "Head"
+            @selected_character.unequip_helmet(@selected_character.helmet)
         when "Chest"
-            @selected_character.unequip_chest(@selected_character.chest_item)
-        when "Legs"
-            @selected_character.unequip_legs(@selected_character.legs_item)
+            @selected_character.unequip_chest(@selected_character.chest)
         when "Amulet"
-            @selected_character.unequip_amulet(@selected_character.neck_item)
+            @selected_character.unequip_amulet(@selected_character.neck)
         when "Ring"
-            @selected_character.unequip_ring(@selected_character.finger1_item)
+            @selected_character.unequip_ring(@selected_character.finger1)
         when "Waist"
-            @selected_character.unequip_waist(@selected_character.waist_item)
+            @selected_character.unequip_waist(@selected_character.waist)
         when "Gloves"
-            @selected_character.unequip_hands(@selected_character.hands_item)
+            @selected_character.unequip_hands(@selected_character.hands)
         when "Boots"
-            @selected_character.unequip_feet(@selected_character.feet_item)
-        # Add mappings for other item types
-        else
-        Rails.logger.warn("Unsupported item type: #{item.item_type}")
+            @selected_character.unequip_feet(@selected_character.feet)
         end
 
         @selected_character.modify_stats_based_on_attributes
         @selected_character.apply_passive_skills
-        @selected_character.save
-        # Redirect to the show character page
+        @selected_character.save!
+
         redirect_to @selected_character, notice: "#{item.name} unequipped."
     end
 
     def add_to_inventory
-    @selected_character = Character.find(session[:selected_character_id])
-    inventory = @selected_character.inventory
-    item = Item.find(params[:item_id])
+        @selected_character = Character.find(session[:selected_character_id])
+        inventory = @selected_character.inventory
+        item = Item.find(params[:item_id])
 
-        if inventory.items.count < 10
-        flash[:notice] = "#{item.name} added to inventory."
-        inventory.items << item
-        inventory.save
-        redirect_back fallback_location: root_path
+        if @selected_character.gold >= item.gold_price
+            if inventory.items.count < 10
+                @selected_character.gold -= item.gold_price
+                flash[:notice] = "#{item.name} bought for #{item.gold_price} gold."
+                inventory.items << item
+                inventory.save
+                @selected_character.save
+                item.update(purchased: true)
+                redirect_back fallback_location: root_path
+            else
+                flash[:alert] = 'Inventory is full.'
+                redirect_back fallback_location: root_path
+            end
         else
-            flash[:alert] = 'Inventory is full.'
+            flash[:alert] = 'You do not have enough gold for this item.'
+            redirect_back fallback_location: root_path
+        end
+    end
+
+    def sell_item
+        @selected_character = Character.find(session[:selected_character_id])
+        inventory = @selected_character.inventory
+        item = Item.find(params[:item_id])
+
+        if inventory.items.include?(item)
+            @selected_character.gold += item.gold_price
+            flash[:notice] = "#{item.name} sold for #{item.gold_price} gold."
+            inventory.items.delete(item)
+            inventory.save
+            @selected_character.save
+            redirect_back fallback_location: root_path
+        else
+            flash[:alert] = 'Item not found in inventory.'
             redirect_back fallback_location: root_path
         end
     end
@@ -264,15 +505,14 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             @character.decrement(:skill_points)
             @character.save
             flash[:notice] = 'Talent unlocked.'
-            puts "Intermediate values - Armor: #{@character.armor}, Magic Resistance: #{@character.magic_resistance}, Spellpower: #{@character.spellpower}, Updated Attack: #{@character.attack}"
         end
 
-        redirect_to @character
+        redirect_to talents_character_path
     end
 
     private
 
     def character_params
-        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :max_health, :health, :attack, :armor, :spellpower, :magic_resistance, :strength, :intelligence, :luck, :willpower)
+        params.require(:character).permit(:race, :race_image, :character_class, :gender, :character_name, :max_health, :health, :attack, :armor, :spellpower, :necrosurge, :magic_resistance, :strength, :intelligence, :agility, :dreadmight, :luck, :willpower)
     end
 end

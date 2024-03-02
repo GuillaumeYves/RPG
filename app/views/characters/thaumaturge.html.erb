@@ -1,0 +1,91 @@
+  <div class="mt-5" style="display: flex; flex-direction: row;">
+    <div class="card text-left " style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 600px; width: 500px; margin-right: 20px; align-items: center;">
+      <div class="card-body">
+        <div style="position: relative; max-width: 100%;">
+          <%= image_tag('npcs/thaumaturge.jpg', style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+          <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;">Mekail</h5>
+        </div>
+        <br>
+        <p class="card-text">Greetings, <%= @character.character_name =%>.</p>
+        <p id="thaumaturge-dialogue">How can I assist you?</p>
+      </div>
+        <div class="card text-left mt-4" style="width: 500px; height: 200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+            <div class="card-body">
+                <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Restore Health</h4>
+                <p class="text-center" style="margin-top: -20px;"><small>Heal back to full Health</small></p>
+                <div class="text-center">
+                    <%= form_tag(heal_character_path(@character), method: :post) do %>
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                    <%= submit_tag "Heal", class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="flex-row">
+      <div class="mb-4">
+        <div class="mx-auto">
+          <% if current_user.present? && @character.user_id == current_user.id && current_user.selected_character.present? && current_user.selected_character.id == @character.id %>
+            <!-- Inventory card -->
+            <%= render partial: 'characters/inventory', locals: { character: @character } %>
+          <% end %>
+        </div>
+      </div>
+
+<script>
+  function showTooltip(itemId, itemType) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    if (tooltip) tooltip.style.display = 'block';
+  }
+
+  function hideTooltip(itemId) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    if (tooltip) tooltip.style.display = 'none';
+  }
+
+  function updateTooltipPosition(event, itemId) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    const offset = 10;
+    const x = event.clientX + offset;
+    const y = event.clientY + offset;
+
+    // Check if the cursor is in the bottom half of the page
+    const isBottomHalf = event.clientY > window.innerHeight / 2;
+
+    // Adjust the tooltip position based on the cursor's location
+    if (isBottomHalf) {
+      tooltip.style.left = `${x}px`;
+      tooltip.style.bottom = `${window.innerHeight - y}px`;
+      tooltip.style.top = ''; // Reset top property
+    } else {
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+      tooltip.style.bottom = ''; // Reset bottom property
+    }
+  }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Array of possible texts
+    var possibleTexts = [
+      "May I interest you in some of my fine wares?",
+      "Take a look at my merchandise... You'll surely find something...",
+      "Looking for something? I've got just what you need...",
+      "Please take a seat and let's negociate...",
+      "Weapons, armor... I've got it all...",
+      "Your shiny coins for my shiny merchandise. Deal?",
+      "I know exactly what you need.",
+    ];
+
+    // Get the element by its id
+    var merchantDialogue = document.getElementById("merchant-dialogue");
+
+    // Randomly select a text from the array
+    var randomText = possibleTexts[Math.floor(Math.random() * possibleTexts.length)];
+
+    // Set the new text
+    merchantDialogue.innerText = randomText;
+  });
+</script>

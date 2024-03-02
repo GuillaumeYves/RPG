@@ -1,33 +1,12 @@
-          <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 5 %>
-          <%= form.submit "Gain 5 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 10 %>
-          <%= form.submit "Gain 10 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 100 %>
-          <%= form.submit "Gain 100 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 1000 %>
-          <%= form.submit "Gain 1000 XP" %>
-        <% end %>
-        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
-          <%= form.hidden_field :amount, value: 10000 %>
-          <%= form.submit "Gain 10000 XP" %>
-        <% end %>
-
 <!-- Character Info Card -->
-<div class="container-fluid">
-  <div class="card text-center mx-auto mt-4" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+<div class="mt-5 mx-auto">
+  <div class="card text-center" style="width: 800px; height: 560px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;" id="character-profile-display">
     <div class="card-body">
       <div class="row no-gutters">
         <!-- Left column with helmet, chest, hands, and feet -->
         <div class="col-md-3">
 
-          <% head_item = @character.head_item %>
+          <% head_item = @character.head %>
           <% if head_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= head_item.id %>)" onmouseover="showTooltip(<%= head_item.id %>)" onmouseout="hideTooltip(<%= head_item.id %>)">
               <!-- Tooltip content -->
@@ -40,7 +19,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% chest_item = @character.chest_item %>
+          <% chest_item = @character.chest %>
           <% if chest_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= chest_item.id %>)" onmouseover="showTooltip(<%= chest_item.id %>)" onmouseout="hideTooltip(<%= chest_item.id %>)">
               <!-- Tooltip content -->
@@ -53,7 +32,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% hands_item = @character.hands_item %>
+          <% hands_item = @character.hands %>
           <% if hands_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= hands_item.id %>)" onmouseover="showTooltip(<%= hands_item.id %>)" onmouseout="hideTooltip(<%= hands_item.id %>)">
               <!-- Tooltip content -->
@@ -66,7 +45,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% feet_item = @character.feet_item %>
+          <% feet_item = @character.feet %>
           <% if feet_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= feet_item.id %>)" onmouseover="showTooltip(<%= feet_item.id %>)" onmouseout="hideTooltip(<%= feet_item.id %>)">
               <!-- Tooltip content -->
@@ -82,34 +61,65 @@
         </div>
 
         <!-- Character details-->
-        <div class="col-md-6 text-center">
-          <!-- Replace the next line with your actual code for the character image -->
+        <div class="col text-center">
           <div style="position: relative; max-width: 100%;">
             <%= image_tag(@character.race_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
-            <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= @character.character_name %></h5>
+            <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 90%; text-align: center;">
+              <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> <%= @character.character_name %></h5>
+              <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> < Defenders of Tedorha ></h5>
+            </div>
           </div>
             <% current_experience = @character.experience %>
             <% required_experience = @character.required_experience_for_next_level %>
             <% progress_percentage = (current_experience.to_f / required_experience) * 100 %>
-            <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
-              <div class="progress-bar bg-success" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
-              <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=@character.race.capitalize%> <%=@character.character_class.capitalize%> Level <%=@character.level%></h6>
-            </div>
-              <div style="margin-top:3px;">
-                <% if @character.user_id == current_user.id %>
-                  <% if @character.skill_points == 1 %>
-                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have 1 Skill Point to spend.</strong><br>
-                  <% elsif @character.skill_points > 1 %>
-                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have <%= @character.skill_points %> Skill Points to spend.</strong><br>
-                  <% end %>
-                <% end %>
+            <% if @character.level < 100 %>
+              <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
+                <div class="progress-bar bg-success" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+                <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=@character.race.capitalize%> <%=@character.character_class.capitalize%> Level <%=@character.level%></h6>
               </div>
+            <% else %>
+              <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
+                <div class="progress-bar bg-info" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+                <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=@character.race.capitalize%> <%=@character.character_class.capitalize%> Level <%=@character.level%></h6>
+              </div>
+            <% end %>
+            <div style="margin-top:3px;">
+              <% if @character.user_id == current_user.id %>
+                <% if @character.skill_points == 1 %>
+                  <span class="d-inline-block">
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">
+                      <small>You have 1 Talent Point</small>
+                    </strong>
+                  </span>
+                <% elsif @character.skill_points > 1 %>
+                  <span class="d-inline-block">
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">
+                      <small>You have <%= @character.skill_points %> Talent Points</small>
+                    </strong>
+                  </span>
+                <% end %>
+              <% end %>
+
+              <% if @character.paragon_points == 1 %>
+                <span class="d-inline-block">
+                  <strong class="badge rounded-pill bg-info" style="color: black;">
+                    <small>You have 1 Paragon Point</small>
+                  </strong>
+                </span>
+              <% elsif @character.paragon_points > 1 %>
+                <span class="d-inline-block">
+                  <strong class="badge rounded-pill bg-info" style="color: black;">
+                    <small>You have <%= @character.paragon_points %> Paragon Points</small>
+                  </strong>
+                </span>
+              <% end %>
+            </div>
         </div>
 
         <!-- Right column with amulet, waist, finger1, and finger2 -->
         <div class="col-md-3">
 
-          <% neck_item = @character.neck_item %>
+          <% neck_item = @character.neck %>
           <% if neck_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= neck_item.id %>)" onmouseover="showTooltip(<%= neck_item.id %>)" onmouseout="hideTooltip(<%= neck_item.id %>)">
               <!-- Tooltip content -->
@@ -122,7 +132,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% waist_item = @character.waist_item %>
+          <% waist_item = @character.waist %>
           <% if waist_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= waist_item.id %>)" onmouseover="showTooltip(<%= waist_item.id %>)" onmouseout="hideTooltip(<%= waist_item.id %>)">
               <!-- Tooltip content -->
@@ -135,7 +145,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
           
-          <% finger1_item = @character.finger1_item %>
+          <% finger1_item = @character.finger1 %>
           <% if finger1_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger1_item.id %>)" onmouseover="showTooltip(<%= finger1_item.id %>)" onmouseout="hideTooltip(<%= finger1_item.id %>)">
               <!-- Tooltip content -->
@@ -148,7 +158,7 @@
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
 
-          <% finger2_item = @character.finger2_item %>
+          <% finger2_item = @character.finger2 %>
           <% if finger2_item.present? %>
           <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger2_item.id %>)" onmouseover="showTooltip(<%= finger2_item.id %>)" onmouseout="hideTooltip(<%= finger2_item.id %>)">
               <!-- Tooltip content -->
@@ -168,7 +178,7 @@
           
           <div class="row justify-content-center">
 
-            <% main_hand_item = @character.main_hand_item %>
+            <% main_hand_item = @character.main_hand %>
             <% if main_hand_item.present? %>
             <div class="hover-item col-2 text-center" onmousemove="updateTooltipPosition(event, <%= main_hand_item.id %>)" onmouseover="showTooltip(<%= main_hand_item.id %>)" onmouseout="hideTooltip(<%= main_hand_item.id %>)">
                 <!-- Tooltip content -->
@@ -178,10 +188,10 @@
               </div>
             <% else %>
               <!-- Empty card content -->
-              <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey; margin-right:30px;"></span>
+              <span style="display: inline-block; margin-left: 15.66px; margin-right: 15.66px; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
             <% end %>
               
-            <% off_hand_item = @character.off_hand_item %> 
+            <% off_hand_item = @character.off_hand %> 
             <% if off_hand_item.present? %>
             <div class="hover-item col-2 text-center" onmousemove="updateTooltipPosition(event, <%= off_hand_item.id %>)" onmouseover="showTooltip(<%= off_hand_item.id %>)" onmouseout="hideTooltip(<%= off_hand_item.id %>)">
                 <!-- Tooltip content -->
@@ -191,7 +201,7 @@
               </div>
             <% else %>
               <!-- Empty card content -->
-              <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+              <span style="display: inline-block; margin-left: 15.66px; margin-right: 15.66px; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
             <% end %>
 
           </div>
@@ -200,56 +210,23 @@
     </div>
   </div>
 
-    <% opponent = Character.find(params[:id]) %>
-    <% if opponent && opponent != current_user.selected_character %>
-      <div class="container-fluid mt-1">
-        <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
-          <div class="card-body">
-            <div class="row no-gutters">
-
-              <div class="col-md-4 mx-auto">
-                <div class="text-center">
-                    <%= form_tag combat_character_path(@character), method: :post do %>
-                        <%= hidden_field_tag :opponent_id, opponent.id %>
-                        <%= hidden_field_tag :character_id, current_user.selected_character.id %>
-                        <%= submit_tag 'Attack', class: "btn btn-outline-danger" %>
-                    <% end %>
-                </div>
-              </div>
-
-              <div class="col-md-4 mx-auto ">
-                <div class="text-center">
-                  <p class= "btn btn-outline-success"> Add as Ally </p>
-                </div>
-              </div>
-
-              <div class="col-md-4 mx-auto">
-                <div class="text-center">
-                  <p class= "btn btn-outline-primary"> Guild Invite </p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-      <% end %>
-
   <!-- Character stats card -->
-  <div class="container-fluid mt-1">
-      <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+  <div class=" mt-1">
+      <div class="card text-center" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;" id="character-stats-display">
         <div class="card-body">
           <div class="row no-gutters">
 
             <!-- Left column -->
             <div class="col-md-4 mx-auto mb-2">
               <div class="text-center">
-                <h4 class="card-header text-white bg-primary">General</h4><br>
-                <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.max_health %></span><br>
+                <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">General</h4><br>
+                <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.total_health %>/<%= @character.total_max_health %></span><br>
                 <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_attack %></span><br>
                 <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_spellpower %></span><br>
-                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= @character.total_critical_strike_chance%>%</span><br>
-                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= (@character.total_critical_strike_damage * 100) %>%</span><br>
+                <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_necrosurge %></span><br>
+                <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
+                <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
+                <span data-tooltip="tooltip" title="Increases all types of damage"><strong>Global Damage:</strong> <%= number_with_precision(@character.total_global_damage * 100, precision: 2) %>%</span><br>                
                 <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.total_armor %></span><br>
                 <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%= @character.total_magic_resistance %></span><br>
                 <span data-tooltip="tooltip" title="Evading will allow you to ignore damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
@@ -260,9 +237,10 @@
             <!-- Middle column -->
             <div class="col-md-4 mx-auto mb-2 ">
               <div class="text-center">
-                <h4 class="card-header text-white bg-primary">Attributes</h4><br>
+                <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Attributes</h4><br>
                 <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= @character.strength %></span><br>
                 <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= @character.intelligence %></span><br>
+                <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= @character.dreadmight %></span><br>
                 <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= @character.agility %></span><br>
                 <span data-tooltip="tooltip" title="Increases your critical strike chance"><strong>Luck:</strong> <%= @character.luck %></span><br>
                 <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= @character.willpower %></span><br>
@@ -272,7 +250,7 @@
               <!-- Right column -->
               <div class="col-md-4 mx-auto">
                 <div class="text-center">
-                  <h4 class="card-header text-white bg-primary">Talents</h4><br>
+                  <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Talents</h4><br>
                   <% if @skills.any?(&:unlocked) %>
                     <div class="row">
                       <% @skills.each do |skill| %>
@@ -282,7 +260,8 @@
                               <span data-tooltip="tooltip" title="<%= skill.description %>">
                                 <%= image_tag skill.skill_image, style: 'width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
                               </span>
-                              <p><small><%= skill.name %></small></p>
+                              <p style="margin-top: -5px; font-size:13px"><small><%= skill.name %></small></p>
+                              <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small><%= skill.skill_type&.capitalize %></small></p>
                             </div>
                           </div>
                         <% end %>
@@ -293,71 +272,286 @@
                   <% end %>
                 </div>
               </div>
-
           </div>
         </div>
       </div>
   </div>
-
-  <% if @character.user_id == current_user.id %>
-    <div class="container-fluid mt-1">
-      <div class="card text-center mx-auto" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
-        <div class="card-body">
-          <h4 class="card-header text-white bg-primary">Talents</h4>
-          <p><small>Choose your talents wisely, as you can only pick one talent in each row.</small></p><br>
-          <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
-            <h4 class="card-title">Level <%= level %></h4>
-            <div class="row mt-3">
-              <% level_skills.each_slice(2) do |skill1, skill2| %>
-                <div class="col-md-6">
-                  <div class="card mb-3">
-                    <div class="card-body" style ="height: 300px;">
-                      <h5 class="card-title"><%= skill1.name %></h5>
-                      <% if skill1.unlocked %>
-                        <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-                        <% else %>
-                          <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
-                          <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
-                            <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
-                          <% end %>
-                      <% end %>
-                      <br>
-                      <p class="card-text"><%= skill1.description %></p>
-                    </div>
-                  </div>
-                </div>
-
-                <% if skill2 %>
-                <div class="col-md-6">
-                  <div class="card mb-3">
-                    <div class="card-body" style ="height: 300px;">
-                      <h5 class="card-title"><%= skill2.name %></h5>
-                      <% if skill2.unlocked %>
-                        <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-                        <% else %>
-                          <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
-                          <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
-                            <%= form.submit 'Unlock', class: "btn btn-outline-primary", data: { confirm: 'Are you sure you want to unlock this skill?' } %>
-                          <% end %>
-                      <% end %>
-                      <br>
-                      <p class="card-text"><%= skill2.description %></p>
-                    </div>
-                  </div>
-                </div>
-                <% end %>
-              <% end %>
-            </div>
-          <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 50 %>
+          <%= form.hidden_field :gold_reward, value: 1 %>
+        <%= form.submit "50 XP and 1 Gold" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 100 %>
+          <%= form.hidden_field :gold_reward, value: 2 %>
+          <%= form.submit "100 XP and 2 Gold" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 1000 %>
+          <%= form.hidden_field :gold_reward, value: 10 %>
+          <%= form.submit "1000 XP and 10 Gold" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 200000 %>
+          <%= form.hidden_field :gold_reward, value: 1000 %>
+          <%= form.submit "200000 XP and 1000 Gold" %>
+        <% end %>
+        <%= form_with(url: gain_experience_character_path(@character), method: :post) do |form| %>
+          <%= form.hidden_field :amount, value: 200 %>
+          <%= form.hidden_field :gold_reward, value: 100000 %>
+          <%= form.submit "200 XP and 100000 Gold" %>
+        <% end %>
+</div>
+  <div class="container mt-5">
+    <div class="card text-left" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="card-body">
+        <div class="card" id="characterDescriptionCard" style="border: 2px solid #333; padding: 10px; height:300px; ">
+          <p class="card-text" id="characterDescriptionText">Lorem 
+            ipsum dolor sit amet, consectetur adipiscing elit, 
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         </div>
       </div>
     </div>
-  <% end %>
+    <% opponent = Character.find(params[:id]) %>
+    <% if opponent && current_user.selected_character.present? && opponent != current_user.selected_character %>
+      <div class="mt-1">
+        <div class="card text-center mx-auto" style="width: 800px; height: 80px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <div class="card-body">
+            <div class="row no-gutters">
+              <div class="col mx-auto">
+                <div class="text-center">
+                    <%= form_tag combat_character_path(@character), method: :post do %>
+                        <%= hidden_field_tag :opponent_id, opponent.id %>
+                        <%= hidden_field_tag :character_id, current_user.selected_character.id %>
+                        <%= submit_tag 'Attack', class: "btn btn-outline-danger" %>
+                    <% end %>
+                </div>
+              </div>
+              <div class="col">
+                <div class="text-center">
+                  <p class= "btn btn-outline-success"> Add as Ally </p>
+                </div>
+              </div>
+              <div class="col">
+                <div class="text-center">
+                  <p class= "btn btn-outline-primary"> Guild Invite </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
 
-  <%= render partial: 'inventory', locals: { character: @character } %>
+    <div class="mt-1">
+      <div class="mx-auto" id="character-inventory-display">
+        <% if current_user.present? && @character.user_id == current_user.id && current_user.selected_character.present? && current_user.selected_character.id == @character.id %>
+          <!-- Inventory card -->
+          <%= render partial: 'inventory', locals: { character: @character } %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Third modal -->
+    <div class="modal" style="margin-top: 150px; margin-left: 280px" id="tutorialModal3" role="dialog" aria-labelledby="tutorialModal3Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content card text-center" style="width: auto; height: 300px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <h5 class="mx-auto mt-2">Tutorial</h5>
+            <div class="modal-body">
+              <p>
+              This is the character profile page. 
+              <br>
+              Here you'll find all the informations about a character's items and global informations.
+              <br>
+              You can also hover on the experience bar to know exactly how much experience a character has.</p>
+              <br>
+              <button type="button" class="btn btn-outline-primary mb-1" style= "position: absolute; bottom: 0; left: 90%; transform: translateX(-50%);" id="closeModal3">Next</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fourth modal -->
+    <div class="modal" style="margin-top: 620px; margin-left: 280px" id="tutorialModal4" role="dialog" aria-labelledby="tutorialModal4Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content card text-center" style="width: auto; height: 300px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <h5 class="mx-auto mt-2">Tutorial</h5>
+            <div class="modal-body">
+              <p>
+              Here you'll find more details about a character. 
+              <br>
+              For exemple, its stats and talents.
+              <br>
+              This is especially useful when deciding whether or not to attack another player.</p>
+              <br>
+              <button type="button" class="btn btn-outline-primary mb-1" style= "position: absolute; bottom: 0; left: 90%; transform: translateX(-50%);" id="closeModal4">Next</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fifth modal -->
+    <div class="modal" style="margin-top: 430px; margin-left: -280px" id="tutorialModal5" role="dialog" aria-labelledby="tutorialModal5Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content card text-center" style="width: auto; height: 300px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <h5 class="mx-auto mt-2">Tutorial</h5>
+            <div class="modal-body">
+              <p>
+              Here is your inventory.
+              <br>
+              You can hold up to 10 items at the same time and it's only visible for your characters.
+              <br>
+              <button type="button" class="btn btn-outline-primary mb-1" style= "position: absolute; bottom: 0; left: 90%; transform: translateX(-50%);" id="closeModal5">Next</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sixth modal -->
+    <div class="modal" style="margin-top: 50px;" id="tutorialModal6" role="dialog" aria-labelledby="tutorialModal6Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content card text-center" style="width: auto; height: 300px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <h5 class="mx-auto mt-2">Tutorial</h5>
+            <div class="modal-body">
+              <p>
+              This is your character's resources.
+              <br>
+              You'll find your character's gold, energy, daily quests count and arena tickets.
+              <br>
+              This will be displayed on all pages as long as you have a character selected, so you can keep track of your resources at all times.
+              <br>
+              <button type="button" class="btn btn-outline-primary mb-1" style= "position: absolute; bottom: 0; left: 90%; transform: translateX(-50%);" id="closeModal6">Next</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seventh modal -->
+    <div class="modal" style="margin-top: 10px; margin-left: -600px" id="tutorialModal7" role="dialog" aria-labelledby="tutorialModal7Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content card text-center" style="width: auto; height: 100px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <h5 class="mx-auto mt-2">Tutorial</h5>
+            <div class="modal-body">
+              <p>
+              And finally let's take a quick look at the menu and its navigation.
+              <br>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eighth modal -->
+    <div class="modal" style="margin-top: 10px; margin-left: -600px" id="tutorialModal8" role="dialog" aria-labelledby="tutorialModal8Label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content card text-center" style="width: 700px; height: 600px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <h5 class="mx-auto mt-2">Tutorial</h5>
+            <div class="modal-body">
+              <p>
+              On this menu you'll find different links;
+              <br>
+              <br>
+              - <strong>Select Character</strong> : This brings you back to the character selection page, in case you want to switch characters.
+              <br>
+              - <strong>Profile</strong> : This is the current page, it will bring you to your selected character's profile.
+              <br>
+              - <strong>Talents</strong> : Your character's talent and paragon boards, when you aquire a talent point or a paragon point you spend them on this page.
+              <br>
+              - <strong>Hunt</strong> : You can accept hunts there, a quick way to earn experience and gold.
+              <br>
+              - <strong>Merchant</strong> : Here the merchant will offer you a limited amount of items every day and you can buy them with gold.
+              <br>
+              - <strong>Leaderboard</strong> : The leaderboard displays the rankings of characters in the arena, you can also access a character's profile from this page.
+              <br>
+              <br>
+              Feel free to navigate through the game and familiarise yourself with the interface and may the Tedorha Gods bless your journey!</p>
+              <br>
+              <button type="button" class="btn btn-outline-primary mb-1" style= "position: absolute; bottom: 0; left: 90%; transform: translateX(-50%);" id="closeModal8">Complete</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 
-</div>
+
+
+
+<script>
+  // Check if select_character_tutorial is true on page load
+  $(document).ready(function () {
+    if (localStorage.getItem('user_tutorial') === 'true') {
+      // Exit the script if the user tutorial is completed
+      return;
+    }
+    
+      if (localStorage.getItem('select_character_tutorial') === 'true') {
+        $('#tutorialModal3').modal('show');
+        $('#character-profile-display').addClass('on-top');
+      }
+
+      // Close Modal 3
+      $('#closeModal3').on('click', function () {
+        $('#tutorialModal3').modal('hide');
+        $('#character-profile-display').removeClass('on-top');
+        // Open Modal 4
+        $('#tutorialModal4').modal('show');
+        $('#character-stats-display').addClass('on-top');
+      });
+
+      // Close Modal 4
+      $('#closeModal4').on('click', function () {
+        $('#tutorialModal4').modal('hide');
+        $('#character-stats-display').removeClass('on-top');
+        // Open Modal 5
+        $('#tutorialModal5').modal('show');
+        $('#character-inventory-display').addClass('on-top');
+      });
+
+      // Close Modal 5
+      $('#closeModal5').on('click', function () {
+        $('#tutorialModal5').modal('hide');
+        $('#character-inventory-display').removeClass('on-top');
+        // Open Modal 6
+        $('#tutorialModal6').modal('show');
+        $('#character-resources-display').addClass('on-top');
+      });
+
+      // Close Modal 6
+      $('#closeModal6').on('click', function () {
+        $('#tutorialModal6').modal('hide');
+        $('#character-resources-display').removeClass('on-top');
+        // Open Modal 7
+        $('#tutorialModal7').modal('show');
+        $('#menuButton').addClass('on-top').removeClass('btn-outline-primary').addClass('btn-primary');
+      });
+
+      // Close Modal 7
+      $('#menuButton').on('click', function () {
+        // Check if the user tutorial is not completed
+          // Hide Modal 7 first
+          $('#tutorialModal7').modal('hide');
+          // Remove 'on-top' and 'btn-primary' classes from #menuButton
+          $('#menuButton').removeClass('on-top').removeClass('btn-primary').addClass('btn-outline-primary');
+          // Open Modal 8
+          $('#tutorialModal8').modal('show');
+          // Add 'on-top' class to #mySidenav
+          $('#mySidenav').addClass('on-top');
+      });
+
+      // Close Modal 8
+      $('#closeModal8').on('click', function () {
+        $('#tutorialModal8').modal('hide');
+        $('#mySidenav').removeClass('on-top');
+
+        localStorage.setItem('user_tutorial', 'true');
+        location.reload();
+      });
+  });
+</script>
 
 <script>
     $(document).ready(function() {

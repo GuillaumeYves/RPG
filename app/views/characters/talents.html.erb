@@ -1,0 +1,220 @@
+<% if @character.user_id == current_user.id %>
+  <div class="mt-5">
+    <div style="display: flex; flex-direction: row;">
+      <!-- First column -->
+      <div class="col" style="margin-right: 20px;">
+        <div class="card text-center mx-auto" style="width: 800px; height: 1200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; overflow: auto;">
+          <div class="card-body" style="width: 100%; margin-left: 5px;">
+              <h4 class="card-header text-white bg-primary mx-auto" style="width: 200px;">Talents</h4>
+            <p><small>Choose your talents wisely, as you can only pick one talent in each row.</small></p><br>
+              <div>
+                <% if @character.user_id == current_user.id %>
+                  <% if @character.skill_points == 1 %>
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have 1 Talent Point</strong><br>
+                  <% elsif @character.skill_points > 1 %>
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have <%= @character.skill_points %> Talent Points</strong><br>
+                  <% end %>
+                <% end %>
+              </div>
+            <% @character.skills.order(:level_requirement).group_by(&:level_requirement).each_with_index do |(level, level_skills), index| %>
+              <h4 class="card-title mt-2">Level <%= level %></h4>
+              <div class="row mt-3">
+                <% level_skills.each_slice(2) do |skill1, skill2| %>
+                  <div class="col-md-6">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title"><%= skill1.name %></h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px"><%= skill1.skill_type&.capitalize %></p>
+                        <% if skill1.unlocked %>
+                          <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                          <p class="card-text"><%= skill1.description %></p>
+                        <% else %>
+                          <%= image_tag skill1.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                          <p class="card-text"><%= skill1.description %></p>
+                          <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill1.id), method: :post, local: true) do |form| %>
+                            <%= form.submit 'Unlock', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <% if skill2 %>
+                    <div class="col-md-6">
+                      <div class="card mb-3">
+                        <div class="card-body" style="height: 320px;">
+                          <h5 class="card-title"><%= skill2.name %></h5>
+                          <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px"><%= skill2.skill_type&.capitalize %></p>
+                          <% if skill2.unlocked %>
+                            <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                            <p class="card-text"><%= skill2.description %></p>
+                          <% else %>
+                            <%= image_tag skill2.skill_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px; filter: grayscale(100%);' %>
+                            <p class="card-text"><%= skill2.description %></p>
+                            <%= form_with(url: unlock_skill_character_path(@character, skill_id: skill2.id), method: :post, local: true) do |form| %>
+                              <%= form.submit 'Unlock', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                            <% end %>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paragon column -->
+      <div class="col">
+        <div class="card text-center mx-auto" style="width: 800px; height: 1200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888; overflow: auto; ">
+          <div class="card-body" style="width: 100%; margin-left: 5px;">
+              <h4 class="card-header text-white bg-primary mx-auto" style="width: 200px;">Paragon</h4>
+              <p><small>From level 100 and onwards, you can spend Paragon points to unleash your true power.</small></p><br>
+                <% if @character.user_id == current_user.id %>
+                  <% if @character.paragon_points == 1 %>
+                    <strong class="badge rounded-pill bg-info" style="color: black;"><small>You have 1 Paragon Point</small></strong><br>
+                  <% elsif @character.paragon_points > 1 %>
+                    <strong class="badge rounded-pill bg-info" style="color: black;"><small>You have <%= @character.paragon_points %> Paragon Points</small></strong><br>
+                  <% end %>
+                <% end %>
+                <h4 class="card-title mt-2">Physical</h4>
+                <div class="row mt-3">
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Attack</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Attack by 1% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_attack_count %> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_attack * 100 , precision: 2) %>%</p>
+                          <%= form_tag paragon_increase_attack_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Armor</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Armor by 0.50% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_armor_count%> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_armor * 100 , precision: 2) %>%</p>
+                          <%= form_tag paragon_increase_armor_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h4 class="card-title mt-2">Magic</h4>
+                <div class="row mt-3">
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Spellpower</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Spellpower by 1% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_spellpower_count %> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_spellpower * 100 , precision: 2) %>%</p>
+                          <%= form_tag paragon_increase_spellpower_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Magic Resistance</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Magic Resistance by 0.50% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_magic_resistance_count%> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_magic_resistance * 100 , precision: 2) %>%</p>  
+                          <%= form_tag paragon_increase_magic_resistance_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h4 class="card-title mt-2">Critical</h4>
+                <div class="row mt-3">
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Critical Strike Chance</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Critical Strike Chance by 0.10% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_critical_strike_chance_count %> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_critical_strike_chance, precision: 2) %>%</p>
+                          <%= form_tag paragon_increase_critical_strike_chance_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Critical Strike Damage</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Critical Strike Damage by 1.00% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_critical_strike_damage_count%> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_critical_strike_damage * 100 , precision: 2) %>%</p>  
+                          <%= form_tag paragon_increase_critical_strike_damage_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h4 class="card-title mt-2">Core</h4>
+                <div class="row mt-3">
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Total Health</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Total Health by 0.40% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_total_health_count %> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_total_health * 100 , precision: 2) %>%</p>
+                          <%= form_tag paragon_increase_total_health_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <div class="card mb-3">
+                      <div class="card-body" style="height: 320px;">
+                        <h5 class="card-title">Global Damage</h5>
+                        <p style="font-size:12px; margin-top:-10px; margin-bottom: 1px">Increase your Global Damage by 0.40% per point spent</p>
+                        <%= image_tag('misc/paragon_image.jpg', style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                        <p class="card-text" style="font-size:12px; margin-top:-5px;"><strong><%= @character.paragon_increase_global_damage_count%> / 50</strong></p>
+                        <p class="card-text"><%= number_with_precision(@character.paragon_global_damage * 100 , precision: 2) %>%</p>
+                          <%= form_tag paragon_increase_global_damage_character_path(@character), method: :post do %>
+                            <%= submit_tag 'Increase', class: "btn btn-outline-primary mb-1", data: { confirm: 'Are you sure you want to unlock this skill?' }, style: "position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);" %>
+                          <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+<% end %>

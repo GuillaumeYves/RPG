@@ -1,85 +1,185 @@
-  <div style="display: flex; flex-direction: row;">
-    <!-- Left Column - Image and Text -->
-    <div class="card text-left" style="border: 2px solid #000; padding: 30px; max-height: 700px; max-width: 500px; margin-right: 20px;">
+  <div class="mt-5" style="display: flex; flex-direction: row; ">
+    <div class="card text-left " style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 600px; width: 500px; margin-right: 20px; align-items: center;">
       <div class="card-body">
-        <%= image_tag('npcs/merchant.jpg', style: 'width:100%; height:auto; border-radius:30%; margin-bottom:30px; box-shadow: 5px 5px 10px #888888;') %>
+        <div style="position: relative; max-width: 100%;">
+          <%= image_tag('npcs/merchant.jpg', style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+          <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;">Mysterious Merchant</h5>
+        </div>
         <br>
-        <h4 class="card-header text-white bg-primary">Mysterious Merchant</h4>
-        <br>
-        <p class="card-text">Welcome adventurer... 
-        <br>  
-        May I interest you in some of my fine wares?
-        </p>
+        <p class="card-text">Welcome adventurer...</p>
+        <p id="merchant-dialogue"> May I interest you in some of my fine wares?</p>
+      </div>
+        <div class="card text-left mt-4" style="width: 500px; height: 200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+            <div class="card-body">
+                <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Renew stocks</h4>
+                <p class="text-center" style="margin-top: -20px;"><small>Get new items for sale before the daily reset</small></p>
+                <div class="text-center">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div style="flex-row">
+      <div class="mb-4">
+        <div class="mx-auto">
+          <% if current_user.present? && @selected_character.user_id == current_user.id && current_user.selected_character.present? && current_user.selected_character.id == @selected_character.id %>
+            <!-- Inventory card -->
+            <%= render partial: 'characters/inventory', locals: { character: @selected_character } %>
+          <% end %>
+        </div>
+      </div>
+
+    <div class="card text-left mb-1" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="card-body">
+        <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Weapon</h4>
+        <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(5, 1fr);">
+          <% (1..5).each do |index| %>
+            <% if @random_weapon_items[index - 1] %>
+              <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= @random_weapon_items[index - 1].id %>)" onmouseover="showTooltip(<%= @random_weapon_items[index - 1].id %>, 'Weapon')" onmouseout="hideTooltip(<%= @random_weapon_items[index - 1].id %>)">
+                <%= display_item_tooltip(@random_weapon_items[index - 1]) %>
+                <%= image_tag(@random_weapon_items[index - 1].item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+                <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: @random_weapon_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_weapon_items[index - 1].id}" %>
+                <script>
+                  // JavaScript code to show gold price on hover
+                  document.getElementById('purchaseButton<%= @random_weapon_items[index - 1].id %>').addEventListener('mouseover', function() {
+                    this.innerText = '- <%= number_with_delimiter(@random_weapon_items[index - 1].gold_price) %>';
+                  });
+
+                  document.getElementById('purchaseButton<%= @random_weapon_items[index - 1].id %>').addEventListener('mouseout', function() {
+                    this.innerText = 'Purchase';
+                  });
+                </script>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <div class="text-center">
+                <span class="mb-5" style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card text-left mb-1" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="card-body">
+        <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Armor</h4>
+        <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(5, 1fr);">
+          <% (1..5).each do |index| %>
+            <% if @random_armor_items[index - 1] %>
+              <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= @random_armor_items[index - 1].id %>)" onmouseover="showTooltip(<%= @random_armor_items[index - 1].id %>, 'Weapon')" onmouseout="hideTooltip(<%= @random_armor_items[index - 1].id %>)">
+                <%= display_item_tooltip(@random_armor_items[index - 1]) %>
+                <%= image_tag(@random_armor_items[index - 1].item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+                <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: @random_armor_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_armor_items[index - 1].id}" %>
+                <script>
+                  // JavaScript code to show gold price on hover
+                  document.getElementById('purchaseButton<%= @random_armor_items[index - 1].id %>').addEventListener('mouseover', function() {
+                    this.innerText = '- <%= number_with_delimiter(@random_armor_items[index - 1].gold_price) %>';
+                  });
+
+                  document.getElementById('purchaseButton<%= @random_armor_items[index - 1].id %>').addEventListener('mouseout', function() {
+                    this.innerText = 'Purchase';
+                  });
+                </script>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <div class="text-center">
+                <span class="mb-5" style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card text-left mb-1" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="card-body">
+        <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Jewelry</h4>
+        <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(5, 1fr);">
+          <% (1..5).each do |index| %>
+            <% if @random_jewelry_items[index - 1] %>
+              <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= @random_jewelry_items[index - 1].id %>)" onmouseover="showTooltip(<%= @random_jewelry_items[index - 1].id %>, 'Weapon')" onmouseout="hideTooltip(<%= @random_jewelry_items[index - 1].id %>)">
+                <%= display_item_tooltip(@random_jewelry_items[index - 1]) %>
+                <%= image_tag(@random_jewelry_items[index - 1].item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+                <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: @random_jewelry_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_jewelry_items[index - 1].id}" %>
+                <script>
+                  // JavaScript code to show gold price on hover
+                  document.getElementById('purchaseButton<%= @random_jewelry_items[index - 1].id %>').addEventListener('mouseover', function() {
+                    this.innerText = '- <%= number_with_delimiter(@random_jewelry_items[index - 1].gold_price) %>';
+                  });
+
+                  document.getElementById('purchaseButton<%= @random_jewelry_items[index - 1].id %>').addEventListener('mouseout', function() {
+                    this.innerText = 'Purchase';
+                  });
+                </script>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <div class="text-center">
+                <span class="mb-5" style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
       </div>
     </div>
 
 
-    <div style="flex-grow: 1;">
-      <!-- Right Columns - Items -->
-      <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
-        <h4 class="card-header text-center text-white bg-primary">Weapons</h4>
-        <div class="card-body text-center">
-          <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-            <% @random_weapon_items.each do |item| %>
-              <div class="merchant-item text-center">
-                <% if item %>
-                  <%= image_tag(item.item_image, style: 'width: 80px; height: 80px; border-radius: 10%; box-shadow: 2px 2px 10px #888888; margin: 0 auto;') %>
-                  <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: item.id), method: :post, class: "btn btn-outline-primary btn-sm mt-2" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
+<script>
+  function showTooltip(itemId, itemType) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    if (tooltip) tooltip.style.display = 'block';
+  }
 
-      <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
-        <h4 class="card-header text-center text-white bg-primary">Armor</h4>
-        <div class="card-body text-center">
-          <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-            <% @random_armor_items.each do |item| %>
-              <div class="merchant-item text-center">
-                <% if item %>
-                  <%= image_tag(item.item_image, style: 'width: 80px; height: 80px; border-radius: 10%; box-shadow: 2px 2px 10px #888888; margin: 0 auto;') %>
-                  <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: item.id), method: :post, class: "btn btn-outline-primary btn-sm mt-2" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
+  function hideTooltip(itemId) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    if (tooltip) tooltip.style.display = 'none';
+  }
 
-      <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
-        <h4 class="card-header text-center text-white bg-primary">Jewelry</h4>
-        <div class="card-body text-center">
-          <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-            <% @random_jewelry_items.each do |item| %>
-              <div class="merchant-item text-center">
-                <% if item %>
-                  <%= image_tag(item.item_image, style: 'width: 80px; height: 80px; border-radius: 10%; box-shadow: 2px 2px 10px #888888; margin: 0 auto;') %>
-                  <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: item.id), method: :post, class: "btn btn-outline-primary btn-sm mt-2" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
+  function updateTooltipPosition(event, itemId) {
+    const tooltip = document.getElementById(`tooltip_${itemId}`);
+    const offset = 10;
+    const x = event.clientX + offset;
+    const y = event.clientY + offset;
 
-      <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 300px; ">
-        <h4 class="card-header text-center text-white bg-primary">Potions</h4>
-        <div class="card-body text-center">
-          <div class="merchant-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-            <% @random_jewelry_items.each do |item| %>
-              <div class="merchant-item text-center">
-                <% if item %>
-                  <%= image_tag(item.item_image, style: 'width: 80px; height: 80px; border-radius: 10%; box-shadow: 2px 2px 10px #888888; margin: 0 auto;') %>
-                  <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: item.id), method: :post, class: "btn btn-outline-primary btn-sm mt-2" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
+    // Check if the cursor is in the bottom half of the page
+    const isBottomHalf = event.clientY > window.innerHeight / 2;
 
+    // Adjust the tooltip position based on the cursor's location
+    if (isBottomHalf) {
+      tooltip.style.left = `${x}px`;
+      tooltip.style.bottom = `${window.innerHeight - y}px`;
+      tooltip.style.top = ''; // Reset top property
+    } else {
+      tooltip.style.left = `${x}px`;
+      tooltip.style.top = `${y}px`;
+      tooltip.style.bottom = ''; // Reset bottom property
+    }
+  }
+</script>
 
-    </div>
-  </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Array of possible texts
+    var possibleTexts = [
+      "May I interest you in some of my fine wares?",
+      "Take a look at my merchandise... You'll surely find something...",
+      "Looking for something? I've got just what you need...",
+      "Please take a seat and let's negociate...",
+      "Weapons, armor... I've got it all...",
+      "Your shiny coins for my shiny merchandise. Deal?",
+      "I know exactly what you need.",
+    ];
+
+    // Get the element by its id
+    var merchantDialogue = document.getElementById("merchant-dialogue");
+
+    // Randomly select a text from the array
+    var randomText = possibleTexts[Math.floor(Math.random() * possibleTexts.length)];
+
+    // Set the new text
+    merchantDialogue.innerText = randomText;
+  });
+</script>

@@ -1,53 +1,65 @@
 <% if @characters.any? %>
-  <div>
-    <table class="table">
-      <tbody>
-        <tr>
-          <% @characters.each do |character| %>
-            <td style="padding-right: 50px;">
-              <div class="card" style="border: 2px solid #000; padding: 30px; max-width: 500px;">
-                <%= image_tag(character.race_image, style: 'width:100%; height:auto; border-radius:30%;', class: 'card-img-top', alt: character.race_image) %>
-                <div class="card-body">
-                  <h3><%= character.character_name %></h3>
-                  <h5 class="card-title"><%= character.race.capitalize %> <%= character.character_class.capitalize %> Level <%= character.level %></h5>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <%= form_with(model: character, url: select_character_path(character), method: :post, local: true) do |form| %>
-                        <%= form.submit 'Select', class: "btn btn-outline-primary", data: { confirm: 'Are you sure?' } %>
-                      <% end %>
-                    </div>
-                    <div class="col-md-6">
-                      <%= form_with(model: character, url: character_path(character), method: :delete, local: true) do |form| %>
-                        <%= form.button 'Delete', class: "btn btn-outline-danger", data: { confirm: 'Are you sure?' } %>
-                      <% end %>
-                    </div>
-                  </div>
+  <div class="mt-5 mx-auto">
+    <div class="row justify-content-center" id="user-characters-display">
+      <% @characters.each do |character| %>
+        <div class="col" style="width: 400px;">
+          <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+            <div class="col text-center">
+              <div style="position: relative; max-width: 100%;">
+                <%= image_tag(character.race_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+                <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= character.character_name %></h5>
+              </div>
+            </div>
+          </div>
+              <% current_experience = character.experience %>
+              <% required_experience = character.required_experience_for_next_level %>
+              <% progress_percentage = (current_experience.to_f / required_experience) * 100 %>
+              <% if character.level < 100 %>
+                <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+                  <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=character.race.capitalize%> <%=character.character_class.capitalize%> Level <%=character.level%></h6>
+                </div>
+              <% else %>
+                <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+                  <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=character.race.capitalize%> <%=character.character_class.capitalize%> Level <%=character.level%></h6>
+                </div>
+              <% end %>
+              <div class="row mt-3 text-center">
+                <div class="col" style="padding-left: 50px;">
+                  <%= form_with(model: character, url: select_character_path(character), method: :post, local: true, id: "SelectCharacterTutorial") do |form| %>
+                    <%= form.submit 'Select', id: "character-select-button", class: "btn btn-outline-primary", data: { confirm: 'Are you sure?' } %>
+                  <% end %>
+                </div>
+                <div class="col" style="padding-right: 50px;">
+                  <%= form_with(model: character, url: character_path(character), method: :delete, local: true) do |form| %>
+                    <%= form.button 'Delete', class: "btn btn-outline-danger", data: { confirm: 'Are you sure?' } %>
+                  <% end %>
                 </div>
               </div>
-            </td>
-          <% end %>
-        </tr>
-      </tbody>
-    </table>
-    <% else %>
-      <p>You don't have any characters yet.</p>
-      <br>
-      <%= link_to "Create a Character", new_character_path %>
-    <% end %>
-  </div>
-
-<script>
-  document.addEventListener('turbo:load', function () {
-    <% @characters.each do |character| %>
-      const deleteButton<%= character.id %> = document.getElementById('delete-character-<%= character.id %>');
-      if (deleteButton<%= character.id %>) {
-        deleteButton<%= character.id %>.addEventListener('click', function (event) {
-          const confirmation = confirm('Are you sure?');
-          if (!confirmation) {
-            event.preventDefault();
-          }
-        });
-      }
-    <% end %>
-  });
-</script>
+        </div>
+      <% end %>
+    </div>
+    <br>
+    <% if current_user.characters.count == 3 %>
+      <div class="mt-5 text-center" style="font-size: 18px;">
+        <p>You currently have <span style="font-weight: bold"><%= current_user.characters.count %>/3</span> characters.</p>
+        <br>
+        <p>You cannot have more characters.</p>
+      </div>
+    <% else%>
+      <div class="mt-5 text-center" style="font-size: 18px;">
+        <p>You currently have <span style="font-weight: bold"><%= current_user.characters.count %>/3</span> characters.</p>
+        <br>
+        <%= link_to "Create a new character", new_character_path %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+<% if current_user.characters.count == 0 %>
+      <div class="mt-5 text-center" style="font-size: 18px;">
+        <p>Start your journey and create a character</p>
+        <br>
+        <%= link_to "Create a character", new_character_path %>
+      </div>
+<% end %>

@@ -1,23 +1,44 @@
-<% if @character.user_id == current_user.id %>
-  <div class="card text-left" style="border: 2px solid #000; padding: 15px; margin-bottom: 20px; width: 500px; height: 220px;">
-    <h4 class="card-header text-center text-white bg-primary">Inventory</h4>
-    <div class="card-body">
-      <div class="inventory-grid " style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-        <% (1..10).each do |index| %>
-          <% item = @character.inventory.items[index - 1] %>
-          <div class="inventory-item ">
-            <% if item %>
-              <%= image_tag(item.item_image, style: 'width: 50px; height: 50px; border-radius: 10%; box-shadow: 2px 2px 10px #888888;') %>
-                <%= form_with(model: @selected_character, url: equip_item_character_path(@selected_character, item), method: :post, local: true, params: { item_id: item.id }) do |form| %>
-                  <%= form.button "Equip", class: "btn btn-outline-primary btn-sm mt-2" %>
+<div class="card text-left" style="width: 800px; height: auto; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+  <div class="card-body">
+    <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Inventory</h4>
+    <div class="inventory-grid text-center" style="display: grid; grid-template-columns: repeat(5, 1fr);">
+      <% (1..10).each do |index| %>
+        <div class="row justify-content-center">
+          <% item = @selected_character.inventory.items[index - 1] %>
+          <% if item %>
+            <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= item.id %>)" onmouseover="showTooltip(<%= item.id %>)" onmouseout="hideTooltip(<%= item.id %>)">
+              <!-- Tooltip content -->
+              <%= display_item_tooltip(item) %>
+              <!-- Item Image -->
+              <%= image_tag(item.item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+              <% if current_page?(items_path) %>
+                <%= form_with(model: @selected_character, url: sell_item_character_path(@selected_character, item), method: :post, local: true, params: { item_id: item.id }) do |form| %>
+                  <%= form.button "Sell", class: "btn btn-outline-danger btn-sm mt-1 mb-1", style:"width: 100px;", id:"sellButton#{item.id}" %>
+                  <script>
+                    // JavaScript code to show gold price on hover
+                    document.getElementById('sellButton<%= item.id %>').addEventListener('mouseover', function() {
+                      this.innerText = '+ <%= number_with_delimiter(item.gold_price) %>';
+                    });
+                  
+                    document.getElementById('sellButton<%= item.id %>').addEventListener('mouseout', function() {
+                      this.innerText = 'Sell';
+                    });
+                  </script>
                 <% end %>
-            <% else %>
-              <!-- Empty card content -->
-              <div style="width: 50px; height: 50px; border-radius: 10%; border: 1px solid #000; box-shadow: 2px 2px 10px #888888;"></div>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
+              <% else %>
+                <%= form_with(model: @selected_character, url: equip_item_character_path(@selected_character, item), method: :post, local: true, params: { item_id: item.id }) do |form| %>
+                  <%= form.button "Equip", class: "btn btn-outline-primary btn-sm mt-1 mb-1" %>
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
+            <!-- Empty card content -->
+            <div>
+              <span class="mb-5" style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </div>
-<% end %>
+</div>

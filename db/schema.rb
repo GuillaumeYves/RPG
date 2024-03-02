@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_02_153739) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -77,20 +77,63 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.bigint "feet"
     t.string "gender"
     t.integer "agility", default: 5
-    t.float "critical_strike_damage", default: 1.5
+    t.decimal "critical_strike_damage", precision: 5, scale: 2, default: "1.2"
     t.integer "max_health", default: 100
     t.integer "total_attack"
     t.integer "total_spellpower"
     t.integer "total_armor"
     t.integer "total_magic_resistance"
-    t.float "total_critical_strike_damage"
+    t.decimal "total_critical_strike_damage", precision: 5, scale: 2
     t.integer "strength_bonus", default: 0
     t.integer "intelligence_bonus", default: 0
     t.integer "agility_bonus", default: 0
-    t.float "critical_strike_chance", default: 1.0
-    t.float "total_critical_strike_chance"
+    t.decimal "critical_strike_chance", precision: 5, scale: 2, default: "1.0"
+    t.decimal "total_critical_strike_chance", precision: 5, scale: 2
+    t.integer "gold", default: 0
+    t.integer "total_health"
+    t.integer "total_max_health"
+    t.integer "energy", default: 100
+    t.integer "max_energy", default: 100
+    t.integer "arena_ticket", default: 10
+    t.integer "max_arena_ticket", default: 10
+    t.integer "daily_quest", default: 10
+    t.integer "max_daily_quest", default: 10
+    t.integer "necrosurge", default: 10
+    t.integer "total_necrosurge"
+    t.integer "dreadmight", default: 5
+    t.integer "dreadmight_bonus", default: 0
+    t.integer "paragon_points", default: 0
+    t.decimal "global_damage", precision: 6, scale: 3, default: "0.0"
+    t.decimal "total_global_damage", precision: 6, scale: 3
+    t.integer "paragon_increase_attack_count", default: 0
+    t.integer "paragon_increase_armor_count", default: 0
+    t.integer "paragon_increase_spellpower_count", default: 0
+    t.integer "paragon_increase_magic_resistance_count", default: 0
+    t.integer "paragon_increase_critical_strike_chance_count", default: 0
+    t.integer "paragon_increase_critical_strike_damage_count", default: 0
+    t.integer "paragon_increase_total_health_count", default: 0
+    t.integer "paragon_increase_global_damage_count", default: 0
+    t.decimal "paragon_attack", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_armor", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_spellpower", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_magic_resistance", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_critical_strike_chance", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_critical_strike_damage", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_total_health", precision: 6, scale: 3, default: "0.0"
+    t.decimal "paragon_global_damage", precision: 6, scale: 3, default: "0.0"
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
+  end
+
+  create_table "combat_results", force: :cascade do |t|
+    t.bigint "character_id"
+    t.bigint "opponent_id"
+    t.string "opponent_type"
+    t.text "combat_logs", default: [], array: true
+    t.string "result"
+    t.integer "opponent_health_in_combat"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "hunts", force: :cascade do |t|
@@ -103,7 +146,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.datetime "updated_at", null: false
     t.text "description"
     t.bigint "character_id"
+    t.integer "gold_reward"
+    t.integer "energy_cost"
+    t.bigint "combat_result_id"
     t.index ["character_id"], name: "index_hunts_on_character_id"
+    t.index ["combat_result_id"], name: "index_hunts_on_combat_result_id"
   end
 
   create_table "inventories", force: :cascade do |t|
@@ -124,7 +171,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.integer "spellpower"
     t.integer "magic_resistance"
     t.string "name", null: false
-    t.text "description", null: false
+    t.text "description"
     t.string "item_type", null: false
     t.string "rarity", null: false
     t.integer "character_id"
@@ -135,6 +182,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.string "inventory_type"
     t.bigint "inventory_id"
     t.integer "level_requirement"
+    t.string "item_class"
+    t.integer "upgrade", default: 0
+    t.decimal "critical_strike_chance", precision: 5, scale: 2
+    t.decimal "critical_strike_damage", precision: 5, scale: 2
+    t.integer "agility"
+    t.integer "gold_price"
+    t.integer "necrosurge"
+    t.integer "dreadmight"
+    t.boolean "merchant_item", default: false
+    t.boolean "purchased", default: false
+    t.decimal "global_damage", precision: 6, scale: 3
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -154,15 +212,26 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
     t.integer "willpower", default: 5
     t.integer "agility", default: 5
     t.integer "level", default: 1
-    t.float "critical_strike_damage", default: 1.5
+    t.decimal "critical_strike_damage", precision: 5, scale: 2, default: "1.2"
     t.integer "max_health", default: 100
     t.integer "total_attack"
     t.integer "total_spellpower"
     t.integer "total_armor"
     t.integer "total_magic_resistance"
-    t.float "critical_strike_chance", default: 1.0
-    t.float "total_critical_strike_chance"
-    t.float "total_critical_strike_damage"
+    t.decimal "critical_strike_chance", precision: 5, scale: 2, default: "1.0"
+    t.decimal "total_critical_strike_chance", precision: 5, scale: 2
+    t.decimal "total_critical_strike_damage", precision: 5, scale: 2
+    t.integer "strength_bonus", default: 0
+    t.integer "intelligence_bonus", default: 0
+    t.integer "agility_bonus", default: 0
+    t.integer "total_health"
+    t.integer "total_max_health"
+    t.integer "necrosurge", default: 10
+    t.integer "total_necrosurge"
+    t.integer "dreadmight", default: 5
+    t.integer "dreadmight_bonus", default: 0
+    t.decimal "global_damage", precision: 6, scale: 3, default: "0.0"
+    t.decimal "total_global_damage", precision: 6, scale: 3
   end
 
   create_table "skills", force: :cascade do |t|
@@ -199,8 +268,20 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_24_152700) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "characters", "hunts"
+  add_foreign_key "characters", "items", column: "chest"
+  add_foreign_key "characters", "items", column: "feet"
+  add_foreign_key "characters", "items", column: "finger1"
+  add_foreign_key "characters", "items", column: "finger2"
+  add_foreign_key "characters", "items", column: "hands"
+  add_foreign_key "characters", "items", column: "head"
+  add_foreign_key "characters", "items", column: "legs"
+  add_foreign_key "characters", "items", column: "main_hand"
+  add_foreign_key "characters", "items", column: "neck"
+  add_foreign_key "characters", "items", column: "off_hand"
+  add_foreign_key "characters", "items", column: "waist"
   add_foreign_key "characters", "users"
   add_foreign_key "hunts", "characters"
+  add_foreign_key "hunts", "combat_results"
   add_foreign_key "inventories", "characters"
   add_foreign_key "skills", "characters"
   add_foreign_key "users", "characters", column: "selected_character_id"
