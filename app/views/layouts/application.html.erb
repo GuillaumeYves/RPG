@@ -150,6 +150,7 @@
             <%= link_to "Profile", character_path(@selected_character), class: "btn btn-outline-primary" %>
             <%= link_to "Talents", talents_character_path(@selected_character), class: "btn btn-outline-primary" %>
             <%= link_to "Merchant", items_path(character_id: @selected_character.id), class: "btn btn-outline-primary" %>
+            <%= link_to "Thaumaturge", thaumaturge_characters_path, class: "btn btn-outline-primary" %>
             <%= link_to "Hunt", hunts_path, class: "btn btn-outline-primary" %>
             <%= link_to "Leaderboard", leaderboard_characters_path, class: "btn btn-outline-primary" %>
           <% end %>
@@ -204,8 +205,6 @@
       
     </div>
 
-    <audio id="backgroundAudio"><source src="/assets/background_audio.mp3" type="audio/mpeg"></audio>
-
     <audio id="clickAudio"><source src="/assets/click_sound.mp3" type="audio/mpeg"></audio>
 
     <div class="footer bg-white text-black fixed-bottom" style="width: 100%; height: 30px; border-top: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
@@ -219,10 +218,7 @@
           </div>
         </div>
         <div class="col-1 text-right" style="width: 10%;">
-          <span>BGM</span>
-          <button onclick="playAudio()"class= "btn btn-outline-primary btn-sm ">Play</button>
-          <button onclick="pauseAudio()"class= "btn btn-outline-primary btn-sm ">Pause</button>
-          <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="setVolume(this.value)" style="width: 25%">
+          <p>BGM</p>
         </div>
       </div>
     </div>
@@ -303,11 +299,14 @@
         "A character cannot dual wield a One-handed Weapon and a Two-handed Weapon simultaneously.",
         "Having more Spellpower than Attack will allow you to deal Magic damage.",
         "True damage cannot be reduced by any source of damage reduction.",
-        "Deathwalkers have a lot of life and use that life to scale their damage.",
+        "Every hour you will recover some Energy, Health and Arena tickets.",
+        "Deathwalkers have a lot of life and use that life to scale their damage, at the cost of their defences.",
+        "A 'normal attack' is the attack made each turn, whereas a talent activates only if unlocked and/or condition is met.",
         "There's a 50% chance for you or your opponent to start first during a combat.",
         "Paladins can easily heal during combat, allowing them to deal more damage and turn the tide of a battle.",
-        "Passive talents apply all the time to your character, trigger passives apply when condition is met and combat talents apply during your combat turn.",
+        "'Passive' talents apply all the time to your character, 'Trigger' passives apply when condition is met and 'Combat' talents apply during your combat turn.",
         "Shadow damage is extremely dangerous as it cannot be reduced by Armor or Magic Resistance.",
+        "Be cautious with your Health, with each combat it gets lower. Visit Mekail if you need to heal up.",
         "Each race start with different stats, and each class modify further these stats. But nothing stops you from being an Orc Mage.",
       ];
 

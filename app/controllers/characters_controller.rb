@@ -6,7 +6,31 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     end
 
     def leaderboard
-        @characters = Character.order(level: :desc).limit(20)
+        @characters = Character.order(level: :desc)
+    end
+
+    def thaumaturge
+        @character = current_user.selected_character
+    end
+
+    def heal
+        @character = current_user.selected_character
+        healing_cost = 10
+
+        if @character.total_health < @character.total_max_health
+            if @character.gold >= healing_cost
+                @character.total_health = @character.total_max_health
+                @character.gold -= healing_cost
+                @character.save
+                flash[:notice] = "You feel refreshed."
+            else
+                flash[:alert] = "You do not have enough gold."
+            end
+        else
+            flash[:alert] = "Your health is already full."
+        end
+
+        redirect_back fallback_location: root_path
     end
 
     def create
@@ -17,8 +41,8 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @character.set_default_values_for_buffed_stats
 
         @character.modify_stats_based_on_race
-        @character.set_default_values_for_total_stats
         @character.modify_attributes_based_on_class
+        @character.set_default_values_for_total_stats
         @character.modify_stats_based_on_attributes
 
         if @character.save
@@ -90,6 +114,190 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @skills = @character.skills
     end
 
+    def paragon_increase_attack
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_attack_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_attack += 0.01
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_attack_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_armor
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_armor_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_armor += 0.005
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_armor_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_spellpower
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_spellpower_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_spellpower += 0.01
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_spellpower_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_magic_resistance
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_magic_resistance_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_magic_resistance += 0.005
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_magic_resistance_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_critical_strike_chance
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_critical_strike_chance_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_critical_strike_chance += 0.10
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_critical_strike_chance_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_critical_strike_damage
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_critical_strike_damage_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_critical_strike_damage += 0.01
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_critical_strike_damage_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_total_health
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_total_health_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_total_health += 0.004
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_total_health_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_increase_global_damage
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_global_damage_count < 50
+                if @character.paragon_points > 0
+                    @character.paragon_global_damage += 0.004
+                    @character.modify_stats_based_on_attributes
+                    @character.apply_passive_skills
+                    @character.decrement(:paragon_points)
+                    @character.increment(:paragon_increase_global_damage_count)
+                    @character.save
+                else
+                    flash[:alert] = "Not enough paragon points."
+                end
+            else
+                flash[:alert] = "You increased this Paragon power to its maximum."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
     def gain_experience
         @character = current_user.selected_character
 
@@ -146,6 +354,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         # Drop the completed hunt
         @character.update(accepted_hunt: nil)
 
+        # Drop the combat result
+        @hunt.update(combat_result: nil)
+
         # Save character
         @character.save
 
@@ -191,7 +402,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             end
             @selected_character.modify_stats_based_on_attributes
             @selected_character.apply_passive_skills
-            @selected_character.save!
+            @selected_character.save
             redirect_to @selected_character
         else
             flash[:alert] = @selected_character.errors.full_messages.join(',')
@@ -246,6 +457,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                 inventory.items << item
                 inventory.save
                 @selected_character.save
+                item.update(purchased: true)
                 redirect_back fallback_location: root_path
             else
                 flash[:alert] = 'Inventory is full.'

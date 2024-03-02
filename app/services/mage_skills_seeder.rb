@@ -11,13 +11,13 @@ class MageSkillsSeeder
 
     arcane_protection = Skill.create(
       name: "Arcane Protection",
-      description: "20% of your Magic Resistance applies to your Armor.",
+      description: "30% of your Magic Resistance applies to your Armor.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_armor += (self.total_magic_resistance * 0.2)"
+      effect: " self.total_armor += (self.total_magic_resistance * 0.3)"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'arcaneprotection.jpg')
     arcane_protection.skill_image.attach(io: File.open(image_path), filename: 'arcaneprotection.jpg', content_type: 'image/jpeg')
@@ -66,13 +66,13 @@ class MageSkillsSeeder
 
     runic_empowerment = Skill.create(
       name: "Runic Empowerment",
-      description: "After taking damage, your Spellpower is increased by 2%.",
+      description: "After taking damage, your Spellpower is increased by 6%.",
       skill_type: "trigger",
       row: 3,
       level_requirement: 75,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.buffed_spellpower += (self.total_spellpower * 0.02) "
+      effect: " self.buffed_spellpower += (self.total_spellpower * 0.06) "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'runicempowerment.jpg')
     runic_empowerment.skill_image.attach(io: File.open(image_path), filename: 'runicempowerment.jpg', content_type: 'image/jpeg')
@@ -94,13 +94,13 @@ class MageSkillsSeeder
 
     wisdom_and_power = Skill.create(
       name: "Wisdom and Power",
-      description: "Your Spellpower is increased by 20% of your Magic Resistance.",
+      description: "Your Spellpower is increased by 30% of your Magic Resistance.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_spellpower += (self.total_magic_resistance * 0.2) "
+      effect: " self.total_spellpower += (self.total_magic_resistance * 0.3) "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wisdomandpower.jpg')
     wisdom_and_power.skill_image.attach(io: File.open(image_path), filename: 'wisdomandpower.jpg', content_type: 'image/jpeg')

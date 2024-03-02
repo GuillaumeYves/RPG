@@ -80,3 +80,5 @@ gem "pg", "~> 1.5"
 gem "sidekiq", "~> 7.2"
 
 gem "whenever", "~> 1.0"
+
+gem "pry", "~> 0.14.2"

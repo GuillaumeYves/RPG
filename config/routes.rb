@@ -12,8 +12,8 @@ Rails.application.routes.draw do
 
   resources :characters do
     collection do
-      get 'user_characters'
       get 'leaderboard'
+      get 'thaumaturge'
     end
     member do
       get '/combat_result/:id', to: 'combat#combat_result', as: :combat_result
@@ -29,6 +29,15 @@ Rails.application.routes.draw do
       post 'sell_item/:item_id', to: 'characters#sell_item', as: :sell_item
       post 'equip_prompt'
       post 'spend_skill_point'
+      post 'heal'
+      post 'paragon_increase_attack'
+      post 'paragon_increase_armor'
+      post 'paragon_increase_spellpower'
+      post 'paragon_increase_magic_resistance'
+      post 'paragon_increase_critical_strike_chance'
+      post 'paragon_increase_critical_strike_damage'
+      post 'paragon_increase_total_health'
+      post 'paragon_increase_global_damage'
       patch 'select_hunt'
     end
   end
@@ -45,5 +54,4 @@ Rails.application.routes.draw do
 
   get '/user_characters', to: 'characters#user_characters', as: 'user_characters'
   get '/combat_result', to: 'combat#combat_result', as: :combat_result
-  get 'update_health_bars', to: 'combat_controller#update_health_bars'
 end

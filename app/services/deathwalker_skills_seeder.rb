@@ -25,7 +25,7 @@ class DeathwalkerSkillsSeeder
 
     lifetap = Skill.create(
       name: "Lifetap",
-      description: "At the end of each turn, you sacrifice 1% of your maximum Health to gain that amount of Necrosurge.",
+      description: "At the end of each turn, you sacrifice 1% of your maximum Health to gain that amount as Necrosurge.",
       skill_type: "combat",
       row: 1,
       level_requirement: 25,
@@ -67,7 +67,7 @@ class DeathwalkerSkillsSeeder
 
     path_of_the_dead = Skill.create(
       name: "Path of the Dead",
-      description: "Reduce your Armor and Magic Resistance by 50% but increase your maximum Health by 50%.",
+      description: "Reduce your Armor and Magic Resistance by 50% but increase your maximum Health by 30%.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
@@ -75,8 +75,8 @@ class DeathwalkerSkillsSeeder
       character_id: character.id,
       effect: " self.total_armor *= 0.5;
               self.total_magic_resistance *= 0.5;
-              self.total_max_health *= 1.5;
-              self.total_health *= 1.5;"
+              self.total_max_health *= 1.3;
+              self.total_health *= 1.3;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'pathofthedead.jpg')
     path_of_the_dead.skill_image.attach(io: File.open(image_path), filename: 'pathofthedead.jpg', content_type: 'image/jpeg')
@@ -84,7 +84,7 @@ class DeathwalkerSkillsSeeder
 
     crimson_torrent = Skill.create(
       name: "Crimson Torrent",
-      description: "At the end of each turn you deal 5% of your maximum Health as shadow damage.",
+      description: "At the end of each turn you deal 3% of your maximum Health as shadow damage.",
       skill_type: "combat",
       row: 3,
       level_requirement: 75,
@@ -97,14 +97,13 @@ class DeathwalkerSkillsSeeder
 
     cadaverous_pact = Skill.create(
       name: "Cadaverous Pact",
-      description: "You can no longer deal Critical Strikes, physical or magic damage but your Necrosurge is increased by 66%.",
+      description: "You can no longer deal physical or magic damage but your Necrosurge is increased by 66%.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: " self.total_critical_strike_chance = 0.0;
-              self.total_critical_strike_damage = 0.0;
+      effect: "
               self.total_attack = 0;
               self.total_spellpower = 0;
               self.total_necrosurge *= 1.66;"

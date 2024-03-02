@@ -17,7 +17,7 @@ module ApplicationHelper
     end
 
     def display_item_attributes(item)
-        attributes = %w(attack spellpower critical_strike_chance critical_strike_damage health armor magic_resistance strength intelligence agility luck willpower)
+        attributes = %w(attack spellpower necrosurge critical_strike_chance critical_strike_damage health armor magic_resistance strength intelligence dreadmight agility luck willpower)
         html = ""
 
         attributes.each do |attribute|

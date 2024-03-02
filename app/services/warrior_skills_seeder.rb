@@ -46,7 +46,7 @@ class WarriorSkillsSeeder
       character_id: character.id,
       effect: "
       if self.main_hand.present? && self.main_hand.item_type == 'Two-handed Weapon' || self.off_hand.present? && self.off_hand.item_type == 'Two-handed Weapon'
-        self.total_critical_strike_damage = (self.critical_strike_damage + 0.3);
+        self.total_critical_strike_damage = (self.critical_strike_damage + 0.30);
         self.total_attack *= 1.1;
       end "
     )
@@ -56,16 +56,12 @@ class WarriorSkillsSeeder
 
     blood_frenzy = Skill.create(
       name: "Blood Frenzy",
-      description: "You gain 2% of your maximum Health as additional Attack but you cannot deal Critical Strikes.",
+      description: "You heal for 8% of the damage you deal.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: warrior_class,
       character_id: character.id,
-      effect:
-      " self.total_critical_strike_chance = 0
-        self.total_critical_strike_damage = 0;
-        self.total_attack = (self.attack + (self.max_health * 0.02)); "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'bloodfrenzy.jpg')
     blood_frenzy.skill_image.attach(io: File.open(image_path), filename: 'bloodfrenzy.jpg', content_type: 'image/jpeg')
@@ -74,11 +70,12 @@ class WarriorSkillsSeeder
     forged_in_battle = Skill.create(
       name: "Forged in Battle",
       skill_type: "passive",
-      description: "You can now dual wield Two-handed Weapons.",
+      description: "You can dual wield Two-handed Weapons but your attacks now have a 10% chance to miss and your Attack is reduced by 20%.",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,
       character_id: character.id,
+      effect: "self.total_attack *= 0.80;"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'forgedinbattle.jpg')
     forged_in_battle.skill_image.attach(io: File.open(image_path), filename: 'forgedinbattle.jpg', content_type: 'image/jpeg')
@@ -86,7 +83,7 @@ class WarriorSkillsSeeder
 
     undeniable = Skill.create(
       name: "Undeniable",
-      description: "While wielding a Two-handed Weapon, your Attack is doubled but you can no longer Ignore Pain or Evade and your Health is reduced by 20%.",
+      description: "While wielding a Two-handed Weapon, your Attack is increased by 50% but you can no longer Ignore Pain or Evade.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
@@ -94,9 +91,7 @@ class WarriorSkillsSeeder
       character_id: character.id,
       effect:
       " if self.main_hand.present? && self.main_hand.item_type == 'Two-handed Weapon'
-          self.total_attack *= 2;
-          self.total_health *= 0.80;
-          self.total_max_health *= 0.80;
+          self.total_attack *= 1.5;
         end"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'undeniable.jpg')
@@ -105,13 +100,15 @@ class WarriorSkillsSeeder
 
     berserk = Skill.create(
       name: "Berserk",
-      description: "Your Attack is increased by 1% for every 100 maximum Health you have.",
-      skill_type: "passive",
+      description: "When you reach 30% Health, your Attack is increased by 50%.",
+      skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
-      effect: "self.total_attack += (self.total_attack * (self.total_max_health / 100.0)) / 100.0"
+      effect: " if (self.total_health <= (0.3 * self.total_max_health))
+            self.buffed_attack = (self.total_attack * 0.5) ;
+          end  "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'berserk.jpg')
     berserk.skill_image.attach(io: File.open(image_path), filename: 'berserk.jpg', content_type: 'image/jpeg')
@@ -119,14 +116,14 @@ class WarriorSkillsSeeder
 
     unbridled_ferocity = Skill.create(
       name: "Unbridled Ferocity",
-      description: "Your Attack is increased by 50% but your Armor and Magic Resistance are reduced by 50%.",
+      description: "Your Attack is increased by 30% but your Armor and Magic Resistance are reduced by 50%.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
       effect:
-          " self.total_attack *= 1.5;
+          " self.total_attack *= 1.3;
             self.total_armor *= 0.5;
             self.total_magic_resistance *= 0.5; "
     )

@@ -10,9 +10,9 @@
               <h5 style=" color: white; font-size: 22px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;"> < Defenders of Tedorha ></h5>
             </div>
           </div>
-          <div class="progress" style="height: 30px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top : 20px;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: <%= (@character.total_health / @character.total_max_health) * 100 %>%;"></div>
-            <h5 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @character.total_health %> / <%= @character.total_max_health %></h5>
+          <div id="character-health-bar" class="progress" style="height: 30px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top : 20px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: <%= (@character.total_health.to_f / @character.total_max_health) * 100 %>%;"></div>
+            <h5 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @character.total_health.to_i %> / <%= @character.total_max_health %></h5>
           </div>
         </div>
       </div>
@@ -40,27 +40,30 @@
             </div>
           </div>
           <% end %>
-          <div class="progress" style="height: 30px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top : 20px;">
-            <div class="progress-bar bg-danger" role="progressbar" style="width: <%= (@opponent.total_health / @opponent.total_max_health) * 100 %>%;"></div>
-            <h5 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @opponent.total_health %> / <%= @opponent.total_max_health %></h5>
-          </div>
+            <div id="opponent-health-bar" class="progress" style="height: 30px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative; margin-top: 20px;">
+              <div class="progress-bar bg-danger" role="progressbar" style="width: <%= (@opponent_health_in_combat.to_f / @opponent.total_max_health) * 100 %>%;"></div>
+              <h5 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%= @opponent_health_in_combat.to_i %> / <%= @opponent.total_max_health %></h5>
+            </div>
         </div>
       </div>
     </div>
 
     <!-- Victory or Defeat Prompt -->
     <div class="row justify-content-center mt-5 mb-3">
-      <div class="col-md-6">
-        <% if @combat_result == '<strong style="font-size: 18px;">Victory</strong>' && @hunt.present? %>
+      <div id="combat-result" class="col-md-6">
+        <% if @result == '<strong style="font-size: 18px;">Victory</strong>' && @hunt.present? %>
+          <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
           <h3>- <span class="text-success">Victory</span> -</h3>
-            <%= form_tag(complete_hunt_character_path(@character), method: :post) do %>
-              <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
-              <%= hidden_field_tag :hunt_id, @hunt.id %>
-            <%= submit_tag 'Complete Hunt', class: 'btn btn-outline-success mt-2' %>
-            <% end %>
-        <% elsif @combat_result == '<strong style="font-size: 18px;">Victory</strong>'%>
+          <%= form_tag(complete_hunt_character_path(@character), method: :post) do %>
+            <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
+            <%= hidden_field_tag :hunt_id, @hunt.id %>
+            <%= submit_tag 'Complete', class: 'btn btn-outline-success mt-2' %>
+          <% end %>
+        <% elsif @result == '<strong style="font-size: 18px;">Victory</strong>'%>
+          <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
           <h3>- <span class="text-success">Victory</span> -</h3>
-        <% elsif @combat_result == '<strong style="font-size: 18px;">Defeat</strong>' %>
+        <% elsif @result == '<strong style="font-size: 18px;">Defeat</strong>' %>
+          <audio autoplay id="defeatAudio"><source src="/assets/defeat.mp3" type="audio/mpeg"></audio>
           <h3>- <span class="text-danger">Defeat</span> -<br style="mb-5"><a href="<%= character_path(@character) %>" style="font-size:18px;">Retreat</a></h3>
         <% end %>
       </div>
@@ -73,7 +76,7 @@
         <div class="row justify-content-center" style="width: auto; height: 400px; overflow: auto;">
             <div>
                 <div class="card-body">
-                    <div class="combat-log">
+                    <div id="combat-log-container" class="combat-log">
                         <% @combat_logs.each_with_index do |log, index| %>
                             <p><%= log.html_safe %></p>
                             <% unless index == @combat_logs.size - 1 %>

@@ -1,3 +1,5 @@
+set :environment, ENV['RAILS_ENV'] || 'development'
+env :PATH, ENV['PATH']
 # Use this file to easily define all of your cron jobs.
 #
 # It's helpful, but not entirely necessary to understand cron before proceeding.
@@ -5,7 +7,7 @@
 
 # Example:
 #
-# set :output, "/path/to/my/cron_log.log"
+set :job_template, "bash -l -i -c ':job'"
 #
 # every 2.hours do
 #   command "/usr/bin/some_great_command"
@@ -19,6 +21,11 @@
 
 # Learn more: http://github.com/javan/whenever
 
-every 1.day, at: '00:00' do
-  rake 'energy:reset'
+every 1.hour do
+  runner "Character.recovery"
+end
+
+every 24.hour, at: '00:00' do
+  runner "Item.reset_items"
+  runner "Item.set_merchant_items"
 end

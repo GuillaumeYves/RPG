@@ -1,6 +1,7 @@
 class Hunt < ApplicationRecord
     belongs_to :character, optional: true
     has_many :monsters
+    belongs_to :combat_result, optional: true
 
 
 

@@ -40,6 +40,31 @@ class Character < ApplicationRecord
     attr_accessor :piety
     attr_accessor :nullify
     attr_accessor :ephemeral_rebirth
+    attr_accessor :temp_health
+
+    def self.recovery
+        Character.find_each do |character|
+            character.recover_energy
+            character.recover_health
+        end
+    end
+
+    def recover_health
+        return if self.total_health >= self.total_max_health
+
+        recovered_health = (total_max_health * 0.10).to_i
+        self.total_health += recovered_health
+        self.total_health = total_max_health if total_health > total_max_health
+        save
+    end
+
+    def recover_energy
+        return if self.energy >= self.max_energy
+
+        self.energy += 10
+        self.energy = self.max_energy if self.energy > self.max_energy
+        save
+    end
 
     def create_inventory
         Inventory.create(character: self)
@@ -104,36 +129,33 @@ class Character < ApplicationRecord
     end
 
     def set_default_values_for_total_stats
-            if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
-                self.total_attack = self.attack + self.agility_bonus
-            elsif self.character_class == 'rogue' && skills.find_by(name: 'From the Shadows', unlocked: true)
-                self.total_attack = self.attack + ((self.strength_bonus * 0.8)+(self.intelligence_bonus * 0.8))
-            else
-                self.total_attack = self.attack + self.strength_bonus
-            end
-        self.total_spellpower = self.spellpower + self.intelligence_bonus
-            if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
-                self.total_armor = self.armor + self.strength_bonus
-            else
-                self.total_armor = self.armor
-            end
+        if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
+            self.total_attack = ((self.attack + self.agility_bonus) + (self.attack * self.paragon_attack))
+        else
+            self.total_attack = ((self.attack + self.strength_bonus) + (self.attack * self.paragon_attack))
+        end
+        self.total_spellpower = (self.spellpower + self.intelligence_bonus) + self.paragon_spellpower
+        if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
+            self.total_armor = ((self.armor + self.strength_bonus) + (self.armor * self.paragon_armor))
+        else
+            self.total_armor = (self.armor + (self.armor * self.paragon_armor))
+        end
         self.total_necrosurge = self.necrosurge + self.dreadmight_bonus
-            if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
-                self.total_magic_resistance = (self.magic_resistance + self.intelligence_bonus)
-            elsif self.character_class == 'paladin' && skills.find_by(name: 'Judgement', unlocked: true)
-                self.total_magic_resistance = self.magic_resistance + self.intelligence_bonus
-            else
-                self.total_magic_resistance = self.magic_resistance
-            end
-        self.total_critical_strike_chance = (self.critical_strike_chance + calculate_luck_bonus).round(2)
-        self.total_critical_strike_damage = self.critical_strike_damage.round(2)
+        if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
+            self.total_magic_resistance = ((self.magic_resistance + self.intelligence_bonus) + (self.magic_resistance * self.paragon_magic_resistance))
+        else
+            self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
+        end
+        self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance).round(2)
+        self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage).round(2)
         self.max_health = self.health
-            if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
-                self.total_health = (self.health + self.strength_bonus)
-            else
-                self.total_health = self.health
-            end
+        if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
+            self.total_health = ((self.health + self.strength_bonus) + (self.health * self.paragon_total_health))
+        else
+            self.total_health = (self.health + (self.health * self.paragon_total_health))
+        end
         self.total_max_health = self.total_health
+        self.total_global_damage = (self.global_damage + self.paragon_global_damage).round(2)
     end
 
     def set_default_values_for_buffed_stats
@@ -227,82 +249,47 @@ class Character < ApplicationRecord
     def modify_stats_based_on_race
         case race
         when 'human'
-            self.health += 2
-            self.strength -= 1
-            self.intelligence -= 1
-            self.agility += 1
-            self.dreadmight -= 2
-            self.necrosurge -= 2
-            self.willpower -= 2
-            self.attack += 1
-            self.spellpower -= 1
-            self.armor += 1
-            self.magic_resistance += 1
+            # Stats for humans are defaults
         when 'elf'
             # Modify stats for elf race
-            self.health -= 5
+            self.health -= 3
             self.strength -= 3
             self.intelligence += 2
             self.agility += 2
             self.dreadmight -= 3
-            self.necrosurge -= 3
             self.willpower -= 2
-            self.attack -= 3
-            self.spellpower += 3
-            self.armor -= 2
-            self.magic_resistance += 2
         when 'dwarf'
             # Modify stats for dwarf race
-            self.health -= 6
+            self.health -= 4
             self.strength -= 2
             self.intelligence += 1
             self.agility -= 1
             self.dreadmight -= 2
-            self.necrosurge -= 2
             self.willpower += 1
-            self.attack += 1
-            self.armor += 2
-            self.spellpower += 1
-            self.magic_resistance += 2
         when 'troll'
             # Modify stats for troll race
-            self.health += 12
+            self.health += 5
             self.strength += 1
             self.intelligence += 1
             self.agility -= 3
             self.dreadmight -= 1
-            self.necrosurge -= 1
             self.willpower += 1
-            self.attack += 1
-            self.spellpower += 1
-            self.armor += 5
-            self.magic_resistance += 5
         when 'orc'
             # Modify stats for orc race
-            self.health += 10
+            self.health += 3
             self.strength += 4
             self.intelligence -= 3
             self.agility -= 3
             self.dreadmight += 1
-            self.necrosurge += 1
             self.willpower += 1
-            self.attack += 4
-            self.armor -= 3
-            self.spellpower -= 3
-            self.magic_resistance -= 3
         when 'goblin'
             # Modify stats for goblin race
-            self.health -= 8
+            self.health -= 5
             self.strength -= 2
             self.intelligence += 2
             self.agility += 2
             self.dreadmight += 1
-            self.necrosurge += 1
             self.willpower -= 2
-            self.attack -= 2
-            self.armor -= 2
-            self.spellpower += 2
-            self.magic_resistance -= 2
         end
     end
 
@@ -311,44 +298,39 @@ class Character < ApplicationRecord
         case character_class
         when 'warrior'
             # Modify attributes for warrior class
-            self.strength += 1
-            self.intelligence -= 1
-            self.agility -= 1
-            self.luck += 1
-            self.willpower -= 1
-            self.dreadmight -= 1
+            self.attack += 3
+            self.spellpower -= 3
+            self.necrosurge -= 2
+            self.armor += 1
+            self.magic_resistance -= 2
         when 'mage'
             # Modify attributes for mage class
-            self.strength -= 1
-            self.intelligence += 1
-            self.agility -= 1
-            self.luck += 1
-            self.willpower -= 1
-            self.dreadmight -= 1
+            self.attack -= 3
+            self.spellpower += 3
+            self.necrosurge -= 2
+            self.armor -= 2
+            self.magic_resistance += 2
         when 'rogue'
             # Modify attributes for rogue class
-            self.strength += 1
-            self.intelligence -= 1
-            self.agility += 1
-            self.luck += 1
-            self.willpower -= 1
-            self.dreadmight += 1
+            self.attack += 2
+            self.spellpower -= 1
+            self.necrosurge -= 1
+            self.armor -= 1
+            self.magic_resistance -= 1
         when 'paladin'
             # Modify attributes for paladin class
-            self.strength += 1
-            self.intelligence += 1
-            self.agility -= 1
-            self.luck -= 1
-            self.willpower += 1
-            self.dreadmight -= 1
+            self.attack += 2
+            self.spellpower += 1
+            self.necrosurge -= 3
+            self.armor += 1
+            self.magic_resistance += 1
         when 'deathwalker'
             # Modify attributes for deathwalker class
-            self.strength -= 1
-            self.intelligence += 1
-            self.agility -= 1
-            self.luck -= 1
-            self.willpower += 1
-            self.dreadmight += 1
+            self.attack -= 1
+            self.spellpower -= 3
+            self.necrosurge += 4
+            self.armor -= 2
+            self.magic_resistance -= 2
         end
     end
 
@@ -458,6 +440,7 @@ class Character < ApplicationRecord
         self.willpower -= item.willpower unless item.willpower.nil?
         self.critical_strike_chance -= item.critical_strike_chance unless item.critical_strike_chance.nil?
         self.critical_strike_damage -= item.critical_strike_damage unless item.critical_strike_damage.nil?
+        self.global_damage -= item.global_damage unless item.global_damage.nil?
     end
 
     def modify_stats_based_on_item(item)
@@ -476,6 +459,7 @@ class Character < ApplicationRecord
         self.willpower += item.willpower unless item.willpower.nil?
         self.critical_strike_chance += item.critical_strike_chance unless item.critical_strike_chance.nil?
         self.critical_strike_damage += item.critical_strike_damage unless item.critical_strike_damage.nil?
+        self.global_damage += item.global_damage unless item.global_damage.nil?
     end
 
     def level_up
@@ -486,19 +470,22 @@ class Character < ApplicationRecord
         if [25, 50, 75, 100].include?(level)
             self.skill_points += 1
         end
+        if self.level >= 100
+            self.paragon_points += 1
+        end
 
         # Modify health based on character class
         case character_class
         when 'warrior'
-            self.health += 8
-        when 'mage'
             self.health += 5
+        when 'mage'
+            self.health += 3
         when 'rogue'
-            self.health += 7
+            self.health += 4
         when 'paladin'
-            self.health += 9
+            self.health += 6
         when 'deathwalker'
-            self.health += 10
+            self.health += 7
         end
 
         self.modify_stats_based_on_attributes
@@ -549,8 +536,8 @@ class Character < ApplicationRecord
                     errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
                     return false
                 when 'Axe'
-                    return true if %w[warrior deathwalker].include?(character_class)
-                    errors.add(:base, "Only Warriors and Deathwalkers can equip Axes.")
+                    return true if character_class == 'warrior'
+                    errors.add(:base, "Only Warriors can equip Axes.")
                     return false
                 when 'Mace'
                     return true if character_class == 'paladin'

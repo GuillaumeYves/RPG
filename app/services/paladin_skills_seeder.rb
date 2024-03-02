@@ -115,19 +115,16 @@ class PaladinSkillsSeeder
 
     fervor = Skill.create(
       name: "Fervor",
-      description: "Increase your Attack by 30% if your Attack is superior to your Spellpower.
-                    Increase your Spellpower by 30% if your Spellpower is superior to your Attack.",
+      description: "While wielding a One-handed Weapon, your Health is increased by 40%.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: paladin_class,
       character_id: character.id,
-      effect:
-        " if self.total_attack > self.total_spellpower
-            self.total_attack *= 1.3;
-          elsif self.total_spellpower > self.total_attack
-            self.total_spellpower *= 1.3;
-        end "
+      effect: "if self.main_hand.present? && self.main_hand.item_type == 'One-handed Weapon'
+        self.total_health *= 1.4;
+        self.total_max_health *= 1.4;
+      end"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'fervor.jpg')
     fervor.skill_image.attach(io: File.open(image_path), filename: 'fervor.jpg', content_type: 'image/jpeg')

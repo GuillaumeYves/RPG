@@ -10,6 +10,7 @@ class Monster < ApplicationRecord
 
     attr_accessor :buffed_attack, :buffed_spellpower, :buffed_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
     attr_accessor :took_damage
+    attr_accessor :temp_health
 
     def calculate_strength_bonus
         self.strength_bonus = (self.strength * 0.2)
@@ -58,6 +59,7 @@ class Monster < ApplicationRecord
         self.max_health = self.health
         self.total_health = self.health
         self.total_max_health = self.total_health
+        self.total_global_damage = self.global_damage
         save
     end
 

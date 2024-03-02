@@ -83,15 +83,37 @@
                 <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=@character.race.capitalize%> <%=@character.character_class.capitalize%> Level <%=@character.level%></h6>
               </div>
             <% end %>
-              <div style="margin-top:3px;">
-                <% if @character.user_id == current_user.id %>
-                  <% if @character.skill_points == 1 %>
-                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have 1 Talent Point to spend.</strong><br>
-                  <% elsif @character.skill_points > 1 %>
-                    <strong class="badge rounded-pill bg-warning" style="color: black;">You have <%= @character.skill_points %> Talent Points to spend.</strong><br>
-                  <% end %>
+            <div style="margin-top:3px;">
+              <% if @character.user_id == current_user.id %>
+                <% if @character.skill_points == 1 %>
+                  <span class="d-inline-block">
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">
+                      <small>You have 1 Talent Point</small>
+                    </strong>
+                  </span>
+                <% elsif @character.skill_points > 1 %>
+                  <span class="d-inline-block">
+                    <strong class="badge rounded-pill bg-warning" style="color: black;">
+                      <small>You have <%= @character.skill_points %> Talent Points</small>
+                    </strong>
+                  </span>
                 <% end %>
-              </div>
+              <% end %>
+
+              <% if @character.paragon_points == 1 %>
+                <span class="d-inline-block">
+                  <strong class="badge rounded-pill bg-info" style="color: black;">
+                    <small>You have 1 Paragon Point</small>
+                  </strong>
+                </span>
+              <% elsif @character.paragon_points > 1 %>
+                <span class="d-inline-block">
+                  <strong class="badge rounded-pill bg-info" style="color: black;">
+                    <small>You have <%= @character.paragon_points %> Paragon Points</small>
+                  </strong>
+                </span>
+              <% end %>
+            </div>
         </div>
 
         <!-- Right column with amulet, waist, finger1, and finger2 -->
@@ -198,12 +220,13 @@
             <div class="col-md-4 mx-auto mb-2">
               <div class="text-center">
                 <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">General</h4><br>
-                <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.total_max_health %></span><br>
+                <span data-tooltip="tooltip" title="Total amount of life"><strong>Health:</strong> <%= @character.total_health %>/<%= @character.total_max_health %></span><br>
                 <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_attack %></span><br>
                 <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_spellpower %></span><br>
                 <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_necrosurge %></span><br>
                 <span data-tooltip="tooltip" title="Chance to critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
                 <span data-tooltip="tooltip" title="Increases the damage of your critical strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
+                <span data-tooltip="tooltip" title="Increases all types of damage"><strong>Global Damage:</strong> <%= number_with_precision(@character.total_global_damage * 100, precision: 2) %>%</span><br>                
                 <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor:</strong> <%= @character.total_armor %></span><br>
                 <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%= @character.total_magic_resistance %></span><br>
                 <span data-tooltip="tooltip" title="Evading will allow you to ignore damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
@@ -237,8 +260,8 @@
                               <span data-tooltip="tooltip" title="<%= skill.description %>">
                                 <%= image_tag skill.skill_image, style: 'width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
                               </span>
-                              <p style="margin-top: -5px; font-size:14px"><small><%= skill.name %></small></p>
-                              <p style="font-size:12px; margin-top:-22px; margin-bottom: 15px"><small><%= skill.skill_type&.capitalize %></small></p>
+                              <p style="margin-top: -5px; font-size:13px"><small><%= skill.name %></small></p>
+                              <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small><%= skill.skill_type&.capitalize %></small></p>
                             </div>
                           </div>
                         <% end %>
