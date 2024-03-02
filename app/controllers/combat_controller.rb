@@ -149,7 +149,7 @@ class CombatController < ApplicationController
             else
                 # Check for a critical hit based on critical_strike_chance
                 if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                    damage = ((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_armor + buffed_armor)
+                    damage = (((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_armor + buffed_armor)
                     log_message = '<span style="color: red; text-shadow: 1px 1px 2px #000000;">CRITICAL STRIKE</span>'
                     @combat_logs << log_message
                     @is_crit = true
@@ -190,7 +190,7 @@ class CombatController < ApplicationController
             else
                 # Check for a critical hit based on critical_strike_chance
                 if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                    damage = ((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_magic_resistance + buffed_magic_resistance)
+                    damage = (((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_magic_resistance + buffed_magic_resistance)
                     log_message = '<span style="color: red; text-shadow: 1px 1px 2px #000000;">CRITICAL STRIKE</span>'
                     @combat_logs << log_message
                     @is_crit = true
@@ -231,7 +231,7 @@ class CombatController < ApplicationController
             else
                 # Check for a critical hit based on critical strike chance
                 if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                    damage = ((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage) * (total_critical_strike_damage + buffed_critical_strike_damage))
+                    damage = (((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage))
                     log_message = '<span style="color: red; text-shadow: 1px 1px 2px #000000;">CRITICAL STRIKE</span>'
                     @combat_logs << log_message
                     @is_crit = true
