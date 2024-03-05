@@ -84,7 +84,7 @@ class RogueSkillsSeeder
 
     from_the_shadows = Skill.create(
       name: "From the Shadows",
-      description: "When dealing a Critical Strike, you deal 10% of that damage as additional true damage.",
+      description: "When dealing a Critical Strike, you deal 25% of that damage as additional true damage.",
       skill_type: "trigger",
       row: 3,
       level_requirement: 75,

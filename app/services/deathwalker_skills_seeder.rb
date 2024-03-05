@@ -52,14 +52,16 @@ class DeathwalkerSkillsSeeder
 
     blood_monarch = Skill.create(
       name: "Blood Monarch",
-      description: "Your Health is increased by 30% but you take 20% increased damage from normal attacks.",
+      description: "Your Health is increased by 66% but you take 20% increased damage from normal attacks and you can no longer deal Critical Strikes.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "self.total_max_health *= 1.3;
-              self.total_health *= 1.3;"
+      effect: "self.total_max_health *= 1.66;
+              self.total_health *= 1.66;
+              self.total_critical_strike_chance = 0.0;
+              self.total_critical_strike_damage = 0.0; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodmonarch.jpg')
     blood_monarch.skill_image.attach(io: File.open(image_path), filename: 'bloodmonarch.jpg', content_type: 'image/jpeg')
@@ -114,14 +116,14 @@ class DeathwalkerSkillsSeeder
 
     sanguine_eclipse = Skill.create(
       name: "Sanguine Eclipse",
-      description: "When you reach 10% Health, your Necrosurge is doubled.",
+      description: "When you reach 20% Health, your Necrosurge is doubled.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
       effect: "
-      if (self.total_health <= (0.1 * self.total_max_health))
+      if (self.total_health <= (0.2 * self.total_max_health))
         self.buffed_necrosurge = self.total_necrosurge
       end "
       )

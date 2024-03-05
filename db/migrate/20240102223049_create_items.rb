@@ -14,7 +14,7 @@ class CreateItems < ActiveRecord::Migration[7.1]
       t.string :name, null: false
       t.text :description
       t.string :type, null: false
-      t.string :rarity, null: false
+      t.string :rarity
       t.integer :character_id
       t.integer :inventory_slot
 

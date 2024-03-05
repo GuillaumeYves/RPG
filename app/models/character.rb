@@ -134,20 +134,20 @@ class Character < ApplicationRecord
         else
             self.total_attack = ((self.attack + self.strength_bonus) + (self.attack * self.paragon_attack))
         end
-        self.total_spellpower = (self.spellpower + self.intelligence_bonus) + self.paragon_spellpower
+        self.total_spellpower = ((self.spellpower + self.intelligence_bonus) + self.paragon_spellpower)
         if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
             self.total_armor = ((self.armor + self.strength_bonus) + (self.armor * self.paragon_armor))
         else
             self.total_armor = (self.armor + (self.armor * self.paragon_armor))
         end
-        self.total_necrosurge = self.necrosurge + self.dreadmight_bonus
+        self.total_necrosurge = (self.necrosurge + self.dreadmight_bonus)
         if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
             self.total_magic_resistance = ((self.magic_resistance + self.intelligence_bonus) + (self.magic_resistance * self.paragon_magic_resistance))
         else
             self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
         end
-        self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance).round(2)
-        self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage).round(2)
+        self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance)
+        self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage)
         self.max_health = self.health
         if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
             self.total_health = ((self.health + self.strength_bonus) + (self.health * self.paragon_total_health))
@@ -155,7 +155,12 @@ class Character < ApplicationRecord
             self.total_health = (self.health + (self.health * self.paragon_total_health))
         end
         self.total_max_health = self.total_health
-        self.total_global_damage = (self.global_damage + self.paragon_global_damage).round(2)
+        self.total_global_damage = (self.global_damage + self.paragon_global_damage)
+
+        self.total_attack += self.elixir_attack
+        self.total_armor += self.elixir_armor
+        self.total_spellpower += self.elixir_spellpower
+        self.total_magic_resistance += self.elixir_magic_resistance
     end
 
     def set_default_values_for_buffed_stats
@@ -504,6 +509,71 @@ class Character < ApplicationRecord
         self.required_experience_for_next_level = (500 * (1.1 ** (self.level - 1))).round
     end
 
+    def update_elixir_effect
+        return unless elixir_active == true
+
+        active_elixirs = Item.where(id: active_elixir_ids)
+
+        active_elixirs.each do |elixir|
+            case elixir.name
+            when "Elixir of Might"
+                update(elixir_attack: (self.total_attack * elixir.potion_effect).round)
+            when "Elixir of Power"
+                update(elixir_spellpower: (self.total_spellpower * elixir.potion_effect).round)
+            when "Elixir of Decay"
+                update(elixir_necrosurge: (self.total_necrosurge * elixir.potion_effect).round)
+            when "Elixir of Fortitude"
+                update(elixir_armor: (self.total_armor * elixir.potion_effect).round)
+            when "Elixir of Knowledge"
+                update(elixir_magic_resistance: (self.total_magic_resistance * elixir.potion_effect).round)
+            when "Elixir of Potency"
+                update(elixir_global_damage: (self.elixir_global_damage + elixir.potion_effect).round)
+            when "Elixir of Vitality"
+                update(elixir_total_health: (self.total_health * elixir.potion_effect).round)
+            end
+        end
+    end
+
+    def remaining_elixir_time(elixir)
+        return { remaining_time: 0 } unless elixir.present?
+
+        if elixir.is_a?(Item) && elixir.item_type == 'Elixir'
+            expiration_time = elixir.created_at.to_i + elixir.duration.seconds.to_i
+        else
+            expiration_time = elixir.elixir_applied_at.to_i + elixir.elixir_duration.seconds.to_i
+        end
+
+        remaining_time = [expiration_time - Time.current.to_i, 0].max
+        { remaining_time: remaining_time, expiration_time: expiration_time }
+    end
+
+    def self.expired_elixirs
+        characters_with_expired_elixir = Character.where("elixir_active = ? AND (current_timestamp - elixir_applied_at) >= elixir_duration * interval '1 second'", true)
+
+        characters_with_expired_elixir.each do |character|
+            expired_elixirs = Item.where(id: character.active_elixir_ids)
+
+            expired_elixirs.each do |elixir|
+            if (Time.current - elixir.elixir_applied_at) >= elixir.elixir_duration
+                # This elixir is expired, remove it
+                character.active_elixir_ids.delete(elixir.id)
+                character.save
+            end
+        end
+
+            # Now update the character's attributes based on the remaining active elixirs
+            character.update(
+            elixir_active: character.active_elixir_ids.present?,
+            elixir_applied_at: character.active_elixir_ids.present? ? Time.current : nil,
+            elixir_duration: character.active_elixir_ids.present? ? expired_elixirs.last.elixir_duration : nil
+            )
+
+            character.modify_stats_based_on_attributes
+            character.apply_passive_skills
+            character.save
+        end
+    end
+
     def add_item_to_inventory(item)
         inventory = Inventory.find_or_create_by(character_id: id)
         item.update(inventory_id: inventory.id)
@@ -516,16 +586,12 @@ class Character < ApplicationRecord
     def can_equip?(item)
         if self.level >= item.level_requirement
             case item.item_class
-                when 'Scythe'
-                    return true if character_class == 'deathwalker'
-                    errors.add(:base, "Only Deathwalkers can equip Scythes.")
-                    return false
                 when 'Sword'
                     # All characters can equip one-handed swords
                     return true if item.item_type == 'One-handed Weapon'
                     # For two-handed swords, restrict to warriors and paladins
-                    return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin].include?(character_class)
-                    errors.add(:base, "Only Warriors and Paladins can equip Two-handed Swords.")
+                    return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin deathwalker].include?(character_class)
+                    errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Two-handed Swords.")
                     return false
                 when 'Great Shield'
                     return true if character_class == 'paladin'
@@ -552,16 +618,16 @@ class Character < ApplicationRecord
                     errors.add(:base, "Only Mages can equip Staves.")
                     return false
                 when 'Plate'
-                    return true if %w[warrior paladin deathwalker].include?(character_class)
-                    errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
+                    return true if %w[warrior paladin].include?(character_class)
+                    errors.add(:base, "Only Warriors and Paladins can equip Plate.")
                     return false
                 when 'Leather'
                     return true if character_class == 'rogue'
                     errors.add(:base, "Only Rogues can equip leather.")
                     return false
                 when 'Cloth'
-                    return true if character_class == 'mage'
-                    errors.add(:base, "Only Mages can equip cloth.")
+                    return true if %w[mage deathwalker].include?(character_class)
+                    errors.add(:base, "Only Mages and Deathwalkers can equip cloth.")
                     return false
                 when 'Ring'
                     return true
@@ -609,6 +675,12 @@ class Character < ApplicationRecord
             if self.main_hand.item_type == 'One-handed Weapon'
                 if (self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && self.character_class == 'rogue'
                     Rails.logger.debug("################## Case 2 - Character is a rogue and item is either sword or dagger")
+                    self.off_hand = item
+                    remove_item_from_inventory(item)
+                    modify_stats_based_on_item(item)
+                    return
+                elsif self.main_hand.item_class == 'Sword' && self.character_class == 'deathwalker'
+                    Rails.logger.debug("################## Case 2 - Character is a deathwalker and item is a sword")
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
