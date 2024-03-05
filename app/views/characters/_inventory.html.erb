@@ -11,13 +11,13 @@
               <%= display_item_tooltip(item) %>
               <!-- Item Image -->
               <%= image_tag(item.item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
-              <% if current_page?(items_path) %>
+              <% if current_page?(items_path) || (controller_name == 'characters' && action_name == 'thaumaturge') %>
                 <%= form_with(model: @selected_character, url: sell_item_character_path(@selected_character, item), method: :post, local: true, params: { item_id: item.id }) do |form| %>
-                  <%= form.button "Sell", class: "btn btn-outline-danger btn-sm mt-1 mb-1", style:"width: 100px;", id:"sellButton#{item.id}" %>
+                  <%= form.button "Sell", class: "btn btn-outline-danger btn-sm mt-1 mb-1", style:"width: 100px;", id:"sellButton#{item.id}"%>
                   <script>
                     // JavaScript code to show gold price on hover
                     document.getElementById('sellButton<%= item.id %>').addEventListener('mouseover', function() {
-                      this.innerText = '+ <%= number_with_delimiter(item.gold_price) %>';
+                      this.innerText = '+ <%= number_with_delimiter((item.gold_price * 0.65).round) %>';
                     });
                   
                     document.getElementById('sellButton<%= item.id %>').addEventListener('mouseout', function() {
@@ -25,9 +25,13 @@
                     });
                   </script>
                 <% end %>
+              <% elsif ["Healing Potion", "Elixir"].include?(item.item_type) %>
+                <%= form_with(model: @selected_character, url: use_elixir_character_path(@selected_character, item), method: :post, local: true, params: { item_id: item.id }) do |form| %>
+                  <%= form.button "Use", class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;" %>
+                <% end %>
               <% else %>
                 <%= form_with(model: @selected_character, url: equip_item_character_path(@selected_character, item), method: :post, local: true, params: { item_id: item.id }) do |form| %>
-                  <%= form.button "Equip", class: "btn btn-outline-primary btn-sm mt-1 mb-1" %>
+                  <%= form.button "Equip", class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;" %>
                 <% end %>
               <% end %>
             </div>

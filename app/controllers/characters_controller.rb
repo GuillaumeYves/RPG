@@ -11,6 +11,8 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
 
     def thaumaturge
         @character = current_user.selected_character
+        @healing_potions = Item.where(item_type: "Healing Potion")
+        @elixirs = Item.where(item_type: "Elixir")
     end
 
     def heal
@@ -122,6 +124,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_attack += 0.01
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_attack_count)
                     @character.save
@@ -145,6 +148,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_armor += 0.005
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_armor_count)
                     @character.save
@@ -168,6 +172,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_spellpower += 0.01
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_spellpower_count)
                     @character.save
@@ -191,6 +196,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_magic_resistance += 0.005
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_magic_resistance_count)
                     @character.save
@@ -214,6 +220,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_critical_strike_chance += 0.10
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_critical_strike_chance_count)
                     @character.save
@@ -237,6 +244,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_critical_strike_damage += 0.01
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_critical_strike_damage_count)
                     @character.save
@@ -260,6 +268,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_total_health += 0.004
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_total_health_count)
                     @character.save
@@ -283,6 +292,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.paragon_global_damage += 0.004
                     @character.modify_stats_based_on_attributes
                     @character.apply_passive_skills
+                    @character.update_elixir_effect
                     @character.decrement(:paragon_points)
                     @character.increment(:paragon_increase_global_damage_count)
                     @character.save
@@ -297,6 +307,175 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
         redirect_back fallback_location: root_path
     end
+
+    def paragon_reset_attack
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_attack_count > 0
+                @character.paragon_points += @character.paragon_increase_attack_count
+                @character.paragon_attack = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_attack_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_armor
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_armor_count > 0
+                @character.paragon_points += @character.paragon_increase_armor_count
+                @character.paragon_armor = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_armor_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_spellpower
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_spellpower_count > 0
+                @character.paragon_points += @character.paragon_increase_spellpower_count
+                @character.paragon_spellpower = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_spellpower_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_magic_resistance
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_magic_resistance_count > 0
+                @character.paragon_points += @character.paragon_increase_magic_resistance_count
+                @character.paragon_magic_resistance = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_magic_resistance_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_critical_strike_chance
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_critical_strike_chance_count > 0
+                @character.paragon_points += @character.paragon_increase_critical_strike_chance_count
+                @character.paragon_critical_strike_chance = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_critical_strike_chance_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_critical_strike_damage
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_critical_strike_damage_count > 0
+                @character.paragon_points += @character.paragon_increase_critical_strike_damage_count
+                @character.paragon_critical_strike_damage = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_critical_strike_damage_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_total_health
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_armor_count > 0
+                @character.paragon_points += @character.paragon_increase_total_health_count
+                @character.paragon_total_health = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_total_health_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
+    def paragon_reset_global_damage
+        @character = current_user.selected_character
+        if @character.level >= 100
+            if @character.paragon_increase_global_damage_count > 0
+                @character.paragon_points += @character.paragon_increase_global_damage_count
+                @character.paragon_global_damage = 0.00
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                @character.update_elixir_effect
+                @character.paragon_increase_global_damage_count = 0
+                @character.save
+                flash[:notice] = "Paragon power successfully reset."
+            else
+                flash[:alert] = "You have not spent Paragon points on this power."
+            end
+        else
+            flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
+        end
+        redirect_back fallback_location: root_path
+    end
+
 
     def gain_experience
         @character = current_user.selected_character
@@ -402,6 +581,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             end
             @selected_character.modify_stats_based_on_attributes
             @selected_character.apply_passive_skills
+            @selected_character.update_elixir_effect
             @selected_character.save
             redirect_to @selected_character
         else
@@ -440,7 +620,8 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
 
         @selected_character.modify_stats_based_on_attributes
         @selected_character.apply_passive_skills
-        @selected_character.save!
+        @selected_character.update_elixir_effect
+        @selected_character.save
 
         redirect_to @selected_character, notice: "#{item.name} unequipped."
     end
@@ -475,8 +656,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         item = Item.find(params[:item_id])
 
         if inventory.items.include?(item)
-            @selected_character.gold += item.gold_price
-            flash[:notice] = "#{item.name} sold for #{item.gold_price} gold."
+            selling_price = (item.gold_price * 0.65).round
+            @selected_character.gold += selling_price
+            flash[:notice] = "#{item.name} sold for #{selling_price} gold."
             inventory.items.delete(item)
             inventory.save
             @selected_character.save
@@ -487,27 +669,85 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
-    def unlock_skill
+    def learn_skill
         @character = current_user.selected_character
         skill_id = params[:skill_id]
         skill = Skill.find(skill_id)
 
-        if @character.level < skill.level_requirement || !skill.locked
-            flash[:alert] = 'You do not meet the level requirement to unlock this talent.'
+        if @character.level < skill.level_requirement
+            flash[:alert] = 'You do not meet the level requirement to learn this talent.'
         elsif @character.skills.where(row: skill.row, unlocked: true).exists?
-            flash[:alert] = 'You can only unlock one talent from this row.'
+            flash[:alert] = 'You can only learn one talent from this row.'
         elsif @character.skill_points.zero?
             flash[:alert] = 'You have no talent point.'
         else
             skill.update(unlocked: true, locked: false)
             @character.apply_passive_skills
             @character.modify_stats_based_on_attributes
+            @character.update_elixir_effect
             @character.decrement(:skill_points)
             @character.save
-            flash[:notice] = 'Talent unlocked.'
+            flash[:notice] = 'Talent learned.'
         end
 
         redirect_to talents_character_path
+    end
+
+    def unlearn_skill
+        @character = current_user.selected_character
+        skill_id = params[:skill_id]
+        skill = Skill.find(skill_id)
+
+        if !skill.unlocked
+            flash[:alert] = 'You have not learned this skill.'
+        elsif skill.unlocked
+            skill.update(unlocked: false, locked: true)
+            @character.apply_passive_skills
+            @character.modify_stats_based_on_attributes
+            @character.update_elixir_effect
+            @character.increment(:skill_points)
+            @character.save
+            flash[:notice] = 'Talent unlearned.'
+        end
+
+        redirect_to talents_character_path
+    end
+
+    def use_elixir
+        @selected_character = Character.find(session[:selected_character_id])
+        inventory = @selected_character.inventory
+        item = Item.find(params[:item_id])
+
+        if item.item_type == "Elixir" && @selected_character.active_elixir_ids.length < 3
+            case item.name
+            when "Elixir of Might"
+            @selected_character.update(elixir_attack: (@selected_character.total_attack * item.potion_effect))
+            when "Elixir of Power"
+            @selected_character.update(elixir_spellpower: (@selected_character.total_spellpower * item.potion_effect))
+            when "Elixir of Decay"
+            @selected_character.update(elixir_necrosurge: (@selected_character.total_necrosurge * item.potion_effect))
+            when "Elixir of Fortitude"
+            @selected_character.update(elixir_armor: (@selected_character.total_armor * item.potion_effect))
+            when "Elixir of Knowledge"
+            @selected_character.update(elixir_magic_resistance: (@selected_character.total_magic_resistance * item.potion_effect))
+            when "Elixir of Potency"
+            @selected_character.update(elixir_global_damage: (@selected_character.elixir_global_damage + item.potion_effect))
+            when "Elixir of Vitality"
+            @selected_character.update(elixir_total_health: (@selected_character.total_health * item.potion_effect))
+            end
+
+            @selected_character.active_elixir_ids << item.id
+            @selected_character.update(elixir_applied_at: Time.current, elixir_active: true, elixir_duration: item.duration)
+            inventory.items.delete(item)
+            inventory.save
+            @selected_character.modify_stats_based_on_attributes
+            @selected_character.apply_passive_skills
+            @selected_character.save
+        else
+            flash[:alert] = 'You already have 3 elixirs active.'
+        end
+
+        redirect_back fallback_location: root_path
     end
 
     private

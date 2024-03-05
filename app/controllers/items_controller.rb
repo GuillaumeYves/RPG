@@ -9,4 +9,15 @@ before_action :authenticate_user!
         @random_jewelry_items = Item.where(item_type: ["Finger", "Neck"], merchant_item: true, purchased: false)
     end
 
+    def reset_merchant_items
+        @character = current_user.selected_character
+        Item.reset_items
+        Item.set_merchant_items
+
+        @character.gold -= 10
+        @character.save
+
+        redirect_back fallback_location: root_path
+    end
+
 end

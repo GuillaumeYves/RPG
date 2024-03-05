@@ -21,11 +21,15 @@ set :job_template, "bash -l -i -c ':job'"
 
 # Learn more: http://github.com/javan/whenever
 
+every 1.minute do
+  runner "Character.expired_elixir"
+end
+
 every 1.hour do
   runner "Character.recovery"
 end
 
-every 24.hour, at: '00:00' do
+every 4.hour do
   runner "Item.reset_items"
   runner "Item.set_merchant_items"
 end

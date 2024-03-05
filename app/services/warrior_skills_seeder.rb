@@ -70,12 +70,11 @@ class WarriorSkillsSeeder
     forged_in_battle = Skill.create(
       name: "Forged in Battle",
       skill_type: "passive",
-      description: "You can dual wield Two-handed Weapons but your attacks now have a 10% chance to miss and your Attack is reduced by 20%.",
+      description: "You can dual wield Two-handed Weapons but your attacks now have a 10% chance to miss.",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,
       character_id: character.id,
-      effect: "self.total_attack *= 0.80;"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'forgedinbattle.jpg')
     forged_in_battle.skill_image.attach(io: File.open(image_path), filename: 'forgedinbattle.jpg', content_type: 'image/jpeg')

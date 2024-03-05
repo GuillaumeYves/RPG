@@ -21,9 +21,6 @@
     <%= javascript_importmap_tags %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
     <style>
-      body {
-        display: none;
-      }
       body, html, * {
         scrollbar-width: thin; /* For Firefox */
         scrollbar-color: transparent transparent; /* For Firefox */
@@ -209,7 +206,7 @@
 
     <div class="footer bg-white text-black fixed-bottom" style="width: 100%; height: 30px; border-top: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
       <div class="row" style="width: 100%; margin: 0; padding: 0;">
-        <div class="col-1 text-left" style="width: 10%;" id="timeDisplay">
+        <div class="col-1 text-center" style="width: 10%;" id="timeDisplay">
           <p><%= Time.now.strftime('%d-%m-%Y, %H:%M:%S') %></p>
         </div>
         <div class="col text-center overflow: hidden" style="width: 80%;">
@@ -217,8 +214,9 @@
             <p class="footer-text"></p>
           </div>
         </div>
-        <div class="col-1 text-right" style="width: 10%;">
-          <p>BGM</p>
+        <div class="col-1 text-center" style="width: 10%;">
+          <% report_subject = "Ticket #{SecureRandom.hex(4)}"%>
+          <a href="mailto:guillaume-las@hotmail.fr?subject=<%= CGI.escape(report_subject) %>">Report a problem</a>
         </div>
       </div>
     </div>
@@ -289,7 +287,7 @@
         "Welcome to the Closed Beta of Tedorha!",
         "Rogues can achieve incredible Critical Strike Damage, keep an eye out for the backstabs.",
         "Talent points are aquired at levels 25, 50, 75 and 100.",
-        "Paladins, Warriors and Deathwalkers have access to Plate armor, giving them more durability than other classes.",
+        "Paladins and Warriors have access to Plate armor, giving them more durability than other classes.",
         "Mages can be deadly if a combat lasts for too long.",
         "Legendary items are obtainable through Bosses... and a bit of luck.",
         "At level 100 and beyond, you unlock a Paragon point each level and you can spend them on your Paragon tree.",
@@ -300,12 +298,14 @@
         "Having more Spellpower than Attack will allow you to deal Magic damage.",
         "True damage cannot be reduced by any source of damage reduction.",
         "Every hour you will recover some Energy, Health and Arena tickets.",
-        "Deathwalkers have a lot of life and use that life to scale their damage, at the cost of their defences.",
+        "Modifiers like 'Global Damage' only apply to your normal attacks and not your talents.",
+        "Deathwalkers use life to scale their damage, at the cost of their defences.",
         "A 'normal attack' is the attack made each turn, whereas a talent activates only if unlocked and/or condition is met.",
-        "There's a 50% chance for you or your opponent to start first during a combat.",
+        "There's a 50% chance for you or for your opponent to start first during a combat.",
+        "Magic attacks cannot be evaded.",
         "Paladins can easily heal during combat, allowing them to deal more damage and turn the tide of a battle.",
         "'Passive' talents apply all the time to your character, 'Trigger' passives apply when condition is met and 'Combat' talents apply during your combat turn.",
-        "Shadow damage is extremely dangerous as it cannot be reduced by Armor or Magic Resistance.",
+        "Shadow damage cannot be reduced by Armor or Magic Resistance.",
         "Be cautious with your Health, with each combat it gets lower. Visit Mekail if you need to heal up.",
         "Each race start with different stats, and each class modify further these stats. But nothing stops you from being an Orc Mage.",
       ];

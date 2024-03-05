@@ -169,7 +169,7 @@ class CombatController < ApplicationController
         damage.round
     end
 
-    def magic_damage(total_spellpower, buffed_spellpower, total_magic_resistance, buffed_magic_resistance, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, total_global_damage, evasion, ignore_pain_chance)
+    def magic_damage(total_spellpower, buffed_spellpower, total_magic_resistance, buffed_magic_resistance, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, total_global_damage, ignore_pain_chance)
         @is_crit = false
 
         # Check for a miss with Forged in Battle
@@ -182,27 +182,19 @@ class CombatController < ApplicationController
             log_message = '<span style="color: green; text-shadow: 1px 1px 2px #000000;">MISS</span>'
             @combat_logs << log_message
         else
-            # Chance to evade damage
-            if rand(0.00..100.00) <= evasion
-                damage = 0
-                log_message = '<span style="color: yellow; text-shadow: 1px 1px 2px #000000;">EVADED</span>'
+            # Check for a critical hit based on critical_strike_chance
+            if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
+                damage = (((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_magic_resistance + buffed_magic_resistance)
+                log_message = '<span style="color: red; text-shadow: 1px 1px 2px #000000;">CRITICAL STRIKE</span>'
                 @combat_logs << log_message
+                @is_crit = true
             else
-                # Check for a critical hit based on critical_strike_chance
-                if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                    damage = (((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_magic_resistance + buffed_magic_resistance)
-                    log_message = '<span style="color: red; text-shadow: 1px 1px 2px #000000;">CRITICAL STRIKE</span>'
+                damage = ((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) - (total_magic_resistance + buffed_magic_resistance)
+                # Apply damage reduction based on ignore_pain_chance
+                if rand(0.00..100.00) <= ignore_pain_chance
+                    damage *= 0.8  # Reduce incoming damage by 20%
+                    log_message = '<span style="color: blue; text-shadow: 1px 1px 2px #000000;">IGNORE PAIN</span>'
                     @combat_logs << log_message
-                    @is_crit = true
-                else
-                    damage = ((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) - (total_magic_resistance + buffed_magic_resistance)
-
-                    # Apply damage reduction based on ignore_pain_chance
-                    if rand(0.00..100.00) <= ignore_pain_chance
-                        damage *= 0.8  # Reduce incoming damage by 20%
-                        log_message = '<span style="color: blue; text-shadow: 1px 1px 2px #000000;">IGNORE PAIN</span>'
-                        @combat_logs << log_message
-                    end
                 end
             end
         end
@@ -350,7 +342,7 @@ class CombatController < ApplicationController
                 damage = [physical_damage(@character.total_attack, @character.buffed_attack, @opponent.total_armor, @opponent.buffed_armor, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance).round, 0].max
                 damage_type = 'physical'
             elsif @character.total_spellpower > @character.total_attack && @character.total_spellpower > @character.total_necrosurge
-                damage = [magic_damage(@character.total_spellpower, @character.buffed_spellpower, @opponent.total_magic_resistance, @opponent.buffed_magic_resistance, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance).round, 0].max
+                damage = [magic_damage(@character.total_spellpower, @character.buffed_spellpower, @opponent.total_magic_resistance, @opponent.buffed_magic_resistance, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.ignore_pain_chance).round, 0].max
                 damage_type = 'magic'
             elsif @character.total_necrosurge > @character.total_attack && @character.total_necrosurge > @character.total_spellpower
                 damage = [shadow_damage(@character.total_necrosurge, @character.buffed_necrosurge, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance).round, 0].max
@@ -383,7 +375,7 @@ class CombatController < ApplicationController
             end
 
             if @is_crit == true && @character.skills.find_by(name: 'From the Shadows', unlocked: true).present?
-                from_the_shadows = (damage * 0.1).round
+                from_the_shadows = (damage * 0.25).round
                 @opponent_health_in_combat -= [from_the_shadows, 0].max
                 log_message += ", <strong>#{from_the_shadows}</strong> true damage with 'From the Shadows' "
             end
@@ -438,7 +430,7 @@ class CombatController < ApplicationController
                 damage = [physical_damage(@opponent.total_attack, @opponent.buffed_attack, @character.total_armor, @character.buffed_armor, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
                 damage_type = 'physical'
             elsif @opponent.total_spellpower > @opponent.total_attack  && @opponent.total_spellpower > @opponent.total_necrosurge
-                damage = [magic_damage(@opponent.total_spellpower, @opponent.buffed_spellpower, @character.total_magic_resistance, @character.buffed_magic_resistance, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
+                damage = [magic_damage(@opponent.total_spellpower, @opponent.buffed_spellpower, @character.total_magic_resistance, @character.buffed_magic_resistance, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.ignore_pain_chance).round, 0].max
                 damage_type = 'magic'
             elsif @opponent.total_necrosurge > @opponent.total_attack && @opponent.total_necrosurge > @opponent.total_spellpower
                 damage = [shadow_damage(@opponent.total_necrosurge, @opponent.buffed_necrosurge, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance).round, 0].max
@@ -464,12 +456,6 @@ class CombatController < ApplicationController
                     log_message = "#{@opponent.monster_name} attacked for <strong>#{damage}</strong> #{damage_type} damage "
                 end
 
-                if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Blood Frenzy', unlocked: true).present?
-                    blood_frenzy = (damage * 0.08).round
-                    @opponent_health_in_combat += [blood_frenzy, @opponent.total_max_health - @opponent_health_in_combat].min
-                    log_message = "#{@opponent.character_name} recovered <strong>#{blood_frenzy}</strong> Health with 'Blood Frenzy' - #{@opponent_health_in_combat} / #{@opponent.total_max_health} "
-                end
-
                 if rand(0.0..100.0) <= 30.0 && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
                     sharpened_blade = ((@opponent.total_attack + @opponent.buffed_attack) * 0.5).round
                     @character.total_health -= [(sharpened_blade - (@character.total_armor + @character.buffed_armor)), 0].max
@@ -481,7 +467,7 @@ class CombatController < ApplicationController
                 end
 
                 if @is_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
-                    from_the_shadows = (damage * 0.1).round
+                    from_the_shadows = (damage * 0.25).round
                     @character.total_health -= [from_the_shadows, 0].max
                     log_message += ", <strong>#{from_the_shadows}</strong> true damage with 'From the Shadows' "
                 end
@@ -508,6 +494,13 @@ class CombatController < ApplicationController
 
                 log_message += "- #{@character.character_name} : #{@character.total_health} / #{@character.total_max_health} Health "
                 @combat_logs << log_message
+
+                if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Blood Frenzy', unlocked: true).present?
+                    blood_frenzy = (damage * 0.08).round
+                    @opponent_health_in_combat += [blood_frenzy, @opponent.total_max_health - @opponent_health_in_combat].min
+                    log_message = "#{@opponent.character_name} recovered <strong>#{blood_frenzy}</strong> Health with 'Blood Frenzy' - #{@opponent_health_in_combat} / #{@opponent.total_max_health} "
+                    @combat_logs << log_message
+                end
 
             else
                 if @opponent.is_a?(Character)
