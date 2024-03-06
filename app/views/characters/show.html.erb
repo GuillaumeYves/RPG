@@ -218,33 +218,47 @@
           <div class="col-md-4">
             <div class="text-center">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">General</h4><br>
-              <span data-tooltip="tooltip" title="Total amount of Health"><strong>Health:</strong> <%= @character.total_health %>/<%= @character.total_max_health %></span><br>
-              <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= (@character.total_attack - @character.elixir_attack) %></span>
+              <span data-tooltip="tooltip" title="Total amount of Health"><strong>Health:</strong> <%= number_with_delimiter(@character.total_health) %>/<%= number_with_delimiter(@character.total_max_health) %></span><br>
+              <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= number_with_delimiter(@character.total_attack - @character.elixir_attack) %></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
                 <% if (elixir.name == "Elixir of Might").present? %>
-                  <span data-tooltip="tooltip" title="Elixir of Might" class="text-success"><%= " +#{@character.elixir_attack}" %></span>
+                  <span data-tooltip="tooltip" title="Elixir of Might" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_attack)}" %></span>              
                 <% end %>
               <% end %>
               <br>
-              <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_spellpower %></span><br>
-              <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_necrosurge %></span><br>
+              <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= number_with_delimiter(@character.total_spellpower - @character.elixir_spellpower) %></span>
+              <% @character.active_elixir_ids.each do |elixir_id| %>
+                <% elixir = Item.find(elixir_id) %>
+                <% if (elixir.name == "Elixir of Power").present? %>
+                  <span data-tooltip="tooltip" title="Elixir of Power" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_spellpower)}" %></span>
+                <% end %>
+              <% end %> 
+              <br>             
+              <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= number_with_delimiter(@character.total_necrosurge - @character.elixir_necrosurge) %></span>
+              <% @character.active_elixir_ids.each do |elixir_id| %>
+                <% elixir = Item.find(elixir_id) %>
+                <% if (elixir.name == "Elixir of Decay").present? %>
+                  <span data-tooltip="tooltip" title="Elixir of Decay" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_necrosurge)}" %></span>
+                <% end %>
+              <% end %> 
+              <br>
               <span data-tooltip="tooltip" title="Chance to Critically Strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
               <span data-tooltip="tooltip" title="Increases the damage of your Critical Strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
               <span data-tooltip="tooltip" title="Increases your damage dealt"><strong>Global Damage:</strong> <%= number_with_precision(@character.total_global_damage * 100, precision: 2) %>%</span><br>
-              <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor: </strong><%= (@character.total_armor - @character.elixir_armor) %></span>
+              <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor: </strong><%= number_with_delimiter(@character.total_armor - @character.elixir_armor) %></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
                 <% if (elixir.name == "Elixir of Fortitude").present? %>
-                  <span data-tooltip="tooltip" title="Elixir of Fortitude" class="text-success"><%= " +#{@character.elixir_armor}" %></span>
+                  <span data-tooltip="tooltip" title="Elixir of Fortitude" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_armor)}" %></span>
                 <% end %>
               <% end %>
               <br>
-              <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%=(@character.total_magic_resistance - @character.elixir_magic_resistance)%></span>
+              <span data-tooltip="tooltip" title="Reduces magic damage taken"><strong>Magic Resistance:</strong> <%=number_with_delimiter(@character.total_magic_resistance - @character.elixir_magic_resistance)%></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
                 <% if (elixir.name == "Elixir of Knowledge").present? %>
-                  <span data-tooltip="tooltip" title="Elixir of Knowledge" class="text-success"><%= " +#{@character.elixir_magic_resistance}" %></span>
+                  <span data-tooltip="tooltip" title="Elixir of Knowledge" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_magic_resistance)}" %></span>
                 <% end %>
               <% end %>
               <br>              
@@ -257,12 +271,12 @@
           <div class="col-md-4">
             <div class="text-center" style=" height:240px;">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Attributes</h4><br>
-              <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= @character.strength %></span><br>
-              <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= @character.intelligence %></span><br>
-              <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= @character.dreadmight %></span><br>
-              <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= @character.agility %></span><br>
-              <span data-tooltip="tooltip" title="Increases your Critical Strike Chance"><strong>Luck:</strong> <%= @character.luck %></span><br>
-              <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= @character.willpower %></span><br>
+              <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= number_with_delimiter(@character.strength) %></span><br>
+              <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= number_with_delimiter(@character.intelligence) %></span><br>
+              <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= number_with_delimiter(@character.dreadmight) %></span><br>
+              <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= number_with_delimiter(@character.agility) %></span><br>
+              <span data-tooltip="tooltip" title="Increases your Critical Strike Chance"><strong>Luck:</strong> <%= number_with_delimiter(@character.luck) %></span><br>
+              <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= number_with_delimiter(@character.willpower) %></span><br>
             </div>
 
             <div class="text-center mt-3 mb-3">
@@ -329,7 +343,7 @@
             <div class="text-center" style=" height:240px;">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Talents</h4><br>
               <% if @skills.any?(&:unlocked) %>
-                <div class="row">
+                <div class="row" style="padding-right: 15px; padding-left: 15px;">
                   <% @skills.each do |skill| %>
                     <% if skill.unlocked %>
                       <div class="col-md-6">

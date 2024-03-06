@@ -161,6 +161,7 @@ class Character < ApplicationRecord
         self.total_armor += self.elixir_armor
         self.total_spellpower += self.elixir_spellpower
         self.total_magic_resistance += self.elixir_magic_resistance
+        self.total_necrosurge += self.elixir_necrosurge
     end
 
     def set_default_values_for_buffed_stats
@@ -385,14 +386,14 @@ class Character < ApplicationRecord
     end
 
     def calculate_luck_bonus
-        self.luck * 0.05
+        self.luck * 0.03
     end
 
     def evasion
         if self.character_class == 'warrior' && skills.find_by(name: 'Undeniable', unlocked: true)
             evasion = 0.0
         else
-            self.agility * 0.03
+            self.agility * 0.02
         end
     end
 
@@ -400,7 +401,7 @@ class Character < ApplicationRecord
         if self.character_class == 'warrior' && skills.find_by(name: 'Undeniable', unlocked: true)
             ignore_pain_chance = 0.0
         else
-            self.willpower * 0.03
+            self.willpower * 0.02
         end
     end
 
@@ -482,15 +483,15 @@ class Character < ApplicationRecord
         # Modify health based on character class
         case character_class
         when 'warrior'
-            self.health += 5
+            self.health += 14
         when 'mage'
-            self.health += 3
+            self.health += 10
         when 'rogue'
-            self.health += 4
+            self.health += 12
         when 'paladin'
-            self.health += 6
+            self.health += 16
         when 'deathwalker'
-            self.health += 7
+            self.health += 18
         end
 
         self.modify_stats_based_on_attributes
@@ -526,47 +527,37 @@ class Character < ApplicationRecord
                 update(elixir_armor: (self.total_armor * elixir.potion_effect).round)
             when "Elixir of Knowledge"
                 update(elixir_magic_resistance: (self.total_magic_resistance * elixir.potion_effect).round)
-            when "Elixir of Potency"
-                update(elixir_global_damage: (self.elixir_global_damage + elixir.potion_effect).round)
-            when "Elixir of Vitality"
-                update(elixir_total_health: (self.total_health * elixir.potion_effect).round)
             end
         end
     end
 
-    def remaining_elixir_time(elixir)
-        return { remaining_time: 0 } unless elixir.present?
+    def remaining_elixir_time(item)
+        return { remaining_time: 0 } unless item.present?
 
-        if elixir.is_a?(Item) && elixir.item_type == 'Elixir'
-            expiration_time = elixir.created_at.to_i + elixir.duration.seconds.to_i
-        else
-            expiration_time = elixir.elixir_applied_at.to_i + elixir.elixir_duration.seconds.to_i
-        end
-
+        expiration_time = item.elixir_applied_at.to_i + item.duration.seconds.to_i
         remaining_time = [expiration_time - Time.current.to_i, 0].max
+
         { remaining_time: remaining_time, expiration_time: expiration_time }
     end
 
     def self.expired_elixirs
-        characters_with_expired_elixir = Character.where("elixir_active = ? AND (current_timestamp - elixir_applied_at) >= elixir_duration * interval '1 second'", true)
+        characters_with_active_elixir = Character.where(elixir_active: true)
 
-        characters_with_expired_elixir.each do |character|
+        characters_with_active_elixir.each do |character|
             expired_elixirs = Item.where(id: character.active_elixir_ids)
 
             expired_elixirs.each do |elixir|
-            if (Time.current - elixir.elixir_applied_at) >= elixir.elixir_duration
-                # This elixir is expired, remove it
-                character.active_elixir_ids.delete(elixir.id)
-                character.save
-            end
-        end
+            expiration_time = elixir.elixir_applied_at + elixir.duration.seconds
 
-            # Now update the character's attributes based on the remaining active elixirs
-            character.update(
-            elixir_active: character.active_elixir_ids.present?,
-            elixir_applied_at: character.active_elixir_ids.present? ? Time.current : nil,
-            elixir_duration: character.active_elixir_ids.present? ? expired_elixirs.last.elixir_duration : nil
-            )
+                if Time.current >= expiration_time
+                    # This elixir is expired, remove it
+                    character.active_elixir_ids.delete(elixir.id)
+                end
+            end
+
+            if character.active_elixir_ids.empty?
+                character.elixir_active = false
+            end
 
             character.modify_stats_based_on_attributes
             character.apply_passive_skills

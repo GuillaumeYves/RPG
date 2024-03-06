@@ -22,7 +22,4 @@ end
 
     create_item("Elixir of Knowledge", "Elixir", 0.10, 14400, 100, "Increase your Magic Resistance by 10% for 4 hours.",'app/assets/images/potions/elixirofknowledge.jpg')
 
-    create_item("Elixir of Potency", "Elixir", 0.10, 14400, 100, "Increase your Global Damage by 10% for 4 hours.",'app/assets/images/potions/elixirofpotency.jpg')
-
-    create_item("Elixir of Vitality", "Elixir", 0.10, 14400, 100, "Increase your Health by 10% for 4 hours.",'app/assets/images/potions/elixirofvitality.jpg')
   end
