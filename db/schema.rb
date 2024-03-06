@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_05_213627) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_06_220624) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -114,16 +114,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_05_213627) do
     t.integer "paragon_increase_total_health_count", default: 0
     t.integer "paragon_increase_global_damage_count", default: 0
     t.decimal "paragon_attack", precision: 5, scale: 2, default: "0.0"
-    t.decimal "paragon_armor", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_armor", precision: 6, scale: 3, default: "0.0"
     t.decimal "paragon_spellpower", precision: 5, scale: 2, default: "0.0"
-    t.decimal "paragon_magic_resistance", precision: 5, scale: 2, default: "0.0"
+    t.decimal "paragon_magic_resistance", precision: 6, scale: 3, default: "0.0"
     t.decimal "paragon_critical_strike_chance", precision: 5, scale: 2, default: "0.0"
     t.decimal "paragon_critical_strike_damage", precision: 5, scale: 2, default: "0.0"
     t.decimal "paragon_total_health", precision: 6, scale: 3, default: "0.0"
     t.decimal "paragon_global_damage", precision: 6, scale: 3, default: "0.0"
     t.boolean "elixir_active", default: false
-    t.datetime "elixir_applied_at"
-    t.integer "elixir_duration"
     t.integer "elixir_attack", default: 0
     t.integer "elixir_spellpower", default: 0
     t.integer "elixir_necrosurge", default: 0
@@ -207,6 +205,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_05_213627) do
     t.integer "duration"
     t.decimal "potion_heal_amount"
     t.decimal "potion_effect"
+    t.datetime "elixir_applied_at"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 

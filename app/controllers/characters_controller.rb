@@ -714,35 +714,36 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     end
 
     def use_elixir
-        @selected_character = Character.find(session[:selected_character_id])
-        inventory = @selected_character.inventory
+        @character = Character.find(session[:selected_character_id])
+        inventory = @character.inventory
         item = Item.find(params[:item_id])
 
-        if item.item_type == "Elixir" && @selected_character.active_elixir_ids.length < 3
-            case item.name
-            when "Elixir of Might"
-            @selected_character.update(elixir_attack: (@selected_character.total_attack * item.potion_effect))
-            when "Elixir of Power"
-            @selected_character.update(elixir_spellpower: (@selected_character.total_spellpower * item.potion_effect))
-            when "Elixir of Decay"
-            @selected_character.update(elixir_necrosurge: (@selected_character.total_necrosurge * item.potion_effect))
-            when "Elixir of Fortitude"
-            @selected_character.update(elixir_armor: (@selected_character.total_armor * item.potion_effect))
-            when "Elixir of Knowledge"
-            @selected_character.update(elixir_magic_resistance: (@selected_character.total_magic_resistance * item.potion_effect))
-            when "Elixir of Potency"
-            @selected_character.update(elixir_global_damage: (@selected_character.elixir_global_damage + item.potion_effect))
-            when "Elixir of Vitality"
-            @selected_character.update(elixir_total_health: (@selected_character.total_health * item.potion_effect))
-            end
+        if item.item_type == "Elixir" && @character.active_elixir_ids.length < 3
+            if @character.active_elixir_ids.any? { |elixir_id| Item.find(elixir_id).name == item.name }
+                flash[:alert] = "You already have an active #{item.name}."
+            else
+                case item.name
+                when "Elixir of Might"
+                    @character.update(elixir_attack: (@character.total_attack * item.potion_effect))
+                when "Elixir of Power"
+                    @character.update(elixir_spellpower: (@character.total_spellpower * item.potion_effect))
+                when "Elixir of Decay"
+                    @character.update(elixir_necrosurge: (@character.total_necrosurge * item.potion_effect))
+                when "Elixir of Fortitude"
+                    @character.update(elixir_armor: (@character.total_armor * item.potion_effect))
+                when "Elixir of Knowledge"
+                    @character.update(elixir_magic_resistance: (@character.total_magic_resistance * item.potion_effect))
+                end
 
-            @selected_character.active_elixir_ids << item.id
-            @selected_character.update(elixir_applied_at: Time.current, elixir_active: true, elixir_duration: item.duration)
-            inventory.items.delete(item)
-            inventory.save
-            @selected_character.modify_stats_based_on_attributes
-            @selected_character.apply_passive_skills
-            @selected_character.save
+                item.update(elixir_applied_at: Time.current)
+                @character.active_elixir_ids << item.id
+                @character.elixir_active = true
+                @character.modify_stats_based_on_attributes
+                @character.apply_passive_skills
+                inventory.items.delete(item)
+                inventory.save
+                @character.save
+            end
         else
             flash[:alert] = 'You already have 3 elixirs active.'
         end
