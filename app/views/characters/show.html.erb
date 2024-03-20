@@ -294,8 +294,7 @@
                         <p class="countdown-text" style="font-size: 13px" data-expiration-time="<%= @character.remaining_elixir_time(elixir)[:expiration_time] %>">
                           <%= "#{format_duration(@character.remaining_elixir_time(elixir)[:remaining_time])}" %>
                         </p>
-                        <script>
-                          document.addEventListener('DOMContentLoaded', function() {
+                          <script>
                             function updateCountdown() {
                               var countdownElements = document.querySelectorAll('.countdown-text');
                               countdownElements.forEach(function(element) {
@@ -310,22 +309,20 @@
                               });
                             }
 
-                          function formatDuration(seconds) {
-                            var hours = Math.floor(seconds / 3600);
-                            var minutes = Math.floor((seconds % 3600) / 60);
-                            var seconds = (seconds % 60).toFixed(0); // Round to 0 decimal places
+                            function formatDuration(seconds) {
+                              var hours = Math.floor(seconds / 3600);
+                              var minutes = Math.floor((seconds % 3600) / 60);
+                              var seconds = (seconds % 60).toFixed(0); // Round to 0 decimal places
 
-                            return `${hours}:${minutes}:${seconds}`;
-                          }
+                              return `${hours}:${minutes}:${seconds}`;
+                            }
 
                             // Initial update
                             updateCountdown();
 
                             // Update every second
                             setInterval(updateCountdown, 1000);
-                          });
-                        </script>
-
+                          </script>
                       </div>
                     </div>
                   <% end %>

@@ -11,13 +11,13 @@ class DeathwalkerSkillsSeeder
 
     bloodforging = Skill.create(
       name: "Bloodforging",
-      description: "You gain 3% of your maximum Health as Necrosurge.",
+      description: "You gain 2% of your maximum Health as Necrosurge.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: " self.total_necrosurge = self.total_necrosurge + (self.total_max_health * 0.03)"
+      effect: " self.total_necrosurge = self.total_necrosurge + (self.total_max_health * 0.02)"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodforging.jpg')
     bloodforging.skill_image.attach(io: File.open(image_path), filename: 'bloodforging.jpg', content_type: 'image/jpeg')
@@ -25,7 +25,7 @@ class DeathwalkerSkillsSeeder
 
     lifetap = Skill.create(
       name: "Lifetap",
-      description: "At the end of each turn, you sacrifice 1% of your maximum Health to gain that amount as Necrosurge.",
+      description: "At the end of each turn, you sacrifice 1% of your maximum Health to gain double of that amount as Necrosurge.",
       skill_type: "combat",
       row: 1,
       level_requirement: 25,
@@ -38,7 +38,7 @@ class DeathwalkerSkillsSeeder
 
     ephemeral_rebirth = Skill.create(
       name: "Ephemeral Rebirth",
-      description: "During combat if your Health drops to 0, you are reborn with 100% of your Health but the damage you take from normal attacks is doubled.
+      description: "During combat if your Health drops to 0, you are reborn with 100% of your Health but you start losing 10% of your maximum Health at the end of each turn.
       This can only happen once per combat.",
       skill_type: "trigger",
       row: 2,
@@ -52,7 +52,7 @@ class DeathwalkerSkillsSeeder
 
     blood_monarch = Skill.create(
       name: "Blood Monarch",
-      description: "Your Health is increased by 66% but you take 20% increased damage from normal attacks and you can no longer deal Critical Strikes.",
+      description: "Your Health is increased by 66% but you no longer have Armor and Magic Resistance.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -60,8 +60,8 @@ class DeathwalkerSkillsSeeder
       character_id: character.id,
       effect: "self.total_max_health *= 1.66;
               self.total_health *= 1.66;
-              self.total_critical_strike_chance = 0.0;
-              self.total_critical_strike_damage = 0.0; "
+              self.total_armor = 0;
+              self.total_magic_resistance = 0; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodmonarch.jpg')
     blood_monarch.skill_image.attach(io: File.open(image_path), filename: 'bloodmonarch.jpg', content_type: 'image/jpeg')
@@ -69,16 +69,15 @@ class DeathwalkerSkillsSeeder
 
     path_of_the_dead = Skill.create(
       name: "Path of the Dead",
-      description: "Reduce your Armor and Magic Resistance by 50% but increase your maximum Health by 30%.",
+      description: "Increase your maximum Health by 33%. When dealing a Critical Strike, you recover 6% of that damage as Health.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: " self.total_armor *= 0.5;
-              self.total_magic_resistance *= 0.5;
-              self.total_max_health *= 1.3;
-              self.total_health *= 1.3;"
+      effect: "
+              self.total_max_health *= 1.33;
+              self.total_health *= 1.33;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'pathofthedead.jpg')
     path_of_the_dead.skill_image.attach(io: File.open(image_path), filename: 'pathofthedead.jpg', content_type: 'image/jpeg')
@@ -99,16 +98,14 @@ class DeathwalkerSkillsSeeder
 
     cadaverous_pact = Skill.create(
       name: "Cadaverous Pact",
-      description: "You can no longer deal physical or magic damage but your Necrosurge is increased by 66%.",
+      description: "Your Necrosurge is increased by 66%.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
       effect: "
-              self.total_attack = 0;
-              self.total_spellpower = 0;
-              self.total_necrosurge *= 1.66;"
+              self.total_necrosurge *= 1.66; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'cadaverouspact.jpg')
     cadaverous_pact.skill_image.attach(io: File.open(image_path), filename: 'cadaverouspact.jpg', content_type: 'image/jpeg')
@@ -116,16 +113,16 @@ class DeathwalkerSkillsSeeder
 
     sanguine_eclipse = Skill.create(
       name: "Sanguine Eclipse",
-      description: "When you reach 20% Health, your Necrosurge is doubled.",
+      description: "When you reach 30% Health, your Necrosurge is doubled.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
       effect: "
-      if (self.total_health <= (0.2 * self.total_max_health))
-        self.buffed_necrosurge = self.total_necrosurge
-      end "
+              if (self.total_health <= (0.3 * self.total_max_health))
+                self.buffed_necrosurge = self.total_necrosurge
+              end "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'sanguineeclipse.jpg')
     sanguine_eclipse.skill_image.attach(io: File.open(image_path), filename: 'sanguineeclipse.jpg', content_type: 'image/jpeg')

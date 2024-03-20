@@ -56,7 +56,7 @@ class WarriorSkillsSeeder
 
     blood_frenzy = Skill.create(
       name: "Blood Frenzy",
-      description: "You heal for 8% of the damage you deal.",
+      description: "You recover 8% of the damage you deal as Health.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,

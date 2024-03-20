@@ -516,27 +516,20 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         @character = current_user.selected_character
         @hunt = @character.accepted_hunt
         gold_reward = @hunt.gold_reward
-
         # Use the scaled_experience_reward method from the Hunt model
         amount = @hunt.scaled_experience_reward(@character.level)
-
         # Add EXP and Gold to character
         @character.increment(:experience, amount)
         @character.increment(:gold, gold_reward)
-
         # Check if the character can level up
         while @character.experience >= @character.required_experience_for_next_level
             @character.level_up
             flash[:notice] = "You are now level #{@character.level}."
         end
-
         # Drop the completed hunt
         @character.update(accepted_hunt: nil)
-
-        # Drop the combat result
+        # Drop the combat result from the hunt if combat occured
         @hunt.update(combat_result: nil)
-
-        # Save character
         @character.save
 
         flash[:notice] = "Hunt completed. You gained #{amount} experience and #{gold_reward} gold"
