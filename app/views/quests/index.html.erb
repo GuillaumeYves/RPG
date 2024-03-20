@@ -1,0 +1,64 @@
+<div class="mt-5" style="display: flex; flex-direction: row;">
+  <!-- Left Column - Image and Text -->
+  <div class="card text-left " style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 600px; width: 500px; margin-right: 20px;">
+    <div class="card-body">
+        <div style="position: relative; max-width: 100%;">
+          <%= image_tag('npcs/leo.jpg', style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+          <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;">Leo</h5>
+        </div>
+      <br>
+      <% if @accepted_quests.present? %>
+        <p class="card-text">Is everything alright <%= @character.character_name %> ?</p>
+        <p class="card-text">Let me know if you need anything.</p>
+      <% else %>
+        <p class="card-text"><%= @character.character_name %> !</p>
+        <p class="card-text">I got some missions for you if you're up to the task.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Right Column - Accepted and Available Quests -->
+  <div style="flex-grow: 1; overflow: auto; height: 1218px;">
+
+    <!-- Display all accepted quests -->
+    <% if @accepted_quests.present? %>
+      <% @accepted_quests.each do |quest| %>
+        <!-- Quest in progress card -->
+        <div class="card text-left" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 15px; margin-bottom: 20px; width: 500px; height: 700px; ">
+          <h4 class="card-header text-white text-center bg-primary" style="width: auto; margin: 0 auto;">Quest in progress</h4>
+          <div class="card-body">
+            <h5 class="card-title"><%= quest.name %></h5>
+            <p class="card-text text-center mt-1">Level required : <%= quest.level_requirement %></p>
+            <p class="card-text"><%= quest.description %></p>
+          </div>
+          <br>
+          <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= quest.experience_reward %></span></p>
+          <p class="card-text">Gold : <span class="badge rounded-pill bg-warning" style="color: black;"><%= quest.gold_reward %></span></p>
+          <%= form_tag cancel_quest_path(quest), method: :post do %>
+            <%= hidden_field_tag :quest_id, quest.id %>
+            <%= submit_tag 'Cancel', class: "btn btn-outline-danger "%>
+          <% end %>        
+        </div>
+      <% end %>
+    <% end %>
+
+    <!-- Loop through available quests -->
+    <% @available_quests.each do |quest| %>
+      <div class="card text-left" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 15px; margin-bottom: 20px; width: 500px; height: auto; ">
+        <h4 class="card-header text-white text-center bg-primary" style="width: auto; margin: 0 auto;"><%= quest.name %></h4>
+        <div class="card-body">
+          <h5 class="card-title text-center"><%= quest.quest_type %></h5>
+          <p class="card-text text-center mt-1">Level required : <%= quest.level_requirement %></p>
+          <p class="card-text"><%= quest.description %></p>
+        </div>
+        <br>
+        <p class="card-text">Experience : <span class="badge rounded-pill bg-success" style="color: black;"><%= quest.experience_reward %></span></p>
+        <p class="card-text">Gold : <span class="badge rounded-pill bg-warning" style="color: black;"><%= quest.gold_reward %></span></p>
+          <%= form_tag accept_quest_path(quest), method: :post do %>
+            <%= submit_tag 'Accept', class: "btn btn-outline-primary "%>
+          <% end %>   
+      </div>
+    <% end %>
+
+  </div>
+</div>

@@ -148,6 +148,7 @@
             <%= link_to "Talents", talents_character_path(@selected_character), class: "btn btn-outline-primary" %>
             <%= link_to "Merchant", items_path(character_id: @selected_character.id), class: "btn btn-outline-primary" %>
             <%= link_to "Thaumaturge", thaumaturge_characters_path, class: "btn btn-outline-primary" %>
+            <%= link_to "Quest", quests_path, class: "btn btn-outline-primary" %>
             <%= link_to "Hunt", hunts_path, class: "btn btn-outline-primary" %>
             <%= link_to "Leaderboard", leaderboard_characters_path, class: "btn btn-outline-primary" %>
           <% end %>

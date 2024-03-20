@@ -37,11 +37,4 @@ class Hunt < ApplicationRecord
         end
     end
 
-
-
-
-
-
-
-
 end
