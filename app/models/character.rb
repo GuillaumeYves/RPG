@@ -159,11 +159,11 @@ class Character < ApplicationRecord
         self.total_max_health = self.total_health
         self.total_global_damage = (self.global_damage + self.paragon_global_damage)
 
-        self.total_attack += self.elixir_attack
-        self.total_armor += self.elixir_armor
-        self.total_spellpower += self.elixir_spellpower
-        self.total_magic_resistance += self.elixir_magic_resistance
-        self.total_necrosurge += self.elixir_necrosurge
+        self.total_attack = (self.total_attack + self.elixir_attack)
+        self.total_armor = (self.total_armor + self.elixir_armor)
+        self.total_spellpower = (self.total_spellpower + self.elixir_spellpower)
+        self.total_magic_resistance = (self.total_magic_resistance + self.elixir_magic_resistance)
+        self.total_necrosurge = (self.total_necrosurge + self.elixir_necrosurge)
     end
 
     def set_default_values_for_buffed_stats
@@ -373,7 +373,7 @@ class Character < ApplicationRecord
 
     def calculate_intelligence_bonus
         if self.character_class == 'mage' && skills.find_by(name: 'Enlighten', unlocked: true)
-            self.intelligence_bonus = (self.intelligence * 0.1)
+            self.intelligence_bonus = (self.intelligence * 0.2)
         else
             self.intelligence_bonus = (self.intelligence * 0.04)
         end

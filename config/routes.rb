@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     collection do
       get 'leaderboard'
       get 'thaumaturge'
+      get 'arena'
     end
     member do
       get '/combat_result/:id', to: 'combat#combat_result', as: :combat_result

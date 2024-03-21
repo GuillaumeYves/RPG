@@ -92,6 +92,17 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
+    def arena
+        user_characters = current_user.characters
+        user_character = current_user.selected_character
+        min_rank = [user_character.arena_rank - 10, 0].max
+        max_rank = user_character.arena_rank + 10
+        @opponents = Character.where('"arena_rank" >= ? AND "arena_rank" <= ?', min_rank, max_rank)
+                                .where.not(id: user_characters.pluck(:id))
+                                .where('total_health = total_max_health')
+                                .limit(3)
+    end
+
     def destroy
         @character = Character.find(params[:id])
         @character.update(accepted_hunt: nil)
