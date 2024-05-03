@@ -1,1 +1,8 @@
+<audio id="characterCreationMusic" autoplay loop><source src="/assets/audios/tedorha.mp3" type="audio/mpeg"></audio>
+
 <%= render 'form', character: @character %>
+
+<script>
+    var audio = document.getElementById("characterCreationMusic");
+    audio.volume = 0.01;
+</script>

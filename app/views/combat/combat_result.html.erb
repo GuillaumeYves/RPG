@@ -48,26 +48,28 @@
       </div>
     </div>
 
-    <!-- Victory or Defeat Prompt -->
-    <div class="row justify-content-center mt-5 mb-3">
-      <div id="combat-result" class="col-md-6">
-        <% if @result == '<strong style="font-size: 18px;">Victory</strong>' && @hunt.present? %>
-          <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
-          <h3>- <span class="text-success">Victory</span> -</h3>
-          <%= form_tag(complete_hunt_character_path(@character), method: :post) do %>
-            <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
-            <%= hidden_field_tag :hunt_id, @hunt.id %>
-            <%= submit_tag 'Complete', class: 'btn btn-outline-success mt-2' %>
+    <% if @result.present? %>
+      <!-- Victory or Defeat Prompt -->
+      <div class="row justify-content-center mt-5 mb-3">
+        <div id="combat-result" class="col-md-6">
+          <% if @result == '<strong style="font-size: 18px;">Victory</strong>' && @hunt.present? %>
+            <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
+            <h3>- <span class="text-success">Victory</span> -</h3>
+            <%= form_tag(complete_hunt_character_path(@character), method: :post) do %>
+              <%= hidden_field_tag :experience_reward, @hunt.experience_reward %>
+              <%= hidden_field_tag :hunt_id, @hunt.id %>
+              <%= submit_tag 'Complete', class: 'btn btn-outline-success mt-2' %>
+            <% end %>
+          <% elsif @result == '<strong style="font-size: 18px;">Victory</strong>'%>
+            <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
+            <h3>- <span class="text-success">Victory</span> -</h3>
+          <% elsif @result == '<strong style="font-size: 18px;">Defeat</strong>' %>
+            <audio autoplay id="defeatAudio"><source src="/assets/defeat.mp3" type="audio/mpeg"></audio>
+            <h3>- <span class="text-danger">Defeat</span> -<br style="mb-5"><a href="<%= character_path(@character) %>" style="font-size:18px;">Retreat</a></h3>
           <% end %>
-        <% elsif @result == '<strong style="font-size: 18px;">Victory</strong>'%>
-          <audio autoplay id="victoryAudio"><source src="/assets/victory.mp3" type="audio/mpeg"></audio>
-          <h3>- <span class="text-success">Victory</span> -</h3>
-        <% elsif @result == '<strong style="font-size: 18px;">Defeat</strong>' %>
-          <audio autoplay id="defeatAudio"><source src="/assets/defeat.mp3" type="audio/mpeg"></audio>
-          <h3>- <span class="text-danger">Defeat</span> -<br style="mb-5"><a href="<%= character_path(@character) %>" style="font-size:18px;">Retreat</a></h3>
-        <% end %>
+        </div>
       </div>
-    </div>
+    <% end %>
 
     <!-- Combat Log -->
     <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding-top: 15px; height: auto; width: auto;">

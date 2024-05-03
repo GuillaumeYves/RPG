@@ -101,6 +101,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                                 .where.not(id: user_characters.pluck(:id))
                                 .where('total_health = total_max_health')
                                 .limit(3)
+        @combat_results = CombatResult.where(opponent_type: 'Character', opponent_id: current_user.selected_character.id).order(created_at: :desc).limit(10)
     end
 
     def destroy

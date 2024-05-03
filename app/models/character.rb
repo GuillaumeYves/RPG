@@ -9,6 +9,8 @@ class Character < ApplicationRecord
     has_one :inventory, dependent: :destroy
     has_many :items, dependent: :destroy
 
+    has_many :combat_results, dependent: :destroy
+
     belongs_to :main_hand, class_name: 'Item', foreign_key: 'main_hand', optional: true
     belongs_to :off_hand, class_name: 'Item', foreign_key: 'off_hand', optional: true
     belongs_to :head, class_name: 'Item', foreign_key: 'head', optional: true
@@ -48,6 +50,14 @@ class Character < ApplicationRecord
         Character.find_each do |character|
             character.recover_energy
             character.recover_health
+        end
+    end
+
+    def self.cleanup_combat_results
+        Character.find_each do |character|
+            combat_results_to_keep = character.combat_results.order(created_at: :desc).limit(10)
+            combat_results_to_delete = character.combat_results.where.not(id: combat_results_to_keep.ids)
+            combat_results_to_delete.destroy_all
         end
     end
 
@@ -116,6 +126,13 @@ class Character < ApplicationRecord
                         else
                         'goblin.jpg'
                         end
+        when 'morvandir'
+            image_path = case gender
+                        when 'female'
+                        'female_morvandir.jpg'
+                        else
+                        'morvandir.jpg'
+                        end
         end
         # Check if image is already attached before attaching
         unless self.race_image.attached?
@@ -143,13 +160,13 @@ class Character < ApplicationRecord
             self.total_armor = (self.armor + (self.armor * self.paragon_armor))
         end
         self.total_necrosurge = (self.necrosurge + self.dreadmight_bonus)
-        if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
-            self.total_magic_resistance = ((self.magic_resistance + self.intelligence_bonus) + (self.magic_resistance * self.paragon_magic_resistance))
-        else
-            self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
-        end
+        self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
         self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance)
-        self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage)
+        if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
+            self.total_critical_strike_damage = ((self.critical_strike_damage + (self.intelligence_bonus * 0.005).to_d) + self.paragon_critical_strike_damage)
+        else
+            self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage)
+        end
         self.max_health = self.health
         if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
             self.total_health = ((self.health + self.strength_bonus) + (self.health * self.paragon_total_health))
@@ -298,6 +315,14 @@ class Character < ApplicationRecord
             self.agility += 2
             self.dreadmight += 1
             self.willpower -= 2
+        when 'morvandir'
+            # Modify stats for goblin race
+            self.health -= 3
+            self.strength -= 3
+            self.intelligence -= 3
+            self.agility += 2
+            self.dreadmight += 5
+            self.willpower -= 3
         end
     end
 
@@ -392,7 +417,7 @@ class Character < ApplicationRecord
     end
 
     def evasion
-        if self.character_class == 'warrior' && skills.find_by(name: 'Undeniable', unlocked: true)
+        if self.character_class == 'warrior' && skills.find_by(name: 'Unbridled Ferocity', unlocked: true)
             evasion = 0.0
         else
             self.agility * 0.02
@@ -400,7 +425,7 @@ class Character < ApplicationRecord
     end
 
     def ignore_pain_chance
-        if self.character_class == 'warrior' && skills.find_by(name: 'Undeniable', unlocked: true)
+        if self.character_class == 'warrior' && skills.find_by(name: 'Unbridled Ferocity', unlocked: true)
             ignore_pain_chance = 0.0
         else
             self.willpower * 0.02
