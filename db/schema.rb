@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_07_132849) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_21_105121) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -130,6 +130,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_07_132849) do
     t.integer "elixir_global_damage", default: 0
     t.integer "elixir_total_health", default: 0
     t.bigint "active_elixir_ids", default: [], array: true
+    t.integer "arena_rank", default: 0
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end

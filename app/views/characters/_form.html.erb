@@ -1,4 +1,4 @@
-<div class="card text-left mt-5 mx-auto" style=" border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; width: 500px; margin-right: 20px; position: relative;">
+<div class="card text-left mt-5 mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; width: 500px; margin-right: 20px; position: relative;">
   <%= form_with(model: @character, local: true) do |form| %>
     <% if @character.errors.any? %>
       <div id="error_explanation">
@@ -11,141 +11,193 @@
       </div>
     <% end %>
       
-    <img id="raceImagePreview" src="#" alt="Race Image Preview" style='max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 20px;'>
+    <img id="raceImagePreview" src="#" alt="Race Image Preview" style="max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 20px;">
     
     <div class="field">
-      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name' %>
+      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name', style: 'text-align: center; font-size: 20px;' %>
     </div>
     
-    <div class="field mt-3 ">
-      <%= form.label :"gender: " %>
-      <%= form.select :gender, ['male', 'female'].map { |g| [g.capitalize, g] }, { class: 'form-control', id: 'character_gender' } %>
+    <div class="field mt-3" style="text-align: center;">
+      <label><strong>Gender</strong></label>
+      <div>
+        <%= form.hidden_field :gender, id: 'selectedGender' %>
+        <input type="hidden" id="gender" name="gender" value="male" />
+        <button type="button" style="width: 60px; height: 40px;" id="maleButton">♂</button>
+        <button type="button" style="width: 60px; height: 40px;" id="femaleButton">♀</button>
+      </div>
     </div>
 
-    <div class="field mt-3 mb-2">
-      <%= form.label :"race: " %>
-      <%= form.select :race, ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin'].map { |r| [r.capitalize, r] }, { class: 'form-control', id: 'character_race' } %>
+    <div class="field mt-3" style="text-align: center;">
+      <label><strong>Race</strong></label>
+      <div>
+        <%= form.hidden_field :race, id: 'selectedRace' %>
+        <button type="button" id="prevRace">&lt;</button>
+        <span id="raceDisplay">Human</span>
+        <button type="button" id="nextRace">&gt;</button>
+      </div>
     </div>
-    <p class ="" id="raceDescription" style="height: 100px; overflow-y: auto;"></p>
+    <p class="" id="raceDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
 
-    <div class="field  mb-2">
-      <%= form.label :"class: " %>
-       <%= form.select :character_class, ['warrior', 'mage', 'rogue', 'paladin', 'deathwalker'].map { |c| [c.capitalize, c] }, { class: 'form-control', id: 'character_class' } %>
+    <div class="field " style="text-align: center;">
+      <label><strong>Class</strong></label>
+      <div>
+        <%= form.hidden_field :character_class, id: 'selectedClass' %>
+        <button type="button" id="prevClass">&lt;</button>
+        <span id="classDisplay">Warrior</span>
+        <button type="button" id="nextClass">&gt;</button>
+      </div>
     </div>
-    <p class ="" id="classDescription" style="height: 100px; overflow-y: auto;"></p>
+    <p class="mb-5" id="classDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
 
-    <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px; ">
+    <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px;">
       <%= form.submit 'Create', class: "btn btn-outline-primary" %>
     </div>
   <% end %>
 </div>
 
+<script>
+  var audio = document.getElementById("backgroundMusic");
+  audio.volume = 0.01;
+</script>
 
 <script>
-$(document).ready(function() {
-  var imagePreview = $('#raceImagePreview');
-  var raceDescription = $('#raceDescription');
-  var classDescription = $('#classDescription');
+  $(document).ready(function() {
+    var imagePreview = $('#raceImagePreview');
+    var raceDescription = $('#raceDescription');
+    var classDescription = $('#classDescription');
+    var races = ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin', 'morvandir'];
+    var classes = ['warrior', 'mage', 'rogue', 'paladin', 'deathwalker', 'warlock'];
+    var currentRaceIndex = 0;
+    var currentClassIndex = 0;
+    var selectedRace = 'human'
+    $('#selectedRace').val(selectedRace);
+    var selectedGender = 'male'
+    $('#selectedGender').val(selectedGender);
+    var selectedClass = 'warrior'
+    $('#selectedClass').val(selectedClass);
 
-  // Function to update race image and description
-  function updateRaceImage(selectedRace, selectedGender) {
-    var imageFileName;
+    function updateRaceImage(selectedRace, selectedGender) {
+      var imageFileName;
 
-    switch (selectedRace) {
-      case 'human':
-        imageFileName = selectedGender === 'female' ? 'female_human.jpg' : 'human.jpg';
-        break;
-      case 'elf':
-        imageFileName = selectedGender === 'female' ? 'female_elf.jpg' : 'elf.jpg';
-        break;
-      case 'dwarf':
-        imageFileName = selectedGender === 'female' ? 'female_dwarf.jpg' : 'dwarf.jpg';
-        break;
-      case 'troll':
-        imageFileName = selectedGender === 'female' ? 'female_troll.jpg' : 'troll.jpg';
-        break;
-      case 'orc':
-        imageFileName = selectedGender === 'female' ? 'female_orc.jpg' : 'orc.jpg';
-        break;
-      case 'goblin':
-        imageFileName = selectedGender === 'female' ? 'female_goblin.jpg' : 'goblin.jpg';
-        break;
-      default:
-        imageFileName = 'human.jpg';
+      switch (selectedRace) {
+        case 'human':
+          imageFileName = selectedGender === 'female' ? 'female_human.jpg' : 'human.jpg';
+          break;
+        case 'elf':
+          imageFileName = selectedGender === 'female' ? 'female_elf.jpg' : 'elf.jpg';
+          break;
+        case 'dwarf':
+          imageFileName = selectedGender === 'female' ? 'female_dwarf.jpg' : 'dwarf.jpg';
+          break;
+        case 'troll':
+          imageFileName = selectedGender === 'female' ? 'female_troll.jpg' : 'troll.jpg';
+          break;
+        case 'orc':
+          imageFileName = selectedGender === 'female' ? 'female_orc.jpg' : 'orc.jpg';
+          break;
+        case 'goblin':
+          imageFileName = selectedGender === 'female' ? 'female_goblin.jpg' : 'goblin.jpg';
+          break;
+        case 'morvandir':
+          imageFileName = selectedGender === 'female' ? 'female_morvandir.jpg' : 'morvandir.jpg';
+          break;
+      }
+
+      var imagePath = '/assets/races/' + imageFileName;
+      imagePreview.attr('src', imagePath);
+
+      switch(selectedRace) {
+        case 'human':
+          raceDescription.text('Diverse, ambitious, adaptable. Passion drives progress, while kindness battles cruelty.');
+          break;
+        case 'elf':
+          raceDescription.text('Known for their grace, wisdom and knowledge, power is what they seek above all.');
+          break;
+        case 'dwarf':
+          raceDescription.text('Durable and loyal, they live to protect their kingdom and allies.');
+          break;
+        case 'troll':
+          raceDescription.text('Rugged, loyal defenders of nature. Strong and fierce, they uphold ancient traditions.');
+          break;
+        case 'orc':
+          raceDescription.text('Powerful conquerors. They are ruthless and show no mercy, even to their own kind.');
+          break;
+        case 'goblin':
+          raceDescription.text('Crafty tricksters, masters of opportunity. Small yet ambitious, they thrive on ingenuity.');
+          break;
+        case 'morvandir':
+          raceDescription.text('Forsaken by their origins, they wield dark powers and keep their secrets veiled in the shadows.');
+          break;
+      }
+      $('#raceDisplay').text(selectedRace.charAt(0).toUpperCase() + selectedRace.slice(1));
     }
 
-    var imagePath = '/assets/races/' + imageFileName;
-
-    // Update the image preview and description based on the selected race
-    imagePreview.attr('src', imagePath);
-
-    switch(selectedRace) {
-      case 'human':
-        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience but are easily corrupted.');
-        break;
-      case 'elf':
-        raceDescription.text('Graceful beings with a strong connection to arcane magic. Wisdom, knowledge and power are what they seek above all.');
-        break;
-      case 'dwarf':
-        raceDescription.text('Durable and loyal, Dwarfs are willing to give their life to save another. Their tumultuous temperament often leads them to take on unreasonable fights.');
-        break;
-      case 'troll':
-        raceDescription.text('Trolls are peaceful and avoid combat as much as possible, however do not underestimate them, as they proved to be incredible warriors in the past.');
-        break;
-      case 'orc':
-        raceDescription.text('Fierce, brutal and with a strong sense of honor, Orcs are known to destroy anything in their path if it means the survival of their race.');
-        break;
-      case 'goblin':
-        raceDescription.text('Quick and cunning, Goblins have been under the protection of Orcs for centuries, in exchange for being the most effective war advisors.');
-        break;
-      default:
-        raceDescription.text('The versatile humans known for their adaptability. Humans are agile and can show remarkable resilience but are easily corrupted.');
+    function updateClassDescription(selectedClass) {
+      switch(selectedClass) {
+        case 'warrior':
+          classDescription.text('Masters of combat, honed strength, and resilience.');
+          break;
+        case 'mage':
+          classDescription.text('Weavers of arcane, bending reality with spells..');
+          break;
+        case 'rogue':
+          classDescription.text('Agile tricksters, navigating shadows with finesse.');
+          break;
+        case 'paladin':
+          classDescription.text('Champions of virtue, wielding righteousness in battle.');
+          break;
+        case 'deathwalker':
+          classDescription.text("Embracers of decay, feeding on life's essence to wield death's unyielding power.");
+          break;
+        case 'warlock':
+          classDescription.text('Dark disciples of forbidden magics, bound by pacts to powerful Demons.');
+          break;
+      }
+      $('#classDisplay').text(selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1));
     }
-  }
 
-  // Set initial values based on the default values in the form
-  var initialRace = $('#character_race').val() || 'human';
-  var initialGender = $('#character_gender').val() || 'male';
-  updateRaceImage(initialRace, initialGender);
-
-  // Function to update class description
-  function updateClassDescription(selectedClass) {
-    // Update the description based on the selected class
-    switch(selectedClass) {
-      case 'warrior':
-        classDescription.text('Specialists of physical strength, Warriors are battlemasters ready to take on the mightiest foes.');
-        break;
-      case 'mage':
-        classDescription.text('Users of powerful arcane magic. The more a mage can learn, the stronger they get.');
-        break;
-      case 'rogue':
-        classDescription.text('Masters of combat, they easily find their target weaknesses to exploit them at their advantage.');
-        break;
-      case 'paladin':
-        classDescription.text('Holy warriors dedicated to justice. Their sheer will alone can vanquish the sinners.');
-        break;
-      case 'deathwalker':
-        classDescription.text('They manipulate death, blood and bind life itself to their will. Deathwalkers do not seek to kill, but to enslave.');
-        break;
-      default:
-        classDescription.text('Specialists of physical strength, Warriors are battlemasters ready to take on the mightiest foes.');
-    }
-  }
-
-  // Call updateClassDescription after defining the function
-  var initialClass = $('#character_character_class').val() || 'warrior';
-  updateClassDescription(initialClass);
-
-  // Event listeners for changes in race, gender, and class
-  $('#character_race, #character_gender').change(function() {
-    var selectedRace = $('#character_race').val();
-    var selectedGender = $('#character_gender').val();
-    updateRaceImage(selectedRace, selectedGender);
-  });
-
-  $('#character_character_class').change(function() {
-    var selectedClass = $('#character_character_class').val();
     updateClassDescription(selectedClass);
-  });
+    
+    updateRaceImage(selectedRace, selectedGender);
+
+$('#maleButton').click(function() {
+  selectedGender = 'male';
+  $('#selectedGender').val(selectedGender);
+  updateRaceImage(selectedRace, selectedGender);
 });
+
+$('#femaleButton').click(function() {
+  selectedGender = 'female';
+  $('#selectedGender').val(selectedGender);
+  updateRaceImage(selectedRace, selectedGender);
+});
+
+$('#prevRace').click(function() {
+  currentRaceIndex = (currentRaceIndex - 1 + races.length) % races.length;
+  selectedRace = races[currentRaceIndex];
+  $('#selectedRace').val(selectedRace);
+  updateRaceImage(selectedRace, selectedGender);
+});
+
+$('#nextRace').click(function() {
+  currentRaceIndex = (currentRaceIndex + 1) % races.length;
+  selectedRace = races[currentRaceIndex];
+  $('#selectedRace').val(selectedRace);
+  updateRaceImage(selectedRace, selectedGender);
+});
+
+$('#prevClass').click(function() {
+  currentClassIndex = (currentClassIndex - 1 + classes.length) % classes.length;
+  selectedClass = classes[currentClassIndex];
+  $('#selectedClass').val(selectedClass);
+  updateClassDescription(selectedClass);
+});
+
+$('#nextClass').click(function() {
+  currentClassIndex = (currentClassIndex + 1) % classes.length;
+  selectedClass = classes[currentClassIndex];
+  $('#selectedClass').val(selectedClass);
+  updateClassDescription(selectedClass);
+});
+  });
 </script>

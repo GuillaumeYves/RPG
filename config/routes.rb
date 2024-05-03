@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     collection do
       get 'leaderboard'
       get 'thaumaturge'
+      get 'arena'
     end
     member do
       get '/combat_result/:id', to: 'combat#combat_result', as: :combat_result
@@ -70,6 +71,5 @@ Rails.application.routes.draw do
   end
 
   get '/user_characters', to: 'characters#user_characters', as: 'user_characters'
-  get '/combat_result', to: 'combat#combat_result', as: :combat_result
   post 'reset_merchant_items', to: 'items#reset_merchant_items', as: :reset_merchant_items
 end

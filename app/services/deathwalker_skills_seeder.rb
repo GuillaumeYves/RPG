@@ -11,13 +11,13 @@ class DeathwalkerSkillsSeeder
 
     bloodforging = Skill.create(
       name: "Bloodforging",
-      description: "You gain 2% of your maximum Health as Necrosurge.",
+      description: "You gain 3% of your maximum Health as Necrosurge.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: " self.total_necrosurge = self.total_necrosurge + (self.total_max_health * 0.02)"
+      effect: " self.total_necrosurge = self.total_necrosurge + (self.total_max_health * 0.03)"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodforging.jpg')
     bloodforging.skill_image.attach(io: File.open(image_path), filename: 'bloodforging.jpg', content_type: 'image/jpeg')
@@ -113,15 +113,15 @@ class DeathwalkerSkillsSeeder
 
     sanguine_eclipse = Skill.create(
       name: "Sanguine Eclipse",
-      description: "When you reach 30% Health, your Necrosurge is doubled.",
+      description: "When you reach 33% Health, your Necrosurge is tripled.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
       effect: "
-              if (self.total_health <= (0.3 * self.total_max_health))
-                self.buffed_necrosurge = self.total_necrosurge
+              if (self.total_health <= (0.33 * self.total_max_health))
+                self.buffed_necrosurge = (self.total_necrosurge * 2.0)
               end "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'sanguineeclipse.jpg')

@@ -55,15 +55,15 @@ class RogueSkillsSeeder
 
     menacing_presence = Skill.create(
       name: "Menacing Presence",
-      description: "Your Health is increased by 20% and your Attack is increased by 30%.",
+      description: "Your Health is increased by 50% and your Attack is increased by 20%.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: rogue_class,
       character_id: character.id,
-      effect: " self.total_health *= 1.2;
-        self.total_max_health *= 1.2;
-        self.total_attack *= 1.3; "
+      effect: " self.total_health *= 1.5;
+        self.total_max_health *= 1.5;
+        self.total_attack *= 1.2; "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'rogue_skills', 'menacingpresence.jpg')
     menacing_presence.skill_image.attach(io: File.open(image_path), filename: 'menacingpresence.jpg', content_type: 'image/jpeg')
@@ -72,7 +72,8 @@ class RogueSkillsSeeder
     swift_movements = Skill.create(
       name: "Swift Movements",
       skill_type: "passive",
-      description: "You gain increased Attack based on your Agility instead of your Strength.",
+      description: "You gain increased Attack based on your Agility instead of your Strength.
+      You have an increasing chance of performing an additional attack, for 50% damage, the more Agility you have.",
       row: 3,
       level_requirement: 75,
       character_class: rogue_class,
@@ -97,15 +98,15 @@ class RogueSkillsSeeder
 
     unnatural_instinct = Skill.create(
       name: "Unnatural Instinct",
-      description: "When you reach 50% Health, your Attack is increased by 20% and your Critical Strikes deal 50% increased damage.",
+      description: "When you reach 50% Health, your Attack is increased by 30% and your Critical Strike Damage by 100%.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: rogue_class,
       character_id: character.id,
       effect: " if self.total_health <= self.total_max_health / 2
-            self.buffed_critical_strike_damage += 0.50
-            self.buffed_attack = (self.total_attack * 0.2) ;
+            self.buffed_critical_strike_damage += 1.00
+            self.buffed_attack = (self.total_attack * 0.3) ;
           end  "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'rogue_skills', 'unnaturalinstinct.jpg')
@@ -114,14 +115,14 @@ class RogueSkillsSeeder
 
     death_mark = Skill.create(
       name: "Death Mark",
-      description: "After each attack, your Attack increases by 2% and your Critical Strike Chance by 1%.",
+      description: "After each attack, your Critical Strike Damage is increased by 20% and your Critical Strike Chance by 2%.",
       skill_type: "combat",
       row: 4,
       level_requirement: 100,
       character_class: rogue_class,
       character_id: character.id,
-      effect: " self.buffed_attack += (self.total_attack * 0.02);
-                self.buffed_critical_strike_chance += 1.0;"
+      effect: " self.buffed_critical_strike_damage += 0.20;
+                self.buffed_critical_strike_chance += 2.0;"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'rogue_skills', 'deathmark.jpg')
     death_mark.skill_image.attach(io: File.open(image_path), filename: 'deathmark.jpg', content_type: 'image/jpeg')

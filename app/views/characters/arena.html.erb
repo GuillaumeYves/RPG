@@ -1,0 +1,88 @@
+<audio id="arenaMusic" autoplay loop><source src="/assets/audios/arena.mp3" type="audio/mpeg"></audio>  
+
+<div class="mt-5 mx-auto">
+  <div class="row justify-content-center" id="arena-display">
+    <% @opponents.each do |opponent| %>
+      <div class="col" style="width: 400px;">
+        <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+          <div class="col text-center">
+            <div style="position: relative; max-width: 100%;">
+              <%= image_tag(opponent.race_image, style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+              <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;"><%= opponent.character_name %></h5>
+            </div>
+          </div>
+        </div>
+            <% current_experience = opponent.experience %>
+            <% required_experience = opponent.required_experience_for_next_level %>
+            <% progress_percentage = (current_experience.to_f / required_experience) * 100 %>
+            <% if opponent.level < 100 %>
+              <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
+                <div class="progress-bar bg-success" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+                <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=opponent.race.capitalize%> <%=opponent.character_class.capitalize%> Level <%=opponent.level%></h6>
+              </div>
+            <% else %>
+              <div class="progress" style="height: 20px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; position: relative;" data-tooltip="tooltip" data-placement="bottom" title="<%= current_experience %> / <%= required_experience %> EXP (<%= progress_percentage.to_i %>%)">
+                <div class="progress-bar bg-info" role="progressbar" style="width: <%= progress_percentage %>%;"></div>
+                <h6 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><%=opponent.race.capitalize%> <%=opponent.character_class.capitalize%> Level <%=opponent.level%></h6>
+              </div>
+            <% end %>
+
+            <div class="row mt-2 text-center">
+              <div class="col">
+                <p>Honor :<span style="font-weight: bold"> <%= opponent.arena_rank %></span></p>
+              </div>
+            </div>
+
+            <div class="row mt-3 text-center">
+              <div class="col">
+                <%= form_tag combat_character_path(opponent), method: :post do %>
+                    <%= hidden_field_tag :opponent_id, opponent.id %>
+                    <%= hidden_field_tag :character_id, current_user.selected_character.id %>
+                    <%= submit_tag 'Attack', class: "btn btn-outline-danger" %>
+                <% end %>
+              </div>
+            </div>
+      </div>
+    <% end %>
+  </div>
+  <br>
+
+<div class="row mt-5">
+  <div class="col-md-12 mb-4">
+    <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding-top: 15px; height: auto; width: auto;">
+      <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Defence history</h4>
+      <hr style="margin-bottom: 0;">
+      <div class="row justify-content-center" style="width: auto; max-height: 400px; overflow-y: auto;">
+        <div>
+          <div class="card-body">
+            <% @combat_results.each do |combat_result| %>
+              <div class="row">
+                <div class="col">
+                  <p>
+                    <%= link_to "#{combat_result.character.character_name}", character_path(combat_result.character) %>, a Level <%= combat_result.character.level %> <%= combat_result.character.character_class.capitalize %>, has attacked you
+                    <% if combat_result.result == '<strong style="font-size: 18px;">Victory</strong>' %>
+                      <br>- <strong class="text-success">Victory</strong> -
+                    <% elsif combat_result.result == '<strong style="font-size: 18px;">Defeat</strong>' %>
+                      <br>- <strong class="text-danger">Defeat</strong> -
+                    <% end %>
+                  </p>
+                  <%= button_to "View", combat_result_character_path(current_user.selected_character, combat_result.id), class:"btn btn-outline-primary"%>
+                </div>
+              </div>
+              <% unless @combat_results.last == combat_result %>
+                <hr class="mx-auto" style="width: 80%;">
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+    var audio = document.getElementById("arenaMusic");
+    audio.volume = 0.02;
+</script>

@@ -33,3 +33,7 @@ every 4.hour do
   runner "Item.reset_items"
   runner "Item.set_merchant_items"
 end
+
+every 8.hour do
+  runner "Character.cleanup_combat_results"
+end

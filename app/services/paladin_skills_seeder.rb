@@ -25,7 +25,7 @@ class PaladinSkillsSeeder
     judgement = Skill.create(
       name: "Judgement",
       skill_type: "passive",
-      description: "You deal 5% of your damage as additional true damage.",
+      description: "5% of the damage you deal is added as additional true damage.",
       row: 1,
       level_requirement: 25,
       character_class: paladin_class,
@@ -37,7 +37,7 @@ class PaladinSkillsSeeder
 
     blessingofkings = Skill.create(
       name: "Blessing of Kings",
-      description: "Your Attack and Spellpower are increased by 20% but your Armor and Magic Resistance are reduced by 30%.",
+      description: "Your Attack and Spellpower are increased by 20%, your Armor and Magic Resistance are increased by 20%.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -46,8 +46,8 @@ class PaladinSkillsSeeder
       effect:
         " self.total_attack *= 1.2;
           self.total_spellpower *= 1.2;
-          self.total_armor *= 0.70;
-          self.total_magic_resistance *= 0.70; "
+          self.total_armor *= 1.2;
+          self.total_magic_resistance *= 1.2; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'blessingofkings.jpg')
     blessingofkings.skill_image.attach(io: File.open(image_path), filename: 'blessingofkings.jpg', content_type: 'image/jpeg')
