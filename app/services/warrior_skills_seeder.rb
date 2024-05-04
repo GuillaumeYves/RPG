@@ -38,7 +38,7 @@ class WarriorSkillsSeeder
 
     skullsplitter = Skill.create(
       name: "Skullsplitter",
-      description: "Your attacks deal an additional 12% of your opponent's Maximum Health as true damage.",
+      description: "Your attacks deal an additional 6% of your opponent's Maximum Health as true damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -50,8 +50,8 @@ class WarriorSkillsSeeder
     warrior_skills << skullsplitter
 
     deep_wounds = Skill.create(
-      name: "Deep wounds",
-      description: "Your opponent bleeds at the end of each of their turn, taking 8% of their Maximum Health as physical damage.",
+      name: "Deep Wounds",
+      description: "Your opponent bleeds at the end of each of their turn, taking 2% of their Maximum Health as physical damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,

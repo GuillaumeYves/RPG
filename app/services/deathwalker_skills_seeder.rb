@@ -11,13 +11,16 @@ class DeathwalkerSkillsSeeder
 
     bloodforging = Skill.create(
       name: "Bloodforging",
-      description: "You gain 3% of your maximum Health as Necrosurge.",
+      description: "Reduce your Maximum Health by 33% and increase your Necrosurge by 66%.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: " self.total_necrosurge = self.total_necrosurge + (self.total_max_health * 0.03)"
+      effect: "
+              self.total_max_health *= 0.67;
+              self.total_health *= 0.67;
+              self.total_necrosurge *= 1.66 ;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodforging.jpg')
     bloodforging.skill_image.attach(io: File.open(image_path), filename: 'bloodforging.jpg', content_type: 'image/jpeg')
@@ -25,7 +28,7 @@ class DeathwalkerSkillsSeeder
 
     lifetap = Skill.create(
       name: "Lifetap",
-      description: "At the end of each turn, you sacrifice 1% of your maximum Health to gain double of that amount as Necrosurge.",
+      description: "At the end of each turn, you sacrifice 1% of your Maximum Health to gain that amount as Necrosurge.",
       skill_type: "combat",
       row: 1,
       level_requirement: 25,
@@ -52,14 +55,14 @@ class DeathwalkerSkillsSeeder
 
     blood_monarch = Skill.create(
       name: "Blood Monarch",
-      description: "Your Health is increased by 66% but you no longer have Armor and Magic Resistance.",
+      description: "Your Maximum Health is increased by 33% but you no longer have Armor and Magic Resistance.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "self.total_max_health *= 1.66;
-              self.total_health *= 1.66;
+      effect: "self.total_max_health *= 1.33;
+              self.total_health *= 1.33;
               self.total_armor = 0;
               self.total_magic_resistance = 0; "
       )
@@ -69,15 +72,12 @@ class DeathwalkerSkillsSeeder
 
     path_of_the_dead = Skill.create(
       name: "Path of the Dead",
-      description: "Increase your maximum Health by 33%. When dealing a Critical Strike, you recover 6% of that damage as Health.",
+      description: "When dealing a Critical Strike, you recover 33% of that damage as Health.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "
-              self.total_max_health *= 1.33;
-              self.total_health *= 1.33;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'pathofthedead.jpg')
     path_of_the_dead.skill_image.attach(io: File.open(image_path), filename: 'pathofthedead.jpg', content_type: 'image/jpeg')
@@ -98,14 +98,16 @@ class DeathwalkerSkillsSeeder
 
     cadaverous_pact = Skill.create(
       name: "Cadaverous Pact",
-      description: "Your Necrosurge is increased by 66%.",
+      description: "Your Maximum Health is increased by 66% but your Necrosurge is reduced by half.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
       effect: "
-              self.total_necrosurge *= 1.66; "
+              self.total_max_health *= 1.66;
+              self.total_health *= 1.66;
+              self.total_necrosurge *= 0.5;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'cadaverouspact.jpg')
     cadaverous_pact.skill_image.attach(io: File.open(image_path), filename: 'cadaverouspact.jpg', content_type: 'image/jpeg')
@@ -113,14 +115,14 @@ class DeathwalkerSkillsSeeder
 
     sanguine_eclipse = Skill.create(
       name: "Sanguine Eclipse",
-      description: "When you reach 33% Health, your Necrosurge is tripled.",
+      description: "When you reach 50% Health, your Necrosurge is tripled.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
       effect: "
-              if (self.total_health <= (0.33 * self.total_max_health))
+              if self.total_health <= self.total_max_health / 2
                 self.buffed_necrosurge = (self.total_necrosurge * 2.0)
               end "
       )

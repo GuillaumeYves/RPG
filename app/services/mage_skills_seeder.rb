@@ -11,13 +11,14 @@ class MageSkillsSeeder
 
     arcane_protection = Skill.create(
       name: "Arcane Protection",
-      description: "Your Magic Resistance is increased by 80%.",
+      description: "Your Magic Resistance is increased by 50%. Your Magic Resistance increases your Armor by 20% of its value.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_magic_resistance *= 1.8 "
+      effect: " self.total_magic_resistance *= 1.5;
+                self.total_armor =  (self.total_armor + (self.total_magic_resistance * 0.2)); "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'arcaneprotection.jpg')
     arcane_protection.skill_image.attach(io: File.open(image_path), filename: 'arcaneprotection.jpg', content_type: 'image/jpeg')
@@ -78,13 +79,13 @@ class MageSkillsSeeder
 
     shared_power = Skill.create(
       name: "Shared Power",
-      description: "Your Spellpower increases by 0.02% each Level.",
+      description: "Your Spellpower is increased by 0.1% for each of your Levels.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_spellpower *= (self.level * 0.002) "
+      effect: "self.total_spellpower = self.total_spellpower * (self.level * 0.01)"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'sharedpower.jpg')
     shared_power.skill_image.attach(io: File.open(image_path), filename: 'sharedpower.jpg', content_type: 'image/jpeg')
@@ -98,8 +99,7 @@ class MageSkillsSeeder
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_spellpower += (self.total_magic_resistance * 1.5);
-                self.total_spellpower *= 1.5; "
+      effect: " self.total_spellpower = (self.total_spellpower + (self.total_magic_resistance * 1.5));"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wisdomandpower.jpg')
     wisdom_and_power.skill_image.attach(io: File.open(image_path), filename: 'wisdomandpower.jpg', content_type: 'image/jpeg')

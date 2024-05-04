@@ -29,8 +29,14 @@ end
 
         create_item("Nethil", "One-handed Weapon", "Sword", 100, 57500, "Legendary", { health: 345, necrosurge: 86, dreadmight: 345, global_damage: 0.06 }, "Go now, for the blade hungers for more souls.", 'app/assets/images/legendary_items/nethil.jpg')
 
+        create_item("Ruler of Storms", "One-handed Weapon", "Mace", 100, 57500, "Legendary", { health: 345, attack: 172, spellpower: 172, strength: 122, intelligence: 122, luck: 50 }, "Shaping destiny with each resounding strike", 'app/assets/images/legendary_items/rulerofstorms.jpg')
+
+        create_item("The Black Gate", "Shield", "Great Shield", 100, 86250, "Legendary", { health: 575, armor: 172, magic_resistance: 57, strength: 172, willpower: 172 }, "Unyielding, a sentinel against the encroaching shadows.", 'app/assets/images/legendary_items/theblackgate.jpg')
+
         create_item("Thundercall", "Shield", "Small Shield", 100, 57500, "Legendary", { health: 345, armor: 23, magic_resistance: 92, intelligence: 172, luck: 86, willpower: 86 }, "The skies obey to your calling.", 'app/assets/images/legendary_items/thundercall.jpg')
 
         create_item("Triad's Gaze", "Neck", "Amulet", 100, 57500, "Legendary", { health: 575, global_damage: 0.10, critical_strike_chance: 11.5, critical_strike_damage: 1.15}, "They watch over you and give you power, as long as you obey.", 'app/assets/images/legendary_items/triadsgaze.jpg')
+
+        create_item("Ush'val", "One-handed Weapon", "Sword", 100, 57500, "Legendary", { health: 345, spellpower: 230, intelligence: 345, global_damage: 0.10 }, "The blade is whispering of arcane secrets and untold power.", 'app/assets/images/legendary_items/ushval.jpg')
 
     end
