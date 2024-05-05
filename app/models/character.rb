@@ -175,7 +175,6 @@ class Character < ApplicationRecord
         end
         self.total_max_health = self.total_health
         self.total_global_damage = (self.global_damage + self.paragon_global_damage)
-
         self.total_attack = (self.total_attack + self.elixir_attack)
         self.total_armor = (self.total_armor + self.elixir_armor)
         self.total_spellpower = (self.total_spellpower + self.elixir_spellpower)
@@ -636,16 +635,16 @@ class Character < ApplicationRecord
                     errors.add(:base, "Only Mages can equip Staves.")
                     return false
                 when 'Plate'
-                    return true if %w[warrior paladin].include?(character_class)
-                    errors.add(:base, "Only Warriors and Paladins can equip Plate.")
+                    return true if %w[warrior paladin deathwalker].include?(character_class)
+                    errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
                     return false
                 when 'Leather'
                     return true if character_class == 'rogue'
                     errors.add(:base, "Only Rogues can equip leather.")
                     return false
                 when 'Cloth'
-                    return true if %w[mage deathwalker].include?(character_class)
-                    errors.add(:base, "Only Mages and Deathwalkers can equip cloth.")
+                    return true if %w[mage].include?(character_class)
+                    errors.add(:base, "Only Mages can equip cloth.")
                     return false
                 when 'Ring'
                     return true
@@ -979,7 +978,7 @@ class Character < ApplicationRecord
         return unless self.neck
         add_item_to_inventory(self.neck)
         revert_stats_based_on_item(self.neck)
-        self.neck_item = nil
+        self.neck = nil
     end
     def equip_amulet(item)
         if self.neck.nil?
@@ -1040,7 +1039,7 @@ class Character < ApplicationRecord
         return unless self.hands
         add_item_to_inventory(self.hands)
         revert_stats_based_on_item(self.hands)
-        self.hands_item = nil
+        self.hands = nil
     end
     def equip_hands(item)
         if hands.nil?
