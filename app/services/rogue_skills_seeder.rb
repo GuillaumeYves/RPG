@@ -12,7 +12,7 @@ class RogueSkillsSeeder
     poisoned_blade = Skill.create(
       name: "Poisoned Blade",
       skill_type: "combat",
-      description: "Your attacks have a 30% chance to poison your opponent, dealing 50% of your Attack as magic damage.",
+      description: "You have a 30% chance to poison your opponent after attacking, dealing 50% of your Attack as magic damage.",
       row: 1,
       level_requirement: 25,
       character_class: rogue_class,
@@ -25,7 +25,7 @@ class RogueSkillsSeeder
     sharpened_blade = Skill.create(
       name: "Sharpened Blade",
       skill_type: "combat",
-      description: "Your attacks have a 30% chance to maim your opponent, dealing 50% of your Attack as physical damage.",
+      description: "You have a 30% chance to maim your opponent after attacking, dealing 50% of your Attack as physical damage.",
       row: 1,
       level_requirement: 25,
       character_class: rogue_class,
@@ -85,7 +85,7 @@ class RogueSkillsSeeder
 
     from_the_shadows = Skill.create(
       name: "From the Shadows",
-      description: "When dealing a Critical Strike, you deal 25% of that damage as additional true damage.",
+      description: "Your Critical Strikes deal 25% of their damage as additional true damage.",
       skill_type: "trigger",
       row: 3,
       level_requirement: 75,

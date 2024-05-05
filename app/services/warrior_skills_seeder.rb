@@ -38,7 +38,7 @@ class WarriorSkillsSeeder
 
     skullsplitter = Skill.create(
       name: "Skullsplitter",
-      description: "Your attacks deal an additional 6% of your opponent's Maximum Health as true damage.",
+      description: "Your Critical Strikes deal an additional 6% of your opponent's Maximum Health as true damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -51,7 +51,8 @@ class WarriorSkillsSeeder
 
     deep_wounds = Skill.create(
       name: "Deep Wounds",
-      description: "Your opponent bleeds at the end of each of their turn, taking 2% of their Maximum Health as physical damage.",
+      description: "Your attacks cause the opponent to suffer physical damage equivalent to the initial attack, applied as bleeding over 3 turns.
+      Only one instance of Deep Wounds can be active on the opponent at a time.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -65,7 +66,7 @@ class WarriorSkillsSeeder
     forged_in_battle = Skill.create(
       name: "Forged in Battle",
       skill_type: "passive",
-      description: "You can dual wield Two-handed Weapons but your attacks now have a 10% chance to miss.",
+      description: "You can dual wield Two-handed Weapons but your attacks now have a 20% chance to miss.",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,

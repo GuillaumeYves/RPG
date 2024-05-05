@@ -9,22 +9,22 @@ class DeathwalkerSkillsSeeder
   def seed_skills
     deathwalker_class = "deathwalker"
 
-    bloodforging = Skill.create(
-      name: "Bloodforging",
-      description: "Reduce your Maximum Health by 33% and increase your Necrosurge by 66%.",
+    blood_monarch = Skill.create(
+      name: "Blood Monarch",
+      description: "Your Maximum Health is increased by 33% but your Armor and Magic Resistance are reduced by 33%.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "
-              self.total_max_health *= 0.67;
-              self.total_health *= 0.67;
-              self.total_necrosurge *= 1.66 ;"
+      effect: "self.total_max_health *= 1.33;
+              self.total_health *= 1.33;
+              self.total_armor *= 0.67;
+              self.total_magic_resistance *= 0.67; "
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodforging.jpg')
-    bloodforging.skill_image.attach(io: File.open(image_path), filename: 'bloodforging.jpg', content_type: 'image/jpeg')
-    deathwalker_skills << bloodforging
+    image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodmonarch.jpg')
+    blood_monarch.skill_image.attach(io: File.open(image_path), filename: 'bloodmonarch.jpg', content_type: 'image/jpeg')
+    deathwalker_skills << blood_monarch
 
     lifetap = Skill.create(
       name: "Lifetap",
@@ -53,22 +53,22 @@ class DeathwalkerSkillsSeeder
     ephemeral_rebirth.skill_image.attach(io: File.open(image_path), filename: 'ephemeralrebirth.jpg', content_type: 'image/jpeg')
     deathwalker_skills << ephemeral_rebirth
 
-    blood_monarch = Skill.create(
-      name: "Blood Monarch",
-      description: "Your Maximum Health is increased by 33% but you no longer have Armor and Magic Resistance.",
+    cadaverous_pact = Skill.create(
+      name: "Cadaverous Pact",
+      description: "Your Maximum Health is increased by 66% but your Necrosurge is reduced by half.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "self.total_max_health *= 1.33;
-              self.total_health *= 1.33;
-              self.total_armor = 0;
-              self.total_magic_resistance = 0; "
+      effect: "
+              self.total_max_health *= 1.66;
+              self.total_health *= 1.66;
+              self.total_necrosurge *= 0.5;"
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodmonarch.jpg')
-    blood_monarch.skill_image.attach(io: File.open(image_path), filename: 'bloodmonarch.jpg', content_type: 'image/jpeg')
-    deathwalker_skills << blood_monarch
+    image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'cadaverouspact.jpg')
+    cadaverous_pact.skill_image.attach(io: File.open(image_path), filename: 'cadaverouspact.jpg', content_type: 'image/jpeg')
+    deathwalker_skills << cadaverous_pact
 
     path_of_the_dead = Skill.create(
       name: "Path of the Dead",
@@ -96,22 +96,19 @@ class DeathwalkerSkillsSeeder
     crimson_torrent.skill_image.attach(io: File.open(image_path), filename: 'crimsontorrent.jpg', content_type: 'image/jpeg')
     deathwalker_skills << crimson_torrent
 
-    cadaverous_pact = Skill.create(
-      name: "Cadaverous Pact",
-      description: "Your Maximum Health is increased by 66% but your Necrosurge is reduced by half.",
+    bloodforging = Skill.create(
+      name: "Bloodforging",
+      description: "You gain 2% of your Maximum Health as Necrosurge.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "
-              self.total_max_health *= 1.66;
-              self.total_health *= 1.66;
-              self.total_necrosurge *= 0.5;"
+      effect: "self.total_necrosurge = (self.total_necrosurge + (self.total_max_health * 0.02))"
       )
-    image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'cadaverouspact.jpg')
-    cadaverous_pact.skill_image.attach(io: File.open(image_path), filename: 'cadaverouspact.jpg', content_type: 'image/jpeg')
-    deathwalker_skills << cadaverous_pact
+    image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodforging.jpg')
+    bloodforging.skill_image.attach(io: File.open(image_path), filename: 'bloodforging.jpg', content_type: 'image/jpeg')
+    deathwalker_skills << bloodforging
 
     sanguine_eclipse = Skill.create(
       name: "Sanguine Eclipse",
