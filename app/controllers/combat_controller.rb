@@ -154,172 +154,206 @@ class CombatController < ApplicationController
         save_combat_result
     end
 
-    def physical_damage(total_attack, buffed_attack, total_armor, buffed_armor, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, total_global_damage, evasion, ignore_pain_chance)
-        @character_is_miss = false
-        @character_is_evade = false
-        @character_is_crit = false
-        @character_is_ignore_pain = false
-        @opponent_is_miss = false
-        @opponent_is_evade = false
-        @opponent_is_crit = false
-        @opponent_is_ignore_pain = false
-        # Check for a miss with Forged in Battle
-        if @character_turn && @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
-            damage = 0
-            @character_is_miss = true
-        elsif @opponent_turn && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
-            damage = 0
-            @opponent_is_miss = true
-        else
-            # Chance to evade damage
-            if rand(0.00..100.00) <= evasion
-                if @character_turn
+    def physical_damage
+        # Initiate attack variables
+        @character_has_missed = false
+        @character_has_evaded = false
+        @character_has_crit = false
+        @character_has_ignored_pain = false
+        @opponent_has_missed = false
+        @opponent_has_evaded = false
+        @opponent_has_crit = false
+        @opponent_has_ignored_pain = false
+        # Character's turn
+        if @character_turn
+            # Check for a miss with Forged in Battle
+            if @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
+                damage = 0
+                @character_has_missed = true
+            else
+                # Chance to evade damage
+                if rand(0.00..100.00) <= @opponent.evasion
                     if @character.skills.find_by(name: 'Undeniable', unlocked: true).present?
-                        damage = ((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage)) - (total_armor + buffed_armor)
+                        damage = ((@character.total_attack + @character.buffed_attack) + (@character.total_attack + @character.buffed_attack) * @character.total_global_damage) - (@opponent.total_armor + @opponent.buffed_armor)
                     else
                         damage = 0
-                        @character_is_evade = true
+                        @opponent_has_evaded = true
                     end
-                elsif @opponent_turn
-                    if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Undeniable', unlocked: true).present?
-                        damage = ((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage)) - (total_armor + buffed_armor)
+                else
+                    # Check for a critical hit based on critical_strike_chance
+                    if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
+                        damage = (((@character.total_attack + @character.buffed_attack) + (@character.total_attack + @character.buffed_attack) * @character.total_global_damage) * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage)) - (@opponent.total_armor + @opponent.buffed_armor)
+                        @character_has_crit = true
                     else
-                        damage = 0
-                        @opponent_is_evade = true
+                        damage = ((@character.total_attack + @character.buffed_attack) + (@character.total_attack + @character.buffed_attack) * @character.total_global_damage) - (@opponent.total_armor + @opponent.buffed_armor)
+                        # Apply damage reduction based on ignore_pain_chance
+                        if rand(0.00..100.00) <= @opponent.ignore_pain_chance
+                            damage *= 0.8  # Reduce incoming damage by 20%
+                            @opponent_has_ignored_pain = true
+                        end
                     end
                 end
-                else
-                # Check for a critical hit based on critical_strike_chance
-                if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                    if @character_turn
-                        damage = (((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_armor + buffed_armor)
-                        @character_is_crit = true
-                    elsif @opponent_turn
-                        damage = (((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_armor + buffed_armor)
-                        @opponent_is_crit = true
+            end
+        # Opponent's turn
+        elsif @opponent_turn
+            # Check for a miss with Forged in Battle
+            if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
+                damage = 0
+                @opponent_has_missed = true
+            else
+                # Chance to evade damage
+                if rand(0.00..100.00) <= @character.evasion
+                    if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Undeniable', unlocked: true).present?
+                        damage = ((@opponent.total_attack + @opponent.buffed_attack) + (@opponent.total_attack + @opponent.buffed_attack) * @opponent.total_global_damage) - (@character.total_armor + @character.buffed_armor)
+                    else
+                        damage = 0
+                        @character_has_evaded = true
                     end
                 else
-                    damage = ((total_attack + buffed_attack) + ((total_attack + buffed_attack) * total_global_damage)) - (total_armor + buffed_armor)
-                    # Apply damage reduction based on ignore_pain_chance
-                    if rand(0.00..100.00) <= ignore_pain_chance
-                        if @character_turn
+                    # Check for a critical hit based on critical_strike_chance
+                    if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
+                        damage = (((@opponent.total_attack + @opponent.buffed_attack) + (@opponent.total_attack + @opponent.buffed_attack) * @opponent.total_global_damage) * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage)) - (@character.total_armor + @character.buffed_armor)
+                        @opponent_has_crit = true
+                    else
+                        damage = ((@opponent.total_attack + @opponent.buffed_attack) + (@opponent.total_attack + @opponent.buffed_attack) * @opponent.total_global_damage) - (@character.total_armor + @character.buffed_armor)
+                        # Apply damage reduction based on ignore_pain_chance
+                        if rand(0.00..100.00) <= @character.ignore_pain_chance
                             damage *= 0.8  # Reduce incoming damage by 20%
-                            @character_is_ignore_pain = true
-                        elsif @opponent_turn
-                            damage *= 0.8  # Reduce incoming damage by 20%
-                            @opponent_is_ignore_pain = true
+                            @character_has_ignored_pain = true
                         end
                     end
                 end
             end
         end
-        damage.round
+        damage.round # Return damage
     end
 
-    def magic_damage(total_spellpower, buffed_spellpower, total_magic_resistance, buffed_magic_resistance, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, total_global_damage, ignore_pain_chance)
-        @character_is_miss = false
-        @character_is_evade = false
-        @character_is_crit = false
-        @character_is_ignore_pain = false
-        @opponent_is_miss = false
-        @opponent_is_evade = false
-        @opponent_is_crit = false
-        @opponent_is_ignore_pain = false
-        # Check for a miss with Forged in Battle
-        if @character_turn && @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
-            damage = 0
-            @character_is_miss = true
-        elsif @opponent_turn && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
-            damage = 0
-            @opponent_is_miss = true
-        else
-            # Check for a critical hit based on critical_strike_chance
-            if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                if @character_turn
-                    damage = (((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_magic_resistance + buffed_magic_resistance)
-                    @character_is_crit = true
-                elsif @opponent_turn
-                    damage = (((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage)) - (total_magic_resistance + buffed_magic_resistance)
-                    @opponent_is_crit = true
-                end
+    def magic_damage
+        # Initiate attack variables
+        @character_has_missed = false
+        @character_has_evaded = false
+        @character_has_crit = false
+        @character_has_ignored_pain = false
+        @opponent_has_missed = false
+        @opponent_has_evaded = false
+        @opponent_has_crit = false
+        @opponent_has_ignored_pain = false
+        # Character's turn
+        if @character_turn
+            # Check for a miss with Forged in Battle
+            if @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
+                damage = 0
+                @character_has_missed = true
             else
-                damage = ((total_spellpower + buffed_spellpower) + ((total_spellpower + buffed_spellpower) * total_global_damage)) - (total_magic_resistance + buffed_magic_resistance)
-                # Apply damage reduction based on ignore_pain_chance
-                if rand(0.00..100.00) <= ignore_pain_chance
-                    if @character_turn
+                # Check for a critical hit based on critical_strike_chance
+                if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
+                    damage = (((@character.total_spellpower + @character.buffed_spellpower) + (@character.total_spellpower + @character.buffed_spellpower)* @character.total_global_damage) * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage)) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)
+                    @character_has_crit = true
+                else
+                    damage = ((@character.total_spellpower + @character.buffed_spellpower) + (@character.total_spellpower + @character.buffed_spellpower) * @character.total_global_damage) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)
+                    # Apply damage reduction based on ignore_pain_chance
+                    if rand(0.00..100.00) <= @opponent.ignore_pain_chance
                         damage *= 0.8  # Reduce incoming damage by 20%
-                        @character_is_ignore_pain = true
-                    elsif @opponent_turn
+                        @opponent_has_ignored_pain = true
+                    end
+                end
+            end
+        # Opponent's turn
+        elsif @opponent_turn
+            # Check for a miss with Forged in Battle
+            if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
+                damage = 0
+                @opponent_has_missed = true
+            else
+                # Check for a critical hit based on critical_strike_chance
+                if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
+                    damage = (((@opponent.total_spellpower + @opponent.buffed_spellpower) + (@opponent.total_spellpower + @opponent.buffed_spellpower) * @opponent.total_global_damage) * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage)) - (@character.total_magic_resistance + @character.buffed_magic_resistance)
+                    @opponent_has_crit = true
+                else
+                    damage = ((@opponent.total_spellpower + @opponent.buffed_spellpower) + (@opponent.total_spellpower + @opponent.buffed_spellpower) * @opponent.total_global_damage) - (@character.total_magic_resistance + @character.buffed_magic_resistance)
+                    # Apply damage reduction based on ignore_pain_chance
+                    if rand(0.00..100.00) <= @character.ignore_pain_chance
                         damage *= 0.8  # Reduce incoming damage by 20%
-                        @opponent_is_ignore_pain = true
+                        @character_has_ignored_pain = true
                     end
                 end
             end
         end
-
-        damage.round
+        damage.round # Return damage
     end
 
-    def shadow_damage(total_necrosurge, buffed_necrosurge, total_critical_strike_chance, buffed_critical_strike_chance, total_critical_strike_damage, buffed_critical_strike_damage, total_global_damage, evasion, ignore_pain_chance)
-        @character_is_miss = false
-        @character_is_evade = false
-        @character_is_crit = false
-        @character_is_ignore_pain = false
-        @opponent_is_miss = false
-        @opponent_is_evade = false
-        @opponent_is_crit = false
-        @opponent_is_ignore_pain = false
-        # Check for a miss with Forged in Battle
-        if @character_turn && @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
-            damage = 0
-            @character_is_miss = true
-        elsif @opponent_turn && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
-            damage = 0
-            @opponent_is_miss = true
-        else
-            # Chance to evade damage
-            if rand(0.00..100.00) <= evasion
-                if @character_turn
+    def shadow_damage
+        # Initiate attack variables
+        @character_has_missed = false
+        @character_has_evaded = false
+        @character_has_crit = false
+        @character_has_ignored_pain = false
+        @opponent_has_missed = false
+        @opponent_has_evaded = false
+        @opponent_has_crit = false
+        @opponent_has_ignored_pain = false
+        # Character's turn
+        if @character_turn
+            # Check for a miss with Forged in Battle
+            if @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
+                damage = 0
+                @character_has_missed = true
+            else
+                # Chance to evade damage
+                if rand(0.00..100.00) <= @opponent.evasion
                     if @character.skills.find_by(name: 'Undeniable', unlocked: true).present?
-                        damage = (((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage))
+                        damage = ((@character.total_necrosurge + @character.buffed_necrosurge) * @character.total_global_damage)
                     else
                         damage = 0
-                        @character_is_evade = true
+                        @opponent_has_evaded = true
                     end
-                elsif @opponent_turn
-                    if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Undeniable', unlocked: true).present?
-                        damage = (((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage))
+                else
+                    # Check for a critical hit based on critical_strike_chance
+                    if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
+                        damage = (((@character.total_necrosurge + @character.buffed_necrosurge) + (@character.total_necrosurge + @character.buffed_necrosurge) * @character.total_global_damage) * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))
+                        @character_has_crit = true
                     else
-                        damage = 0
-                        @opponent_is_evade = true
-                    end
-                end
-            else
-            # Check for a critical hit based on critical strike chance
-            if rand(0.00..100.00) <= (total_critical_strike_chance + buffed_critical_strike_chance)
-                if @character_turn
-                    damage = (((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage))
-                    @character_is_crit = true
-                elsif @opponent_turn
-                    damage = (((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage)) * (total_critical_strike_damage + buffed_critical_strike_damage))
-                    @opponent_is_crit = true
-                end
-            else
-                damage = ((total_necrosurge + buffed_necrosurge) + ((total_necrosurge + buffed_necrosurge) * total_global_damage))
-                # Apply damage reduction based on ignore_pain_chance
-                if rand(0.00..100.00) <= ignore_pain_chance
-                    if @character_turn
-                        damage *= 0.8  # Reduce incoming damage by 20%
-                        @character_is_ignore_pain = true
-                    elsif @opponent_turn
-                        damage *= 0.8  # Reduce incoming damage by 20%
-                        @opponent_is_ignore_pain = true
+                        damage = ((@character.total_necrosurge + @character.buffed_necrosurge) + (@character.total_necrosurge + @character.buffed_necrosurge) * @character.total_global_damage)
+                        # Apply damage reduction based on ignore_pain_chance
+                        if rand(0.00..100.00) <= @opponent.ignore_pain_chance
+                            damage *= 0.8  # Reduce incoming damage by 20%
+                            @opponent_has_ignored_pain = true
+                        end
                     end
                 end
             end
+        # Opponent's turn
+        elsif @opponent_turn
+            # Check for a miss with Forged in Battle
+            if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00
+                damage = 0
+                @opponent_has_missed = true
+            else
+                # Chance to evade damage
+                if rand(0.00..100.00) <= @character.evasion
+                    if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Undeniable', unlocked: true).present?
+                        damage = ((@opponent.total_necrosurge + @opponent.buffed_necrosurge) + (@opponent.total_necrosurge + @opponent.buffed_necrosurge) * @opponent.total_global_damage)
+                    else
+                        damage = 0
+                        @character_has_evaded = true
+                    end
+                else
+                    # Check for a critical hit based on critical_strike_chance
+                    if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
+                        damage = (((@opponent.total_necrosurge + @opponent.buffed_necrosurge) + (@opponent.total_necrosurge + @opponent.buffed_necrosurge) * @opponent.total_global_damage) * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))
+                        @opponent_has_crit = true
+                    else
+                        damage = ((@opponent.total_necrosurge + @opponent.buffed_necrosurge) + (@opponent.total_necrosurge + @opponent.buffed_necrosurge) * @opponent.total_global_damage)
+                        # Apply damage reduction based on ignore_pain_chance
+                        if rand(0.00..100.00) <= @character.ignore_pain_chance
+                            damage *= 0.8  # Reduce incoming damage by 20%
+                            @character_has_ignored_pain = true
+                        end
+                    end
+                end
             end
         end
-        damage.round
+        damage.round # Return damage
     end
 
     def character_turn
@@ -351,40 +385,39 @@ class CombatController < ApplicationController
             if @character.skills.find_by(name: 'Swift Movements', unlocked: true).present?
                 # Picks the element of attack
                 if @character.total_attack > @character.total_spellpower && @character.total_attack > @character.total_necrosurge
-                    swift_movements = [physical_damage(@character.total_attack, @character.buffed_attack, @opponent.total_armor, @opponent.buffed_armor, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance) * 0.5, 0].max.round
+                    swift_movements = [physical_damage * 0.5, 0].max.round
                     damage_type = 'physical'
                 elsif @character.total_spellpower > @character.total_attack && @character.total_spellpower > @character.total_necrosurge
-                    swift_movements = [magic_damage(@character.total_spellpower, @character.buffed_spellpower, @opponent.total_magic_resistance, @opponent.buffed_magic_resistance, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.ignore_pain_chance) * 0.5, 0].max.round
+                    swift_movements = [magic_damage * 0.5, 0].max.round
                     damage_type = 'magic'
                 elsif @character.total_necrosurge > @character.total_attack && @character.total_necrosurge > @character.total_spellpower
-                    swift_movements = [shadow_damage(@character.total_necrosurge, @character.buffed_necrosurge, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance) * 0.5, 0].max.round
+                    swift_movements = [shadow_damage * 0.5, 0].max.round
                     damage_type = 'shadow'
                 end
                 chance_of_additional_attack = @character.agility
                 if rand(0.0..5000.0) <= chance_of_additional_attack
-                    # Check for the statuses of an attack
                     swift_movements_image = "<img src='/assets/rogue_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                    if @character_is_miss == true && @character_is_evade == true
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
-                        @combat_logs << log_message
-                    elsif @character_is_miss == true
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
-                        @combat_logs << log_message
-                    elsif @character_is_evade == true
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - 🚫 (EVADE)"
-                        @combat_logs << log_message
-                    elsif @character_is_crit == true && @character_is_ignore_pain == true
-                        @opponent_health_in_combat -= swift_movements
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
-                    elsif @character_is_crit == true
-                        @opponent_health_in_combat -= swift_movements
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE) <strong>#{swift_movements}</strong> #{damage_type} damage"
-                    elsif @character_is_ignore_pain == true
-                        @opponent_health_in_combat -= swift_movements
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                    # Check for the statuses of an attack
+                    if swift_movements == 0
+                        if @character_has_missed == true
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
+                        elsif @opponent_has_evaded == true
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - 🚫 (EVADE)"
+                        end
                     else
-                        @opponent_health_in_combat -= swift_movements
-                        log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        if @character_has_crit == true && @opponent_has_ignored_pain == true
+                            @opponent_health_in_combat -= swift_movements
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        elsif @character_has_crit == true
+                            @opponent_health_in_combat -= swift_movements
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        elsif @opponent_has_ignored_pain == true
+                            @opponent_health_in_combat -= swift_movements
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        else
+                            @opponent_health_in_combat -= swift_movements
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        end
                     end
                     # Apply combat skills
                     @character.apply_combat_skills
@@ -400,7 +433,7 @@ class CombatController < ApplicationController
                             @opponent_health_in_combat -= [(poisoned_blade - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
                             log_message += ", #{poisoned_blade_image} Poisoned Blade - <strong>#{poisoned_blade}</strong> additional magic damage"
                         end
-                        if damage.positive? && @is_crit == true && @character.skills.find_by(name: 'From the Shadows', unlocked: true).present?
+                        if damage.positive? && @character_has_crit == true && @character.skills.find_by(name: 'From the Shadows', unlocked: true).present?
                             from_the_shadows_image = "<img src='/assets/rogue_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                             from_the_shadows = (damage * 0.25).round
                             @opponent_health_in_combat -= [from_the_shadows, 0].max
@@ -409,7 +442,7 @@ class CombatController < ApplicationController
                     @combat_logs << log_message
                 end
                 # After attack healing
-                if @is_crit == true && @character.skills.find_by(name: 'Path of the Dead', unlocked: true).present? && damage.positive?
+                if @character_has_crit == true && @character.skills.find_by(name: 'Path of the Dead', unlocked: true).present? && damage.positive?
                     path_of_the_dead_image = "<img src='/assets/deathwalker_skills/pathofthedead.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                     path_of_the_dead = (damage * 0.33).round
                     @character.total_health += [path_of_the_dead, @character.total_max_health - @character.total_health].min
@@ -421,37 +454,36 @@ class CombatController < ApplicationController
         # Normal attack
         # Pick the element of attack
         if @character.total_attack > @character.total_spellpower && @character.total_attack > @character.total_necrosurge
-            damage = [physical_damage(@character.total_attack, @character.buffed_attack, @opponent.total_armor, @opponent.buffed_armor, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance), 0].max
+            damage = [physical_damage, 0].max
             damage_type = 'physical'
         elsif @character.total_spellpower > @character.total_attack && @character.total_spellpower > @character.total_necrosurge
-            damage = [magic_damage(@character.total_spellpower, @character.buffed_spellpower, @opponent.total_magic_resistance, @opponent.buffed_magic_resistance, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.ignore_pain_chance), 0].max
+            damage = [magic_damage, 0].max
             damage_type = 'magic'
         elsif @character.total_necrosurge > @character.total_attack && @character.total_necrosurge > @character.total_spellpower
-            damage = [shadow_damage(@character.total_necrosurge, @character.buffed_necrosurge, @character.total_critical_strike_chance, @character.buffed_critical_strike_chance, @character.total_critical_strike_damage, @character.buffed_critical_strike_damage, @character.total_global_damage, @opponent.evasion, @opponent.ignore_pain_chance), 0].max
+            damage = [shadow_damage, 0].max
             damage_type = 'shadow'
         end
             # Check for the statuses of an attack
-            if @character_is_miss == true && @character_is_evade == true
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - ❌ (MISS)"
-                @combat_logs << log_message
-            elsif @character_is_miss == true
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - ❌ (MISS)"
-                @combat_logs << log_message
-            elsif @character_is_evade == true
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - 🚫 (EVADE)"
-                @combat_logs << log_message
-            elsif @character_is_crit == true && @character_is_ignore_pain == true
-                @opponent_health_in_combat -= damage
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-            elsif @character_is_crit == true
-                @opponent_health_in_combat -= damage
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
-            elsif @character_is_ignore_pain == true
-                @opponent_health_in_combat -= damage
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+            if damage == 0
+                if @character_has_missed == true
+                    log_message = "#{@character.character_name}: ⚔️ Basic attack - ❌ (MISS)"
+                elsif @opponent_has_evaded == true
+                    log_message = "#{@character.character_name}: ⚔️ Basic attack - 🚫 (EVADE)"
+                end
             else
-                @opponent_health_in_combat -= damage
-                log_message = "#{@character.character_name}: ⚔️ Basic attack - <strong>#{damage}</strong> #{damage_type} damage"
+                if @character_has_crit == true && @opponent_has_ignored_pain == true
+                    @opponent_health_in_combat -= damage
+                    log_message = "#{@character.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                elsif @character_has_crit == true
+                    @opponent_health_in_combat -= damage
+                    log_message = "#{@character.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
+                elsif @opponent_has_ignored_pain == true
+                    @opponent_health_in_combat -= damage
+                    log_message = "#{@character.character_name}: ⚔️ Basic attack - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                else
+                    @opponent_health_in_combat -= damage
+                    log_message = "#{@character.character_name}: ⚔️ Basic attack - <strong>#{damage}</strong> #{damage_type} damage"
+                end
             end
             # Apply combat skills
             @character.apply_combat_skills
@@ -467,13 +499,13 @@ class CombatController < ApplicationController
                     @opponent_health_in_combat -= [(poisoned_blade - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
                     log_message += ", #{poisoned_blade_image} Poisoned Blade - <strong>#{poisoned_blade}</strong> additional magic damage"
                 end
-                if damage.positive? && @character_is_crit == true && @character.skills.find_by(name: 'From the Shadows', unlocked: true).present?
+                if damage.positive? && @character_has_crit == true && @character.skills.find_by(name: 'From the Shadows', unlocked: true).present?
                     from_the_shadows_image = "<img src='/assets/rogue_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                     from_the_shadows = (damage * 0.25).round
                     @opponent_health_in_combat -= [from_the_shadows, 0].max
                     log_message += ", #{from_the_shadows_image} From the Shadows: <strong>#{from_the_shadows}</strong> additional true damage"
                 end
-                if damage.positive? && @character_is_crit == true && @character.skills.find_by(name: 'Skullsplitter', unlocked: true).present?
+                if damage.positive? && @character_has_crit == true && @character.skills.find_by(name: 'Skullsplitter', unlocked: true).present?
                     skullsplitter_image = "<img src='/assets/warrior_skills/skullsplitter.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                     skullsplitter = (@opponent.total_max_health * 0.06).round
                     @opponent_health_in_combat -= [skullsplitter, 0].max
@@ -492,7 +524,7 @@ class CombatController < ApplicationController
             @combat_logs << log_message
 
             # After attack healing
-            if @character_is_crit == true && @character.skills.find_by(name: 'Path of the Dead', unlocked: true).present? && damage.positive?
+            if @character_has_crit == true && @character.skills.find_by(name: 'Path of the Dead', unlocked: true).present? && damage.positive?
                 path_of_the_dead_image = "<img src='/assets/deathwalker_skills/pathofthedead.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 path_of_the_dead = (damage * 0.33).round
                 @character.total_health += [path_of_the_dead, @character.total_max_health - @character.total_health].min
@@ -617,41 +649,40 @@ class CombatController < ApplicationController
         if @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Swift Movements', unlocked: true).present?
             # Pick the element of attack
             if @opponent.total_attack > @opponent.total_spellpower && @opponent.total_attack > @opponent.total_necrosurge
-                swift_movements = [physical_damage(@opponent.total_attack, @opponent.buffed_attack, @character.total_armor, @character.buffed_armor, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance) * 0.5, 0].max.round
+                swift_movements = [physical_damage * 0.5, 0].max.round
                 damage_type = 'physical'
             elsif @opponent.total_spellpower > @opponent.total_attack  && @opponent.total_spellpower > @opponent.total_necrosurge
-                swift_movements = [magic_damage(@opponent.total_spellpower, @opponent.buffed_spellpower, @character.total_magic_resistance, @character.buffed_magic_resistance, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.ignore_pain_chance) * 0.5, 0].max.round
+                swift_movements = [magic_damage * 0.5, 0].max.round
                 damage_type = 'magic'
             elsif @opponent.total_necrosurge > @opponent.total_attack && @opponent.total_necrosurge > @opponent.total_spellpower
-                swift_movements = [shadow_damage(@opponent.total_necrosurge, @opponent.buffed_necrosurge, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance) * 0.5, 0].max.round
+                swift_movements = [shadow_damage * 0.5, 0].max.round
                 damage_type = 'shadow'
             end
             chance_of_additional_attack = @opponent.agility
             if rand(0.0..5000.0) <= chance_of_additional_attack
-                swift_movements_image = "<img src='/assets/rogue_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                # Check for the statuses of an attack
-                if @opponent_is_miss == true && @opponent_is_evade == true
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
-                    @combat_logs << log_message
-                elsif @opponent_is_miss == true
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
-                    @combat_logs << log_message
-                elsif @opponent_is_evade == true
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - 🚫 (EVADE)"
-                    @combat_logs << log_message
-                elsif @opponent_is_crit == true && @opponent_is_ignore_pain == true
-                    @character.total_health -= swift_movements.round
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
-                elsif @opponent_is_crit == true
-                    @character.total_health -= swift_movements.round
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE) <strong>#{swift_movements}</strong> #{damage_type} damage"
-                elsif @opponent_is_ignore_pain == true
-                    @character.total_health -= swift_movements.round
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
-                else
-                    @character.total_health -= swift_movements.round
-                    log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - <strong>#{swift_movements}</strong> #{damage_type} damage"
-                end
+                    swift_movements_image = "<img src='/assets/rogue_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                    # Check for the statuses of an attack
+                    if swift_movements == 0
+                        if @opponent_has_missed == true
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
+                        elsif @character_has_evaded == true
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - 🚫 (EVADE)"
+                        end
+                    else
+                        if @opponent_has_crit == true && @character_has_ignored_pain == true
+                            @character.total_health -= swift_movements
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        elsif @opponent_has_crit == true
+                            @character.total_health -= swift_movements
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❗ (CRITICAL STRIKE) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        elsif @character_has_ignored_pain == true
+                            @character.total_health -= swift_movements
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - 🛡️ (IGNORE PAIN) <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        else
+                            @character.total_health -= swift_movements
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - <strong>#{swift_movements}</strong> #{damage_type} damage"
+                        end
+                    end
                     @opponent.apply_combat_skills if @opponent.is_a?(Character)
                     if rand(0.0..100.0) <= 30.0 && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
                         sharpened_blade_image = "<img src='/assets/rogue_skills/sharpenedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
@@ -664,7 +695,7 @@ class CombatController < ApplicationController
                         @character.total_health -= [(poisoned_blade - (@character.total_magic_resistance + @character.buffed_magic_resistance)), 0].max
                         log_message += ", #{poisoned_blade_image} Poisoned Blade - <strong>#{poisoned_blade}</strong> additional magic damage"
                     end
-                    if damage.positive? && @opponent_is_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
+                    if damage.positive? && @opponent_has_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
                         from_the_shadows_image = "<img src='/assets/rogue_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                         from_the_shadows = (damage * 0.25).round
                         @character.total_health -= [from_the_shadows, 0].max
@@ -677,61 +708,59 @@ class CombatController < ApplicationController
         # Normal attack
         # Pick the element of attack
         if @opponent.total_attack > @opponent.total_spellpower && @opponent.total_attack > @opponent.total_necrosurge
-            damage = [physical_damage(@opponent.total_attack, @opponent.buffed_attack, @character.total_armor, @character.buffed_armor, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance), 0].max
+            damage = [physical_damage, 0].max
             damage_type = 'physical'
         elsif @opponent.total_spellpower > @opponent.total_attack  && @opponent.total_spellpower > @opponent.total_necrosurge
-            damage = [magic_damage(@opponent.total_spellpower, @opponent.buffed_spellpower, @character.total_magic_resistance, @character.buffed_magic_resistance, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.ignore_pain_chance), 0].max
+            damage = [magic_damage, 0].max
             damage_type = 'magic'
         elsif @opponent.total_necrosurge > @opponent.total_attack && @opponent.total_necrosurge > @opponent.total_spellpower
-            damage = [shadow_damage(@opponent.total_necrosurge, @opponent.buffed_necrosurge, @opponent.total_critical_strike_chance, @opponent.buffed_critical_strike_chance, @opponent.total_critical_strike_damage, @opponent.buffed_critical_strike_damage, @opponent.total_global_damage, @character.evasion, @character.ignore_pain_chance), 0].max
+            damage = [shadow_damage, 0].max
             damage_type = 'shadow'
         end
             # Check statuses of an attack
             if @opponent.is_a?(Character)
-                if @opponent_is_miss == true && @opponent_is_evade == true
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❌ (MISS)"
-                    @combat_logs << log_message
-                elsif @opponent_is_miss == true
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❌ (MISS)"
-                    @combat_logs << log_message
-                elsif @opponent_is_evade == true
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - 🚫 (EVADE)"
-                    @combat_logs << log_message
-                elsif @opponent_is_crit == true && @opponent_is_ignore_pain == true
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-                elsif @opponent_is_crit == true
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
-                elsif @opponent_is_ignore_pain == true
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                if damage == 0
+                    if @opponent_has_missed == true
+                        log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❌ (MISS)"
+                    elsif @character_has_evaded == true
+                        log_message = "#{@opponent.character_name}: ⚔️ Basic attack - 🚫 (EVADE)"
+                    end
                 else
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.character_name}: ⚔️ Basic attack - <strong>#{damage}</strong> #{damage_type} damage"
+                    if @opponent_has_crit == true && @character_has_ignored_pain == true
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                    elsif @opponent_has_crit == true
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
+                    elsif @character_has_ignored_pain == true
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.character_name}: ⚔️ Basic attack - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                    else
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.character_name}: ⚔️ Basic attack - <strong>#{damage}</strong> #{damage_type} damage"
+                    end
                 end
             elsif @opponent.is_a?(Monster)
-                if @opponent_is_miss == true && @opponent_is_evade == true
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❌ (MISS)"
-                    @combat_logs << log_message
-                elsif @opponent_is_miss == true
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❌ (MISS)"
-                    @combat_logs << log_message
-                elsif @opponent_is_evade == true
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - 🚫 (EVADE)"
-                    @combat_logs << log_message
-                elsif @opponent_is_crit == true && @opponent_is_ignore_pain == true
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-                elsif @opponent_is_crit == true
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
-                elsif @opponent_is_ignore_pain == true
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                if damage == 0
+                    if @opponent_has_missed == true
+                        log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❌ (MISS)"
+                    elsif @character_has_evaded == true
+                        log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - 🚫 (EVADE)"
+                    end
                 else
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - <strong>#{damage}</strong> #{damage_type} damage"
+                    if @opponent_has_crit == true && @character_has_ignored_pain == true
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                    elsif @opponent_has_crit == true
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
+                    elsif @character_has_ignored_pain == true
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                    else
+                        @character.total_health -= damage
+                        log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - <strong>#{damage}</strong> #{damage_type} damage"
+                    end
                 end
             end
         # Apply combat skills
@@ -748,7 +777,7 @@ class CombatController < ApplicationController
                 @character.total_health -= [(poisoned_blade - (@character.total_magic_resistance + @character.buffed_magic_resistance)), 0].max
                 log_message += ", #{poisoned_blade_image} Poisened Blade - <strong>#{poisoned_blade}</strong> additional magic damage"
             end
-            if damage.positive? && @opponent_is_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
+            if damage.positive? && @opponent_has_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
                 from_the_shadows_image = "<img src='/assets/rogue_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 from_the_shadows = (damage * 0.25).round
                 @character.total_health -= [from_the_shadows, 0].max
@@ -772,7 +801,7 @@ class CombatController < ApplicationController
             end
         @combat_logs << log_message
             # After attack healing
-            if damage.positive? && @opponent_is_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Path of the Dead', unlocked: true).present?
+            if damage.positive? && @opponent_has_crit == true && @opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Path of the Dead', unlocked: true).present?
                 path_of_the_dead_image = "<img src='/assets/deathwalker_skills/pathofthedead.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 path_of_the_dead = (damage * 0.33).round
                 @opponent_health_in_combat += [path_of_the_dead, @opponent.total_max_health - @opponent_health_in_combat].min
