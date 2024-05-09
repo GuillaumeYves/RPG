@@ -71,7 +71,8 @@ class MageSkillsSeeder
       level_requirement: 75,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.buffed_spellpower += (self.total_spellpower * 0.07) "
+      effect: " self.buffed_min_spellpower += (self.total_min_spellpower * 0.07);
+              self.buffed_max_spellpower += (self.total_max_spellpower * 0.07) "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'runicempowerment.jpg')
     runic_empowerment.skill_image.attach(io: File.open(image_path), filename: 'runicempowerment.jpg', content_type: 'image/jpeg')
@@ -85,7 +86,8 @@ class MageSkillsSeeder
       level_requirement: 75,
       character_class: mage_class,
       character_id: character.id,
-      effect: "self.total_spellpower = self.total_spellpower * (self.level * 0.01)"
+      effect: "self.total_min_spellpower = self.total_min_spellpower * (self.level * 0.01);
+              self.total_max_spellpower = self.total_max_spellpower * (self.level * 0.01);"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'sharedpower.jpg')
     shared_power.skill_image.attach(io: File.open(image_path), filename: 'sharedpower.jpg', content_type: 'image/jpeg')
@@ -99,7 +101,8 @@ class MageSkillsSeeder
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_spellpower = (self.total_spellpower + (self.total_magic_resistance * 1.5));"
+      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance * 1.5));
+              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance * 1.5));"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wisdomandpower.jpg')
     wisdom_and_power.skill_image.attach(io: File.open(image_path), filename: 'wisdomandpower.jpg', content_type: 'image/jpeg')
@@ -113,7 +116,8 @@ class MageSkillsSeeder
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.buffed_spellpower += (self.total_spellpower * 0.1);
+      effect: " self.buffed_min_spellpower += (self.total_min_spellpower * 0.1);
+                self.buffed_max_spellpower += (self.total_max_spellpower * 0.1);
                 self.buffed_critical_strike_chance += 2.0; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wrath.jpg')

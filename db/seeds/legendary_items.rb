@@ -1,42 +1,150 @@
-#Legendary items stats are increased by 15%
-def create_item(name, item_type, item_class, level_requirement, gold_price, rarity, stats = {}, description, image_path)
-    item = Item.create!(
-        name: name,
-        item_type: item_type,
-        item_class: item_class,
-        level_requirement: level_requirement,
-        gold_price: gold_price,
-        rarity: rarity,
-        description: description,
-    )
-    item.update(stats)
-    image_filename = "#{item.id}_#{File.basename(image_path)}"
-    item.item_image.attach(io: File.open(image_path), filename: image_filename, content_type: 'image/jpeg')
+# Method to attach image to item
+def attach_image_to_item(item, image_path)
+  item.item_image.attach(io: File.open(image_path), filename: File.basename(image_path), content_type: 'image/jpeg')
 end
+# Create items
+[
+  {
+    name: "Dawnbreaker",
+    item_type: "Two-handed Weapon",
+    item_class: "Sword",
+    level_requirement: 100,
+    gold_price: 86250,
+    rarity: "Legendary",
+    min_attack: (384 * (rand(0.8..1.0))).to_i,
+    max_attack: (640 * (rand(0.8..1.0))).to_i,
+    strength: (229 * (rand(0.8..1.0))).to_i,
+    luck: (145 * (rand(0.8..1.0))).to_i,
+    willpower: (126 * (rand(0.8..1.0))).to_i,
+    legendary_effect_name: "Dawn's Judgment",
+    legendary_effect_description: "When opponent's Health reaches 10%:<br>
+    Attempt to execute them for 111% of your damage.",
+    description: "Cleave through enemies with righteous fury, bringing dawn's justice to any who would oppose it.",
+    image_path: 'app/assets/images/legendary_items/dawnbreaker.jpg'
+  },
+  {
+    name: "Hellbound",
+    item_type: "Two-handed Weapon",
+    item_class: "Axe",
+    level_requirement: 100,
+    gold_price: 86250,
+    rarity: "Legendary",
+    min_attack: (152 * (rand(0.8..1.0))).to_i,
+    max_attack: (760 * (rand(0.8..1.0))).to_i,
+    strength: (420 * (rand(0.8..1.0))).to_i,
+    luck: (80 * (rand(0.8..1.0))).to_i,
+    legendary_effect_name: "Might of the Underworld",
+    legendary_effect_description: "Skullsplitter talent effect change:<br>
+    Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.",
+    description: "Unleash the wrath of the underworld upon your foes.",
+    image_path: 'app/assets/images/legendary_items/hellbound.jpg'
+  },
+  {
+    name: "Laceration",
+    item_type: "One-handed Weapon",
+    item_class: "Dagger",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Legendary",
+    min_attack: (252 * (rand(0.8..1.0))).to_i,
+    max_attack: (290 * (rand(0.8..1.0))).to_i,
+    strength: (205 * (rand(0.8..1.0))).to_i,
+    agility: (205 * (rand(0.8..1.0))).to_i,
+    luck: (90 * (rand(0.8..1.0))).to_i,
+    legendary_effect_name: "Lethal Strikes",
+    legendary_effect_description: "At the end of your turn:<br>
+    Ambush your opponent for 30% of your damage.",
+    description: "Each strike leaves behind a lingering sensation of otherworldly torment.",
+    image_path: 'app/assets/images/legendary_items/laceration.jpg'
+  },
+  {
+    name: "Nemesis",
+    item_type: "Two-handed Weapon",
+    item_class: "Staff",
+    level_requirement: 100,
+    gold_price: 86250,
+    rarity: "Legendary",
+    min_spellpower: (133 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (880 * (rand(0.8..1.0))).to_i,
+    intelligence: (355 * (rand(0.8..1.0))).to_i,
+    agility: (62 * (rand(0.8..1.0))).to_i,
+    luck: (83 * (rand(0.8..1.0))).to_i,
+    legendary_effect_name: "Enemy of Life",
+    legendary_effect_description: "You deal 50% increased damage to enemies above 70% Health.",
+    description: "Become the enemy of a nation. The doom of an entire kingdom.",
+    image_path: 'app/assets/images/legendary_items/nemesis.jpg'
+  },
+  {
+    name: "Nethil",
+    item_type: "One-handed Weapon",
+    item_class: "Sword",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Legendary",
+    min_necrosurge: (228 * (rand(0.8..1.0))).to_i,
+    max_necrosurge: (380 * (rand(0.8..1.0))).to_i,
+    dreadmight: (355 * (rand(0.8..1.0))).to_i,
+    luck: (145 * (rand(0.8..1.0))).to_i,
+    legendary_effect_name: "Necrotic Touch",
+    legendary_effect_description: "At the end of your turn:<br>
+    Deal 333 shadow damage and heal for that same amount.<br>
+    Cannot Crit, Miss or be mitigated.",
+    description: "Go now, for the blade hungers for more souls.",
+    image_path: 'app/assets/images/legendary_items/nethil.jpg'
+  },
+  {
+    name: "Ruler of Storms",
+    item_type: "One-handed Weapon",
+    item_class: "Mace",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Legendary",
+    min_attack: (42 * (rand(0.8..1.0))).to_i,
+    max_attack: (530 * (rand(0.8..1.0))).to_i,
+    intelligence: (298 * (rand(0.8..1.0))).to_i,
+    strength: (145 * (rand(0.8..1.0))).to_i,
+    luck: (57 * (rand(0.8..1.0))).to_i,
+    legendary_effect_name: "Sentence of the Skies",
+    legendary_effect_description: "On hit with Basic attack:<br>
+    Trigger a thunderbolt dealing 20% of initial damage as additional magic damage.<br>
+    Cannot Crit, Miss or be mitigated.",
+    description: "Shaping destiny with each resounding strike",
+    image_path: 'app/assets/images/legendary_items/rulerofstorms.jpg'
+  },
+  {
+    name: "Tempest Band",
+    item_type: "Finger",
+    item_class: "Ring",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Legendary",
+    health: (700 * (rand(0.8..1.0))).to_i,
+    critical_strike_chance: (5.0 * (rand(0.8..1.0))),
+    critical_strike_damage: (0.50 * (rand(0.80..1.0))),
+    legendary_effect_name: "Stormcaller's Embrace",
+    legendary_effect_description: "At the start of you turn:<br>
+    Inflict 30% of your damage as magic damage.",
+    description: "Forged in the heart of thunder, baptized by the fury of the winds.",
+    image_path: 'app/assets/images/legendary_items/tempestband.jpg'
+  },
+  {
+    name: "The Nexus",
+    item_type: "Neck",
+    item_class: "Amulet",
+    level_requirement: 100,
+    gold_price: 86250,
+    rarity: "Legendary",
+    health: (800 * (rand(0.8..1.0))).to_i,
+    global_damage: (0.10 * (rand(0.8..1.0))),
+    legendary_effect_name: "Cosmic Resonance",
+    legendary_effect_description: "Your damage always results in the highest outcome.",
+    description: "It bends the fabric of reality, whispering secrets of the universe.",
+    image_path: 'app/assets/images/legendary_items/thenexus.jpg'
+  },
 
-    begin
-        create_item("Betrayal", "One-handed Weapon", "Dagger", 100, 57500, "Legendary", { health: 345, attack: 172, global_damage: 0.12, agility: 207, luck: 138, critical_strike_chance: 5.75, critical_strike_damage: 0.57}, "Your lust for power led you to betray your own kin.", 'app/assets/images/legendary_items/betrayal.jpg')
-
-        create_item("Broken Promise", "Finger", "Ring", 100, 57500, "Legendary", { health: 575, strength: 115, intelligence: 115, agility: 115, dreadmight: 115, luck: 115 }, "The promise of a broken world, made by a broken god.", 'app/assets/images/legendary_items/brokenpromise.jpg')
-
-        create_item("Cerberus", "Two-handed Weapon", "Mace", 100, 86250, "Legendary", { health: 575, attack: 230, spellpower: 230, strength: 144, intelligence: 144, willpower: 57 }, "You are now the guardian of the Beyond.", 'app/assets/images/legendary_items/cerberus.jpg')
-
-        create_item("Hellbound", "Two-handed Weapon", "Axe", 100, 86250, "Legendary", { health: 690, attack: 345, strength: 276, luck: 69 }, "Unleash the wrath of the underworld upon your foes.", 'app/assets/images/legendary_items/hellbound.jpg')
-
-        create_item("Karguk's Demise", "Two-handed Weapon", "Sword", 100, 86250, "Legendary", { health: 575, attack: 402, strength: 115, agility: 115, willpower: 115 }, "The blade wielded by the king Yahrm, during the great invasion of the Orcs.", 'app/assets/images/legendary_items/karguksdemise.jpg')
-
-        create_item("Nemesis", "Two-handed Weapon", "Staff", 100, 86250, "Legendary", { health: 575, spellpower: 345, intelligence: 230, luck: 115, magic_resistance: 57 }, "Become the enemy of a nation. The doom of an entire kingdom.", 'app/assets/images/legendary_items/nemesis.jpg')
-
-        create_item("Nethil", "One-handed Weapon", "Sword", 100, 57500, "Legendary", { health: 345, necrosurge: 86, dreadmight: 345, global_damage: 0.06 }, "Go now, for the blade hungers for more souls.", 'app/assets/images/legendary_items/nethil.jpg')
-
-        create_item("Ruler of Storms", "One-handed Weapon", "Mace", 100, 57500, "Legendary", { health: 345, attack: 172, spellpower: 172, strength: 122, intelligence: 122, luck: 50 }, "Shaping destiny with each resounding strike", 'app/assets/images/legendary_items/rulerofstorms.jpg')
-
-        create_item("The Black Gate", "Shield", "Great Shield", 100, 86250, "Legendary", { health: 575, armor: 172, magic_resistance: 57, strength: 172, willpower: 172 }, "Unyielding, a sentinel against the encroaching shadows.", 'app/assets/images/legendary_items/theblackgate.jpg')
-
-        create_item("Thundercall", "Shield", "Small Shield", 100, 57500, "Legendary", { health: 345, armor: 23, magic_resistance: 92, intelligence: 172, luck: 86, willpower: 86 }, "The skies obey to your calling.", 'app/assets/images/legendary_items/thundercall.jpg')
-
-        create_item("Triad's Gaze", "Neck", "Amulet", 100, 57500, "Legendary", { health: 575, global_damage: 0.10, critical_strike_chance: 11.5, critical_strike_damage: 1.15}, "They watch over you and give you power, as long as you obey.", 'app/assets/images/legendary_items/triadsgaze.jpg')
-
-        create_item("Ush'val", "One-handed Weapon", "Sword", 100, 57500, "Legendary", { health: 345, spellpower: 230, intelligence: 345, global_damage: 0.10 }, "The blade is whispering of arcane secrets and untold power.", 'app/assets/images/legendary_items/ushval.jpg')
-
-    end
+# More items go above ^
+].each do |item_params|
+  item = Item.new(item_params.except(:image_path))
+  attach_image_to_item(item, item_params[:image_path])
+  item.save
+end

@@ -1,63 +1,278 @@
-def create_monster( monster_name, health, attack, armor, magic_resistance, spellpower, necrosurge, strength, intelligence, luck, willpower, agility, dreadmight, image_path )
-    monster = Monster.create!(
-        monster_name: monster_name,
-        health: health,
-        attack: attack,
-        spellpower: spellpower,
-        necrosurge:necrosurge,
-        armor: armor,
-        magic_resistance: magic_resistance,
-        strength: strength,
-        intelligence: intelligence,
-        luck: luck,
-        willpower: willpower,
-        agility: agility,
-        dreadmight: dreadmight,
-    )
-    image_filename = "#{monster.id}_#{File.basename(image_path)}"
-    monster.monster_image.attach(io: File.open(image_path), filename: image_filename, content_type: 'image/jpeg')
+# Method to attach image to monster
+def attach_image_to_monster(monster, image_path)
+  image_filename = "#{monster.id}_#{File.basename(image_path)}"
+  monster.monster_image.attach(io: File.open(image_path), filename: image_filename, content_type: 'image/jpeg')
 end
-    begin
-        # Monster id 1
-        create_monster("Bloodmancer", 600, 1, 60, 1, 50, 50, 60, 60, 60, 60, 60, 60, 'app/assets/images/monsters/bloodmancer.jpg')
 
-        # Monster id 2
-        create_monster("Centaur", 300, 30, 1, 1, 20, 20, 30, 30, 30, 30, 30, 30, 'app/assets/images/monsters/centaur.jpg')
-
-        # Monster id 3
-        create_monster("Cultist", 700, 70, 1, 1, 60, 60, 70, 70, 70, 70, 70, 70, 'app/assets/images/monsters/cultist.jpg')
-
-        # Monster id 4
-        create_monster("Demon", 500, 50, 1, 1, 40, 40, 50, 50, 50, 50, 50, 50, 'app/assets/images/monsters/demon.jpg')
-
-        # Monster id 5
-        create_monster("Demon General", 900, 90, 1, 1, 80, 80, 90, 90, 90, 90, 90, 90, 'app/assets/images/monsters/demongeneral.jpg')
-
-        # Monster id 6
-        create_monster("Kolkur", 800, 1, 80, 1, 70, 70, 80, 80, 80, 80, 80, 80, 'app/assets/images/monsters/kolkur.jpg')
-
-        # Monster id 7
-        create_monster("Renegade", 1000, 100, 1, 1, 90, 90, 100, 100, 100, 100, 100, 100, 'app/assets/images/monsters/renegade.jpg')
-
-        # Monster id 8
-        create_monster("Skeleton", 200, 20, 1, 1, 10, 10, 20, 20, 20, 20, 20, 20, 'app/assets/images/monsters/skeleton.jpg')
-
-        # Monster id 9
-        create_monster("Vampire", 100, 10, 1, 1, 5, 5, 10, 10, 10, 10, 10, 10, 'app/assets/images/monsters/vampire.jpg')
-
-        # Monster id 10
-        create_monster("Crimson Legion Warrior", 2500, 250, 1, 1, 100, 100, 250, 250, 250, 250, 250, 250, 'app/assets/images/monsters/crimsonlegionwarrior.jpg')
-
-        # Monster id 11
-        create_monster("Crimson Legion Assassin", 3400, 340, 1, 1, 120, 120, 340, 340, 340, 340, 340, 340, 'app/assets/images/monsters/crimsonlegionassassin.jpg')
-
-        # Monster id 12
-        create_monster("Drakhon", 1500, 140, 1, 1, 140, 140, 150, 150, 150, 150, 150, 150, 'app/assets/images/monsters/drakhon.jpg')
-
-        # Monster id 13
-        create_monster("Sh'ytar", 4000, 400, 1, 1, 200, 200, 400, 400, 400, 400, 400, 400, 'app/assets/images/monsters/shytar.jpg')
-
-        # Monster id 14
-        create_monster("Drakken", 400, 40, 10, 1, 30, 30, 40, 40, 40, 40, 40, 40, 'app/assets/images/monsters/drakken.jpg')
-
-    end
+# Create monsters
+[
+  {
+    monster_name: "Bloodmancer",
+    health: 600,
+    min_attack: 1,
+    max_attack: 12,
+    armor: 40,
+    magic_resistance: 60,
+    min_spellpower: 35,
+    max_spellpower: 50,
+    min_necrosurge: 20,
+    max_necrosurge: 72,
+    strength: 60,
+    intelligence: 60,
+    luck: 60,
+    willpower: 60,
+    agility: 60,
+    dreadmight: 60,
+    image_path: 'app/assets/images/monsters/bloodmancer.jpg'
+  },
+  {
+    monster_name: "Centaur",
+    health: 300,
+    min_attack: 8,
+    max_attack: 35,
+    armor: 1,
+    magic_resistance: 20,
+    min_spellpower: 2,
+    max_spellpower: 12,
+    min_necrosurge: 1,
+    max_necrosurge: 10,
+    strength: 30,
+    intelligence: 30,
+    luck: 30,
+    willpower: 30,
+    agility: 30,
+    dreadmight: 30,
+    image_path: 'app/assets/images/monsters/centaur.jpg'
+  },
+  {
+    monster_name: "Cultist",
+    health: 700,
+    min_attack: 12,
+    max_attack: 47,
+    armor: 1,
+    magic_resistance: 60,
+    min_spellpower: 42,
+    max_spellpower: 73,
+    min_necrosurge: 14,
+    max_necrosurge: 23,
+    strength: 70,
+    intelligence: 70,
+    luck: 70,
+    willpower: 70,
+    agility: 70,
+    dreadmight: 70,
+    image_path: 'app/assets/images/monsters/cultist.jpg'
+  },
+  {
+    monster_name: "Demon",
+    health: 500,
+    min_attack: 12,
+    max_attack: 52,
+    armor: 40,
+    magic_resistance: 40,
+    min_spellpower: 10,
+    max_spellpower: 34,
+    min_necrosurge: 2,
+    max_necrosurge: 10,
+    strength: 50,
+    intelligence: 50,
+    luck: 50,
+    willpower: 50,
+    agility: 50,
+    dreadmight: 50,
+    image_path: 'app/assets/images/monsters/demon.jpg'
+  },
+  {
+    monster_name: "Demon General",
+    health: 900,
+    min_attack: 2,
+    max_attack: 106,
+    armor: 80,
+    magic_resistance: 80,
+    min_spellpower: 1,
+    max_spellpower: 12,
+    min_necrosurge: 1,
+    max_necrosurge: 16,
+    strength: 90,
+    intelligence: 90,
+    luck: 90,
+    willpower: 90,
+    agility: 90,
+    dreadmight: 90,
+    image_path: 'app/assets/images/monsters/demongeneral.jpg'
+  },
+  {
+    monster_name: "Kolkur",
+    health: 800,
+    min_attack: 18,
+    max_attack: 87,
+    armor: 70,
+    magic_resistance: 70,
+    min_spellpower: 64,
+    max_spellpower: 98,
+    min_necrosurge: 3,
+    max_necrosurge: 33,
+    strength: 80,
+    intelligence: 80,
+    luck: 80,
+    willpower: 80,
+    agility: 80,
+    dreadmight: 80,
+    image_path: 'app/assets/images/monsters/kolkur.jpg'
+  },
+  {
+    monster_name: "Renegade",
+    health: 1000,
+    min_attack: 78,
+    max_attack: 117,
+    armor: 90,
+    magic_resistance: 90,
+    min_spellpower: 8,
+    max_spellpower: 24,
+    min_necrosurge: 4,
+    max_necrosurge: 45,
+    strength: 100,
+    intelligence: 100,
+    luck: 100,
+    willpower: 100,
+    agility: 100,
+    dreadmight: 100,
+    image_path: 'app/assets/images/monsters/renegade.jpg'
+  },
+  {
+    monster_name: "Skeleton",
+    health: 200,
+    min_attack: 2,
+    max_attack: 20,
+    armor: 10,
+    magic_resistance: 10,
+    min_spellpower: 1,
+    max_spellpower: 3,
+    min_necrosurge: 1,
+    max_necrosurge: 5,
+    strength: 20,
+    intelligence: 20,
+    luck: 20,
+    willpower: 20,
+    agility: 20,
+    dreadmight: 20,
+    image_path: 'app/assets/images/monsters/skeleton.jpg'
+  },
+  {
+    monster_name: "Vampire",
+    health: 100,
+    min_attack: 1,
+    max_attack: 13,
+    armor: 5,
+    magic_resistance: 5,
+    min_spellpower: 1,
+    max_spellpower: 5,
+    min_necrosurge: 1,
+    max_necrosurge: 3,
+    strength: 10,
+    intelligence: 10,
+    luck: 10,
+    willpower: 10,
+    agility: 10,
+    dreadmight: 10,
+    image_path: 'app/assets/images/monsters/vampire.jpg'
+  },
+  {
+    monster_name: "Crimson Legion Warrior",
+    health: 2500,
+    min_attack: 122,
+    max_attack: 239,
+    armor: 100,
+    magic_resistance: 100,
+    min_spellpower: 2,
+    max_spellpower: 26,
+    min_necrosurge: 35,
+    max_necrosurge: 145,
+    strength: 250,
+    intelligence: 250,
+    luck: 250,
+    willpower: 250,
+    agility: 250,
+    dreadmight: 250,
+    image_path: 'app/assets/images/monsters/crimsonlegionwarrior.jpg'
+  },
+  {
+    monster_name: "Crimson Legion Assassin",
+    health: 3400,
+    min_attack: 22,
+    max_attack: 42,
+    armor: 120,
+    magic_resistance: 120,
+    min_spellpower: 1,
+    max_spellpower: 34,
+    min_necrosurge: 78,
+    max_necrosurge: 366,
+    strength: 340,
+    intelligence: 340,
+    luck: 340,
+    willpower: 340,
+    agility: 340,
+    dreadmight: 340,
+    image_path: 'app/assets/images/monsters/crimsonlegionassassin.jpg'
+  },
+  {
+    monster_name: "Drakhon",
+    health: 1500,
+    min_attack: 14,
+    max_attack: 144,
+    armor: 140,
+    magic_resistance: 140,
+    min_spellpower: 1,
+    max_spellpower: 15,
+    min_necrosurge: 36,
+    max_necrosurge: 78,
+    strength: 150,
+    intelligence: 150,
+    luck: 150,
+    willpower: 150,
+    agility: 150,
+    dreadmight: 150,
+    image_path: 'app/assets/images/monsters/drakhon.jpg'
+  },
+  {
+    monster_name: "Sh'ytar",
+    health: 4000,
+    min_attack: 436,
+    max_attack: 544,
+    armor: 200,
+    magic_resistance: 200,
+    min_spellpower: 2,
+    max_spellpower: 45,
+    min_necrosurge: 4,
+    max_necrosurge: 12,
+    strength: 400,
+    intelligence: 400,
+    luck: 400,
+    willpower: 400,
+    agility: 400,
+    dreadmight: 400,
+    image_path: 'app/assets/images/monsters/shytar.jpg'
+  },
+  {
+    monster_name: "Drakken",
+    health: 400,
+    min_attack: 10,
+    max_attack: 41,
+    armor: 30,
+    magic_resistance: 30,
+    min_spellpower: 3,
+    max_spellpower: 22,
+    min_necrosurge: 2,
+    max_necrosurge: 16,
+    strength: 40,
+    intelligence: 40,
+    luck: 40,
+    willpower: 40,
+    agility: 40,
+    dreadmight: 40,
+    image_path: 'app/assets/images/monsters/drakken.jpg'
+  }
+].each do |monster_params|
+  monster = Monster.create!(monster_params.except(:image_path))
+  attach_image_to_monster(monster, monster_params[:image_path])
+end

@@ -1,70 +1,631 @@
-#Epic items stats are increased by 5%
-def create_item(name, item_type, item_class, level_requirement, gold_price, rarity, stats = {}, image_path)
-    item = Item.create!(
-        name: name,
-        item_type: item_type,
-        item_class: item_class,
-        level_requirement: level_requirement,
-        gold_price: gold_price,
-        rarity: rarity,
-    )
-    item.update(stats)
-    image_filename = "#{item.id}_#{File.basename(image_path)}"
-    item.item_image.attach(io: File.open(image_path), filename: image_filename, content_type: 'image/jpeg')
+# Method to attach image to item
+def attach_image_to_item(item, image_path)
+  item.item_image.attach(io: File.open(image_path), filename: File.basename(image_path), content_type: 'image/jpeg')
 end
-
-    begin
-        create_item("Assassin's Quicksteps", "Feet", "Leather", 100, 52500, "Epic", { health: 210, agility: 315, armor: 31, magic_resistance: 15 }, 'app/assets/images/epic_items/assassinsquicksteps.jpg')
-
-        create_item("Blackfang", "One-handed Weapon", "Dagger", 100, 36750, "Epic", { health: 315, attack: 157, strength: 189, agility: 63, luck: 63, critical_strike_chance: 5.25, critical_strike_damage: 0.52}, 'app/assets/images/epic_items/blackfang.jpg')
-
-        create_item("Blackflame Reaper", "Two-handed Weapon", "Axe", 80, 55125, "Epic", { health: 420, attack: 252, strength: 252, willpower: 63}, 'app/assets/images/epic_items/blackflamereaper.jpg')
-
-        create_item("Burning Hatred", "Head", "Plate", 100, 52500, "Epic", { health: 420, strength: 105, willpower: 105, luck: 105, armor: 47, magic_resistance: 23 }, 'app/assets/images/epic_items/burninghatred.jpg')
-
-        create_item("Champion of Light", "Chest", "Plate", 60, 31500, "Epic", { health: 315, strength: 94, intelligence: 94, armor: 31, magic_resistance: 16 }, 'app/assets/images/epic_items/championoflight.jpg')
-
-        create_item("Cloak of Forbidden Rites", "Chest", "Cloth", 100, 52500, "Epic", { health: 315, dreadmight: 157, willpower: 157, armor: 31, magic_resistance: 31 }, 'app/assets/images/epic_items/cloakofforbiddenrites.jpg')
-
-        create_item("Crown of Twisted Souls", "Head", "Cloth", 100, 52500, "Epic", { health: 210, dreadmight: 94, intelligence: 220, armor: 26, magic_resistance: 26 }, 'app/assets/images/epic_items/crownoftwistedsouls.jpg')
-
-        create_item("Crown of Valor", "Head", "Plate", 30, 15750, "Epic", { health: 126, willpower: 94, armor: 14, magic_resistance: 7 }, 'app/assets/images/epic_items/crownofvalor.jpg')
-
-        create_item("Dying Sun", "One-handed Weapon", "Sword", 90, 47250, "Epic", { health: 283, spellpower: 189, intelligence: 94, agility: 94, luck: 94 }, 'app/assets/images/epic_items/dyingsun.jpg')
-
-        create_item("Emissary of Twilight", "Two-handed Weapon", "Staff", 40, 31500, "Epic", { health: 210, spellpower: 126, intelligence: 126, magic_resistance: 21 }, 'app/assets/images/epic_items/emissaryoftwilight.jpg')
-
-        create_item("Fendel's Determination", "Feet", "Leather", 100, 52500, "Epic", { health: 210, strength: 105, agility: 105, willpower: 105, armor:31, magic_resistance: 16 }, 'app/assets/images/epic_items/fendelsdetermination.jpg')
-
-        create_item("Firelord's Barbute", "Head", "Plate", 100, 52500, "Epic", { health: 420, strength: 105, willpower: 105, intelligence: 105, armor: 47, magic_resistance: 23 }, 'app/assets/images/epic_items/firelordsbarbute.jpg')
-
-        create_item("Fire and Ice", "One-handed Weapon", "Mace", 70, 36750, "Epic", { health: 220, attack: 147, spellpower: 147, intelligence: 110, strength: 110}, 'app/assets/images/epic_items/fireandice.jpg')
-
-        create_item("Footsteps of Wisdom", "Feet", "Cloth", 100, 52500, "Epic", { health: 105, intelligence: 157, dreadmight: 157, armor: 21, magic_resistance: 21 }, 'app/assets/images/epic_items/footstepsofwisdom.jpg')
-
-        create_item("Garnments of Miracles", "Chest", "Cloth", 100, 52500, "Epic", { health: 315, intelligence: 157, luck: 157, armor: 31, magic_resistance: 31 }, 'app/assets/images/epic_items/garnmentsofmiracles.jpg')
-
-        create_item("Grasp of Condemned Kings", "Hands", "Plate", 100, 52500, "Epic", { health: 315, strength: 189, luck: 126, armor: 42, magic_resistance: 21 }, 'app/assets/images/epic_items/graspofcondemnedkings.jpg')
-
-        create_item("Hood of Damned Fortune", "Head", "Leather", 100, 52500, "Epic", { health: 315, strength: 105, agility: 105, luck: 105, armor: 37, magic_resistance: 18 }, 'app/assets/images/epic_items/hoodofdamnedfortune.jpg')
-
-        create_item("Pact of Assassination", "Chest", "Leather", 50, 26250, "Epic", { health: 210, strength: 79, agility: 79, armor: 21, magic_resistance: 10 }, 'app/assets/images/epic_items/pactofassassination.jpg')
-
-        create_item("Prophecy", "Two-handed Weapon", "Mace", 100, 78750, "Epic", { health: 525, attack: 210, spellpower: 210, intelligence: 157, strength: 157}, 'app/assets/images/epic_items/prophecy.jpg')
-
-        create_item("Rise of the Phoenix", "One-handed Weapon", "Sword", 40, 21000, "Epic", { health: 126, spellpower: 84, intelligence: 126 }, 'app/assets/images/epic_items/riseofthephoenix.jpg')
-
-        create_item("Triad's Grasp", "Hands", "Cloth", 100, 52500, "Epic", { health: 105, intelligence: 189, luck: 126, armor: 21, magic_resistance: 21 }, 'app/assets/images/epic_items/triadsgrasp.jpg')
-
-        create_item("Spire of Flames", "Two-handed Weapon", "Staff", 60, 47250, "Epic", { health: 315, spellpower: 189, intelligence: 189, magic_resistance: 31 }, 'app/assets/images/epic_items/spireofflames.jpg')
-
-        create_item("Vision of the Damned", "Head", "Cloth", 100, 52500, "Epic", { health: 210, dreadmight: 262, luck: 52, armor: 26, magic_resistance: 26 }, 'app/assets/images/epic_items/visionofthedamned.jpg')
-
-        create_item("Waistguard of Kings", "Waist", "Belt", 100, 52500, "Epic", { health: 525, agility: 126, strength: 126, dreadmight: 63}, 'app/assets/images/epic_items/waistguardofkings.jpg')
-
-        create_item("Walkers of Time", "Feet", "Cloth", 100, 52500, "Epic", { health: 105, intelligence: 105, willpower: 210, armor: 21, magic_resistance: 21 }, 'app/assets/images/epic_items/walkersoftime.jpg')
-
-        create_item("Wall of Pain", "Shield", "Great Shield", 50, 26250, "Epic", { health: 262, strength: 79, willpower: 79, armor: 52, magic_resistance: 52 }, 'app/assets/images/epic_items/wallofpain.jpg')
-
-        create_item("Zealous Crusade", "Head", "Plate", 100, 52500, "Epic", { health: 420, strength: 126, luck: 189, armor: 47, magic_resistance: 23 }, 'app/assets/images/epic_items/zealouscrusade.jpg')
-    end
+# Create items
+[
+  {
+    name: "Amalgam of Death",
+    item_type: "Feet",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    dreadmight: (300 * (rand(0.8..1.0))).to_i,
+    willpower: (200 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/amalgamofdeath.jpg'
+  },
+  {
+    name: "Ashcaller",
+    item_type: "Waist",
+    item_class: "Belt",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (72 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    willpower: (142 * (rand(0.8..1.0))).to_i,
+    agility: (358 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/ashcaller.jpg'
+  },
+  {
+    name: "Assassin's Quicksteps",
+    item_type: "Feet",
+    item_class: "Leather",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (720 * (rand(0.8..1.0))).to_i,
+    armor: (90 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (90 * (rand(0.8..1.0))).to_i,
+    agility: (200 * (rand(0.8..1.0))).to_i,
+    strength: (184 * (rand(0.8..1.0))).to_i,
+    luck: (116 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/assassinsquicksteps.jpg'
+  },
+  {
+    name: "Band of Might",
+    item_type: "Finger",
+    item_class: "Ring",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (630 * (rand(0.8..1.0))).to_i,
+    critical_strike_chance: (4.5 * (rand(0.8..1.0))),
+    critical_strike_damage: (0.45 * (rand(0.8..1.0))),
+    willpower: (290 * (rand(0.8..1.0))).to_i,
+    strength: (104 * (rand(0.8..1.0))).to_i,
+    luck: (105 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/bandofmight.jpg'
+  },
+  {
+    name: "Bastion of Hope",
+    item_type: "Chest",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1800 * (rand(0.8..1.0))).to_i,
+    armor: (180 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    willpower: (210 * (rand(0.8..1.0))).to_i,
+    strength: (226 * (rand(0.8..1.0))).to_i,
+    intelligence: (64 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/bastionofhope.jpg'
+  },
+  {
+    name: "Blackfang",
+    item_type: "One-handed Weapon",
+    item_class: "Dagger",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_attack: (227 * (rand(0.8..1.0))).to_i,
+    max_attack: (261 * (rand(0.8..1.0))).to_i,
+    strength: (450 * (rand(0.8..1.0))).to_i,
+    luck: (50 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/blackfang.jpg'
+  },
+  {
+    name: "Blackflame Reaper",
+    item_type: "Two-handed Weapon",
+    item_class: "Axe",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_attack: (136 * (rand(0.8..1.0))).to_i,
+    max_attack: (684 * (rand(0.8..1.0))).to_i,
+    strength: (342 * (rand(0.8..1.0))).to_i,
+    luck: (58 * (rand(0.8..1.0))).to_i,
+    willpower: (100 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/blackflamereaper.jpg'
+  },
+  {
+    name: "Broken Promise",
+    item_type: "Finger",
+    item_class: "Ring",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (630 * (rand(0.8..1.0))).to_i,
+    min_attack: (14 * (rand(0.8..1.0))).to_i,
+    max_attack: (91 * (rand(0.8..1.0))).to_i,
+    critical_strike_chance: (4.5 * (rand(0.8..1.0))),
+    critical_strike_damage: (0.45 * (rand(0.8..1.0))),
+    image_path: 'app/assets/images/epic_items/brokenpromise.jpg'
+  },
+  {
+    name: "Burning Hatred",
+    item_type: "Head",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    dreadmight: (256 * (rand(0.8..1.0))).to_i,
+    willpower: (99 * (rand(0.8..1.0))).to_i,
+    luck: (145 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/burninghatred.jpg'
+  },
+  {
+    name: "Cerberus",
+    item_type: "Two-handed Weapon",
+    item_class: "Mace",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (66 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (819 * (rand(0.8..1.0))).to_i,
+    strength: (205 * (rand(0.8..1.0))).to_i,
+    intelligence: (137 * (rand(0.8..1.0))).to_i,
+    luck: (158 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/cerberus.jpg'
+  },
+  {
+    name: "Champion of Light",
+    item_type: "Chest",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1800 * (rand(0.8..1.0))).to_i,
+    armor: (180 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    willpower: (290 * (rand(0.8..1.0))).to_i,
+    intelligence: (146 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/championoflight.jpg'
+  },
+  {
+    name: "Cloak of Forbidden Rites",
+    item_type: "Chest",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1440 * (rand(0.8..1.0))).to_i,
+    armor: (72 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (180 * (rand(0.8..1.0))).to_i,
+    luck: (289 * (rand(0.8..1.0))).to_i,
+    dreadmight: (151 * (rand(0.8..1.0))).to_i,
+    intelligence: (60 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/cloakofforbiddenrites.jpg'
+  },
+  {
+    name: "Crown of Twisted Souls",
+    item_type: "Head",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (540 * (rand(0.8..1.0))).to_i,
+    armor: (54 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    intelligence: (258 * (rand(0.8..1.0))).to_i,
+    luck: (149 * (rand(0.8..1.0))).to_i,
+    dreadmight: (93 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/crownoftwistedsouls.jpg'
+  },
+  {
+    name: "Crown of Valor",
+    item_type: "Head",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    willpower: (242 * (rand(0.8..1.0))).to_i,
+    strength: (258 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/crownofvalor.jpg'
+  },
+  {
+    name: "Dragonscale Greaves",
+    item_type: "Feet",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    strength: (303 * (rand(0.8..1.0))).to_i,
+    willpower: (87 * (rand(0.8..1.0))).to_i,
+    luck: (110 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/dragonscalegreaves.jpg'
+  },
+  {
+    name: "Dying Sun",
+    item_type: "One-handed Weapon",
+    item_class: "Sword",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (205 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (342 * (rand(0.8..1.0))).to_i,
+    intelligence: (371 * (rand(0.8..1.0))).to_i,
+    luck: (129 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/dyingsun.jpg'
+  },
+  {
+    name: "Emissary of Twilight",
+    item_type: "Two-handed Weapon",
+    item_class: "Staff",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (119 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (747 * (rand(0.8..1.0))).to_i,
+    intelligence: (223 * (rand(0.8..1.0))).to_i,
+    luck: (148 * (rand(0.8..1.0))).to_i,
+    willpower: (129 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/emissaryoftwilight.jpg'
+  },
+  {
+    name: "Executioner's Breastplate",
+    item_type: "Chest",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1800 * (rand(0.8..1.0))).to_i,
+    armor: (180 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    strength: (290 * (rand(0.8..1.0))).to_i,
+    willpower: (146 * (rand(0.8..1.0))).to_i,
+    luck: (64 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/executionersbreastplate.jpg'
+  },
+  {
+    name: "Favor of Dusk",
+    item_type: "Chest",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1440 * (rand(0.8..1.0))).to_i,
+    armor: (72 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (180 * (rand(0.8..1.0))).to_i,
+    luck: (175 * (rand(0.8..1.0))).to_i,
+    intelligence: (325 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/favorofdusk.jpg'
+  },
+  {
+    name: "Fendel's Determination",
+    item_type: "Feet",
+    item_class: "Leather",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (720 * (rand(0.8..1.0))).to_i,
+    armor: (90 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (90 * (rand(0.8..1.0))).to_i,
+    agility: (322 * (rand(0.8..1.0))).to_i,
+    luck: (118 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/fendelsdetermination.jpg'
+  },
+  {
+    name: "Fire and Ice",
+    item_type: "One-handed Weapon",
+    item_class: "Mace",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (38 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (477 * (rand(0.8..1.0))).to_i,
+    strength: (214 * (rand(0.8..1.0))).to_i,
+    intelligence: (178 * (rand(0.8..1.0))).to_i,
+    luck: (108 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/fireandice.jpg'
+  },
+  {
+    name: "Firelord's Barbute",
+    item_type: "Head",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    luck: (200 * (rand(0.8..1.0))).to_i,
+    intelligence: (208 * (rand(0.8..1.0))).to_i,
+    willpower: (92 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/firelordsbarbute.jpg'
+  },
+  {
+    name: "Footsteps of Wisdom",
+    item_type: "Feet",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (720 * (rand(0.8..1.0))).to_i,
+    armor: (90 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (90 * (rand(0.8..1.0))).to_i,
+    intelligence: (397 * (rand(0.8..1.0))).to_i,
+    luck: (103 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/footstepsofwisdom.jpg'
+  },
+  {
+    name: "Garnments of Miracles",
+    item_type: "Chest",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1440 * (rand(0.8..1.0))).to_i,
+    armor: (72 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (180 * (rand(0.8..1.0))).to_i,
+    luck: (88 * (rand(0.8..1.0))).to_i,
+    intelligence: (167 * (rand(0.8..1.0))).to_i,
+    willpower: (245 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/garnmentsofmiracles.jpg'
+  },
+  {
+    name: "Grasp of Condemned Kings",
+    item_type: "Hands",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    dreadmight: (369 * (rand(0.8..1.0))).to_i,
+    luck: (131 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/graspofcondemnedkings.jpg'
+  },
+  {
+    name: "Hood of Absolution",
+    item_type: "Head",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (540 * (rand(0.8..1.0))).to_i,
+    armor: (54 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    intelligence: (258 * (rand(0.8..1.0))).to_i,
+    agility: (75 * (rand(0.8..1.0))).to_i,
+    willpower: (167 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/hoodofabsolution.jpg'
+  },
+  {
+    name: "Hood of Damned Fortune",
+    item_type: "Head",
+    item_class: "Leather",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (720 * (rand(0.8..1.0))).to_i,
+    armor: (90 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (90 * (rand(0.8..1.0))).to_i,
+    agility: (254 * (rand(0.8..1.0))).to_i,
+    strength: (88 * (rand(0.8..1.0))).to_i,
+    luck: (158 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/hoodofdamnedfortune.jpg'
+  },
+  {
+    name: "Kingslayer's Hood",
+    item_type: "Head",
+    item_class: "Leather",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (720 * (rand(0.8..1.0))).to_i,
+    armor: (90 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (90 * (rand(0.8..1.0))).to_i,
+    strength: (413 * (rand(0.8..1.0))).to_i,
+    luck: (87 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/kingslayershood.jpg'
+  },
+  {
+    name: "Magefists",
+    item_type: "Hands",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (540 * (rand(0.8..1.0))).to_i,
+    armor: (54 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    intelligence: (378 * (rand(0.8..1.0))).to_i,
+    luck: (122 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/magefists.jpg'
+  },
+  {
+    name: "Pact of Assassination",
+    item_type: "Chest",
+    item_class: "Leather",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1620 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    agility: (332 * (rand(0.8..1.0))).to_i,
+    luck: (168 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/pactofassassination.jpg'
+  },
+  {
+    name: "Prophecy",
+    item_type: "Two-handed Weapon",
+    item_class: "Mace",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (66 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (819 * (rand(0.8..1.0))).to_i,
+    intelligence: (242 * (rand(0.8..1.0))).to_i,
+    willpower: (258 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/prophecy.jpg'
+  },
+  {
+    name: "Rise of the Phoenix",
+    item_type: "One-handed Weapon",
+    item_class: "Sword",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (205 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (342 * (rand(0.8..1.0))).to_i,
+    intelligence: (307 * (rand(0.8..1.0))).to_i,
+    luck: (147 * (rand(0.8..1.0))).to_i,
+    agility: (46 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/riseofthephoenix.jpg'
+  },
+  {
+    name: "Spire of Flames",
+    item_type: "Two-handed Weapon",
+    item_class: "Staff",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (119 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (747 * (rand(0.8..1.0))).to_i,
+    intelligence: (222 * (rand(0.8..1.0))).to_i,
+    willpower: (278 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/spireofflames.jpg'
+  },
+  {
+    name: "The Black Gate",
+    item_type: "Shield",
+    item_class: "Great Shield",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1350 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/theblackgate.jpg'
+  },
+  {
+    name: "Thundercall",
+    item_type: "Shield",
+    item_class: "Small Shield",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (90 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (90 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/thundercall.jpg'
+  },
+  {
+    name: "Triad's Gaze",
+    item_type: "Neck",
+    item_class: "Amulet",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (720 * (rand(0.8..1.0))).to_i,
+    critical_strike_chance: (9.0 * (rand(0.8..1.0))),
+    critical_strike_damage: (0.90 * (rand(0.8..1.0))),
+    image_path: 'app/assets/images/epic_items/triadsgaze.jpg'
+  },
+  {
+    name: "Triad's Grasp",
+    item_type: "Hands",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (540 * (rand(0.8..1.0))).to_i,
+    armor: (54 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    intelligence: (286 * (rand(0.8..1.0))).to_i,
+    luck: (214 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/triadsgrasp.jpg'
+  },
+  {
+    name: "Ush'val",
+    item_type: "One-handed Weapon",
+    item_class: "Sword",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    min_spellpower: (205 * (rand(0.8..1.0))).to_i,
+    max_spellpower: (342 * (rand(0.8..1.0))).to_i,
+    agility: (235 * (rand(0.8..1.0))).to_i,
+    luck: (148 * (rand(0.8..1.0))).to_i,
+    willpower: (117 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/ushval.jpg'
+  },
+  {
+    name: "Vision of the Damned",
+    item_type: "Head",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (540 * (rand(0.8..1.0))).to_i,
+    armor: (54 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    intelligence: (206 * (rand(0.8..1.0))).to_i,
+    luck: (248 * (rand(0.8..1.0))).to_i,
+    agility: (46 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/visionofthedamned.jpg'
+  },
+  {
+    name: "Waistguard of Kings",
+    item_type: "Waist",
+    item_class: "Belt",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (72 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    strength: (412 * (rand(0.8..1.0))).to_i,
+    luck: (88 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/waistguardofkings.jpg'
+  },
+  {
+    name: "Walkers of Time",
+    item_type: "Feet",
+    item_class: "Cloth",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (540 * (rand(0.8..1.0))).to_i,
+    armor: (54 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (135 * (rand(0.8..1.0))).to_i,
+    intelligence: (356 * (rand(0.8..1.0))).to_i,
+    luck: (144 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/walkersoftime.jpg'
+  },
+  {
+    name: "Wall of Pain",
+    item_type: "Shield",
+    item_class: "Great Shield",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1350 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    dreadmight: (221 * (rand(0.8..1.0))).to_i,
+    willpower: (279 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/wallofpain.jpg'
+  },
+  {
+    name: "Warplate of the Crimson Legion",
+    item_type: "Chest",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (1800 * (rand(0.8..1.0))).to_i,
+    armor: (180 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (72 * (rand(0.8..1.0))).to_i,
+    dreadmight: (132 * (rand(0.8..1.0))).to_i,
+    willpower: (368 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/warplateofthecrimsonlegion.jpg'
+  },
+  {
+    name: "Zealous Crusade",
+    item_type: "Head",
+    item_class: "Plate",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Epic",
+    health: (900 * (rand(0.8..1.0))).to_i,
+    armor: (135 * (rand(0.8..1.0))).to_i,
+    magic_resistance: (54 * (rand(0.8..1.0))).to_i,
+    strength: (184 * (rand(0.8..1.0))).to_i,
+    intelligence: (186 * (rand(0.8..1.0))).to_i,
+    willpower: (129 * (rand(0.8..1.0))).to_i,
+    image_path: 'app/assets/images/epic_items/zealouscrusade.jpg'
+  },
+].each do |item_params|
+  item = Item.new(item_params.except(:image_path))
+  attach_image_to_item(item, item_params[:image_path])
+  item.save
+end

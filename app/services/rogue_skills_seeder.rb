@@ -63,7 +63,8 @@ class RogueSkillsSeeder
       character_id: character.id,
       effect: " self.total_health *= 1.5;
         self.total_max_health *= 1.5;
-        self.total_attack *= 1.2; "
+        self.total_min_attack *= 1.2;
+        self.total_max_attack *= 1.2; "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'rogue_skills', 'menacingpresence.jpg')
     menacing_presence.skill_image.attach(io: File.open(image_path), filename: 'menacingpresence.jpg', content_type: 'image/jpeg')
@@ -106,7 +107,8 @@ class RogueSkillsSeeder
       character_id: character.id,
       effect: " if self.total_health <= self.total_max_health / 2
             self.buffed_critical_strike_damage += 1.00
-            self.buffed_attack = (self.total_attack * 0.3) ;
+            self.buffed_min_attack = (self.total_min_attack * 0.3);
+            self.buffed_max_attack = (self.total_max_attack * 0.3);
           end  "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'rogue_skills', 'unnaturalinstinct.jpg')

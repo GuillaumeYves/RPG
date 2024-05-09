@@ -39,12 +39,11 @@ class Character < ApplicationRecord
     validate :max_characters, on: :create
     validate :valid_character_name, on: :create
 
-    attr_accessor :buffed_attack, :buffed_spellpower, :buffed_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
+    attr_accessor :buffed_min_attack, :buffed_max_attack, :buffed_min_spellpower, :buffed_max_spellpower, :buffed_min_necrosurge, :buffed_max_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
     attr_accessor :took_damage
     attr_accessor :piety
     attr_accessor :nullify
     attr_accessor :ephemeral_rebirth
-    attr_accessor :temp_health
 
     def self.recovery
         Character.find_each do |character|
@@ -63,7 +62,6 @@ class Character < ApplicationRecord
 
     def recover_health
         return if self.total_health >= self.total_max_health
-
         recovered_health = (total_max_health * 0.10).to_i
         self.total_health += recovered_health
         self.total_health = total_max_health if total_health > total_max_health
@@ -72,7 +70,6 @@ class Character < ApplicationRecord
 
     def recover_energy
         return if self.energy >= self.max_energy
-
         self.energy += 10
         self.energy = self.max_energy if self.energy > self.max_energy
         save
@@ -149,17 +146,21 @@ class Character < ApplicationRecord
 
     def set_default_values_for_total_stats
         if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
-            self.total_attack = ((self.attack + self.agility_bonus) + (self.attack * self.paragon_attack))
+            self.total_min_attack = ((self.min_attack + self.agility_bonus) + (self.min_attack * self.paragon_attack))
+            self.total_max_attack = ((self.max_attack + self.agility_bonus) + (self.max_attack * self.paragon_attack))
         else
-            self.total_attack = ((self.attack + self.strength_bonus) + (self.attack * self.paragon_attack))
+            self.total_min_attack = ((self.min_attack + self.strength_bonus) + (self.min_attack * self.paragon_attack))
+            self.total_max_attack = ((self.max_attack + self.strength_bonus) + (self.max_attack * self.paragon_attack))
         end
-        self.total_spellpower = ((self.spellpower + self.intelligence_bonus) + self.paragon_spellpower)
+        self.total_min_spellpower = ((self.min_spellpower + self.intelligence_bonus) + self.paragon_spellpower)
+        self.total_max_spellpower = ((self.max_spellpower + self.intelligence_bonus) + self.paragon_spellpower)
         if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
             self.total_armor = ((self.armor + self.strength_bonus) + (self.armor * self.paragon_armor))
         else
             self.total_armor = (self.armor + (self.armor * self.paragon_armor))
         end
-        self.total_necrosurge = (self.necrosurge + self.dreadmight_bonus)
+        self.total_min_necrosurge = (self.min_necrosurge + self.dreadmight_bonus)
+        self.total_max_necrosurge = (self.max_necrosurge + self.dreadmight_bonus)
         self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
         self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance)
         if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
@@ -175,18 +176,24 @@ class Character < ApplicationRecord
         end
         self.total_max_health = self.total_health
         self.total_global_damage = (self.global_damage + self.paragon_global_damage)
-        self.total_attack = (self.total_attack + self.elixir_attack)
+        self.total_min_attack = (self.total_min_attack + self.elixir_attack)
+        self.total_max_attack = (self.total_max_attack + self.elixir_attack)
         self.total_armor = (self.total_armor + self.elixir_armor)
-        self.total_spellpower = (self.total_spellpower + self.elixir_spellpower)
+        self.total_min_spellpower = (self.total_min_spellpower + self.elixir_spellpower)
+        self.total_max_spellpower = (self.total_max_spellpower + self.elixir_spellpower)
         self.total_magic_resistance = (self.total_magic_resistance + self.elixir_magic_resistance)
-        self.total_necrosurge = (self.total_necrosurge + self.elixir_necrosurge)
+        self.total_min_necrosurge = (self.total_min_necrosurge + self.elixir_necrosurge)
+        self.total_max_necrosurge = (self.total_max_necrosurge + self.elixir_necrosurge)
     end
 
     def set_default_values_for_buffed_stats
-        self.buffed_attack = 0
-        self.buffed_spellpower = 0
+        self.buffed_min_attack = 0
+        self.buffed_max_attack = 0
+        self.buffed_min_spellpower = 0
+        self.buffed_max_spellpower = 0
         self.buffed_armor = 0
-        self.buffed_necrosurge = 0
+        self.buffed_min_necrosurge = 0
+        self.buffed_max_necrosurge = 0
         self.buffed_magic_resistance = 0
         self.buffed_critical_strike_chance = 0.0
         self.buffed_critical_strike_damage = 0.0
@@ -330,37 +337,52 @@ class Character < ApplicationRecord
         case character_class
         when 'warrior'
             # Modify attributes for warrior class
-            self.attack += 3
-            self.spellpower -= 3
-            self.necrosurge -= 2
+            self.min_attack += 4
+            self.max_attack += 12
+            self.min_spellpower -= 1
+            self.max_spellpower -= 7
+            self.min_necrosurge -= 2
+            self.max_necrosurge -= 5
             self.armor += 1
             self.magic_resistance -= 2
         when 'mage'
             # Modify attributes for mage class
-            self.attack -= 3
-            self.spellpower += 3
-            self.necrosurge -= 2
+            self.min_attack -= 5
+            self.max_attack -= 13
+            self.min_spellpower += 2
+            self.max_spellpower += 16
+            self.min_necrosurge -= 1
+            self.max_necrosurge -= 7
             self.armor -= 2
             self.magic_resistance += 2
         when 'rogue'
             # Modify attributes for rogue class
-            self.attack += 2
-            self.spellpower -= 1
-            self.necrosurge -= 1
+            self.min_attack += 1
+            self.max_attack += 8
+            self.min_spellpower -= 1
+            self.max_spellpower -= 5
+            self.min_necrosurge -= 2
+            self.max_necrosurge -= 5
             self.armor -= 1
             self.magic_resistance -= 1
         when 'paladin'
             # Modify attributes for paladin class
-            self.attack += 2
-            self.spellpower += 1
-            self.necrosurge -= 3
+            self.min_attack += 2
+            self.max_attack += 6
+            self.min_spellpower += 1
+            self.max_spellpower += 7
+            self.min_necrosurge -= 4
+            self.max_necrosurge -= 9
             self.armor += 1
             self.magic_resistance += 1
         when 'deathwalker'
             # Modify attributes for deathwalker class
-            self.attack -= 1
-            self.spellpower -= 3
-            self.necrosurge += 4
+            self.min_attack -= 1
+            self.max_attack -= 3
+            self.min_spellpower -= 3
+            self.max_spellpower -= 7
+            self.min_necrosurge += 4
+            self.max_necrosurge += 9
             self.armor -= 2
             self.magic_resistance -= 2
         end
@@ -458,11 +480,14 @@ class Character < ApplicationRecord
 
     def revert_stats_based_on_item(item)
         # Subtract stats of the unequipped item
-        self.attack -= item.attack unless item.attack.nil?
-        self.necrosurge -= item.necrosurge unless item.necrosurge.nil?
+        self.min_attack -= item.min_attack unless item.min_attack.nil?
+        self.max_attack -= item.max_attack unless item.max_attack.nil?
+        self.min_necrosurge -= item.min_necrosurge unless item.min_necrosurge.nil?
+        self.max_necrosurge -= item.max_necrosurge unless item.max_necrosurge.nil?
         self.health -= item.health unless item.health.nil?
         self.armor -= item.armor unless item.armor.nil?
-        self.spellpower -= item.spellpower unless item.spellpower.nil?
+        self.min_spellpower -= item.min_spellpower unless item.min_spellpower.nil?
+        self.max_spellpower -= item.max_spellpower unless item.max_spellpower.nil?
         self.magic_resistance -= item.magic_resistance unless item.magic_resistance.nil?
         self.strength -= item.strength unless item.strength.nil?
         self.intelligence -= item.intelligence unless item.intelligence.nil?
@@ -477,11 +502,14 @@ class Character < ApplicationRecord
 
     def modify_stats_based_on_item(item)
         # Adds stats of the equipped item
-        self.attack += item.attack unless item.attack.nil?
-        self.necrosurge += item.necrosurge unless item.necrosurge.nil?
+        self.min_attack += item.min_attack unless item.min_attack.nil?
+        self.max_attack += item.max_attack unless item.max_attack.nil?
+        self.min_necrosurge += item.min_necrosurge unless item.min_necrosurge.nil?
+        self.max_necrosurge += item.max_necrosurge unless item.max_necrosurge.nil?
         self.health += item.health unless item.health.nil?
         self.armor += item.armor unless item.armor.nil?
-        self.spellpower += item.spellpower unless item.spellpower.nil?
+        self.min_spellpower += item.min_spellpower unless item.min_spellpower.nil?
+        self.max_spellpower += item.max_spellpower unless item.max_spellpower.nil?
         self.magic_resistance += item.magic_resistance unless item.magic_resistance.nil?
         self.strength += item.strength unless item.strength.nil?
         self.intelligence += item.intelligence unless item.intelligence.nil?
@@ -544,11 +572,11 @@ class Character < ApplicationRecord
         active_elixirs.each do |elixir|
             case elixir.name
             when "Elixir of Might"
-                update(elixir_attack: (self.total_attack * elixir.potion_effect).round)
+                update(elixir_attack: ((self.total_max_attack * 0.10) * elixir.potion_effect).round)
             when "Elixir of Power"
-                update(elixir_spellpower: (self.total_spellpower * elixir.potion_effect).round)
+                update(elixir_spellpower: ((self.total_max_spellpower * 0.10) * elixir.potion_effect).round)
             when "Elixir of Decay"
-                update(elixir_necrosurge: (self.total_necrosurge * elixir.potion_effect).round)
+                update(elixir_necrosurge: ((self.total_max_necrosurge  * 0.10) * elixir.potion_effect).round)
             when "Elixir of Fortitude"
                 update(elixir_armor: (self.total_armor * elixir.potion_effect).round)
             when "Elixir of Knowledge"
@@ -661,6 +689,10 @@ class Character < ApplicationRecord
 
     def unequip_main_hand(main_hand)
         return unless self.main_hand
+            if self.main_hand.name == "Hellbound"
+                skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                skullsplitter.update(description: "Upon Critical Strike with a Basic attack, your opponent suffers an additional 3% of their Maximum Health as true damage.")
+            end
         # Add the two-handed weapon back to the inventory
         add_item_to_inventory(self.main_hand)
         # Modify stats based on the unequipped two-handed weapon
@@ -671,6 +703,10 @@ class Character < ApplicationRecord
 
     def unequip_off_hand(off_hand)
         return unless self.off_hand
+            if self.off_hand.name == "Hellbound"
+                skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                skullsplitter.update(description: "Upon Critical Strike with a Basic attack, your opponent suffers an additional 3% of their Maximum Health as true damage.")
+            end
         # Add the two-handed weapon back to the inventory
         add_item_to_inventory(self.off_hand)
         # Modify stats based on the unequipped two-handed weapon
@@ -821,6 +857,10 @@ class Character < ApplicationRecord
         if self.main_hand.nil? && self.off_hand.nil?
             Rails.logger.debug("################## Entering Case 1")
             self.main_hand = item
+                if item.name == "Hellbound"
+                    skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                    skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                end
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         # Case 2: Only main hand has a weapon
@@ -830,17 +870,29 @@ class Character < ApplicationRecord
                     # Replace the existing one-handed weapon in main hand
                     unequip_main_hand(self.main_hand)
                     self.main_hand = item
+                        if item.name == "Hellbound"
+                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
             elsif self.main_hand.item_type == 'Two-handed Weapon'
                 if skills.find_by(name: 'Forged in Battle', unlocked: true).present?
                     # Equip the weapon in the off hand if two-handed and Forged in Battle talent
                     self.off_hand = item
+                        if item.name == "Hellbound"
+                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
                     unequip_main_hand(self.main_hand)
                     self.main_hand = item
+                        if item.name == "Hellbound"
+                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
@@ -853,11 +905,19 @@ class Character < ApplicationRecord
             if self.off_hand.item_type == 'Shield'
                 if skills.find_by(name: 'Divine Strength', unlocked: true).present?
                     self.main_hand = item
+                    if item.name == "Hellbound"
+                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                    end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
                     unequip_off_hand(self.off_hand)
                     self.main_hand = item
+                        if item.name == "Hellbound"
+                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
@@ -865,11 +925,19 @@ class Character < ApplicationRecord
                 # Remove the main hand and off hand then equip the item in main hand
                 unequip_off_hand(self.off_hand)
                 self.main_hand = item
+                    if item.name == "Hellbound"
+                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
                 # Equip the item in main hand if Forged in Battle talent
                 self.main_hand = item
+                    if item.name == "Hellbound"
+                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             else
@@ -882,12 +950,20 @@ class Character < ApplicationRecord
                 if skills.find_by(name: 'Divine Strength', unlocked: true).present?
                     unequip_main_hand(self.main_hand)
                     self.main_hand = item
+                        if item.name == "Hellbound"
+                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
                     unequip_main_hand(self.main_hand)
                     unequip_off_hand(self.off_hand)
                     self.main_hand = item
+                        if item.name == "Hellbound"
+                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
@@ -896,12 +972,20 @@ class Character < ApplicationRecord
                 unequip_main_hand(self.main_hand)
                 unequip_off_hand(self.off_hand)
                 self.main_hand = item
+                    if item.name == "Hellbound"
+                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
                 # Equip the item in off hand if Forged in Battle talent
                 unequip_off_hand(self.off_hand)
                 self.off_hand = item
+                    if item.name == "Hellbound"
+                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             end
@@ -1094,7 +1178,11 @@ class Character < ApplicationRecord
         self.health = [self.health, 0].max
         self.total_armor = [self.total_armor, 0].max
         self.total_magic_resistance = [self.total_magic_resistance, 0].max
-        self.total_attack = [self.total_attack, 0].max
-        self.total_spellpower = [self.total_spellpower, 0].max
+        self.total_min_attack = [self.total_min_attack, 0].max
+        self.total_max_attack = [self.total_max_attack, 0].max
+        self.total_min_spellpower = [self.total_min_spellpower, 0].max
+        self.total_max_spellpower = [self.total_max_spellpower, 0].max
+        self.total_min_necrosurge = [self.total_min_necrosurge, 0].max
+        self.total_max_necrosurge = [self.total_max_necrosurge, 0].max
     end
 end
