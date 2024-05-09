@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_21_105121) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -131,6 +131,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_21_105121) do
     t.integer "elixir_total_health", default: 0
     t.bigint "active_elixir_ids", default: [], array: true
     t.integer "arena_rank", default: 0
+    t.integer "min_attack", default: 20
+    t.integer "max_attack", default: 20
+    t.integer "min_spellpower", default: 20
+    t.integer "max_spellpower", default: 20
+    t.integer "min_necrosurge", default: 20
+    t.integer "max_necrosurge", default: 20
+    t.integer "total_min_attack"
+    t.integer "total_max_attack"
+    t.integer "total_min_spellpower"
+    t.integer "total_max_spellpower"
+    t.integer "total_min_necrosurge"
+    t.integer "total_max_necrosurge"
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
@@ -207,6 +219,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_21_105121) do
     t.decimal "potion_heal_amount"
     t.decimal "potion_effect"
     t.datetime "elixir_applied_at"
+    t.string "legendary_effect_name"
+    t.string "legendary_effect_description"
+    t.integer "min_attack"
+    t.integer "max_attack"
+    t.integer "min_spellpower"
+    t.integer "max_spellpower"
+    t.integer "min_necrosurge"
+    t.integer "max_necrosurge"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -246,6 +266,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_21_105121) do
     t.integer "dreadmight_bonus", default: 0
     t.decimal "global_damage", precision: 6, scale: 3, default: "0.0"
     t.decimal "total_global_damage", precision: 6, scale: 3
+    t.integer "min_attack", default: 20
+    t.integer "max_attack", default: 20
+    t.integer "min_spellpower", default: 20
+    t.integer "max_spellpower", default: 20
+    t.integer "min_necrosurge", default: 20
+    t.integer "max_necrosurge", default: 20
+    t.integer "total_min_attack"
+    t.integer "total_max_attack"
+    t.integer "total_min_spellpower"
+    t.integer "total_max_spellpower"
+    t.integer "total_min_necrosurge"
+    t.integer "total_max_necrosurge"
   end
 
   create_table "quests", force: :cascade do |t|

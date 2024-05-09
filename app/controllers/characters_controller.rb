@@ -549,49 +549,49 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
     end
 
     def equip_item
-        @selected_character = current_user.selected_character
+        @character = current_user.selected_character
         item = Item.find(params[:item_id])
-        if @selected_character.can_equip?(item)
+        if @character.can_equip?(item)
             case item.item_type
                 when "One-handed Weapon"
-                    @selected_character.equip_one_handed_weapon(item)
+                    @character.equip_one_handed_weapon(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Two-handed Weapon"
-                    @selected_character.equip_two_handed_weapon(item)
+                    @character.equip_two_handed_weapon(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Shield"
-                    @selected_character.equip_shield(item)
+                    @character.equip_shield(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Head"
-                    @selected_character.equip_helmet(item)
+                    @character.equip_helmet(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Chest"
-                    @selected_character.equip_chest(item)
+                    @character.equip_chest(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Neck"
-                    @selected_character.equip_amulet(item)
+                    @character.equip_amulet(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Finger"
-                    @selected_character.equip_ring(item)
+                    @character.equip_ring(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Waist"
-                    @selected_character.equip_waist(item)
+                    @character.equip_waist(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Hands"
-                    @selected_character.equip_hands(item)
+                    @character.equip_hands(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Feet"
-                    @selected_character.equip_feet(item)
+                    @character.equip_feet(item)
                     flash[:notice] = "#{item.name} equipped."
             end
-            @selected_character.modify_stats_based_on_attributes
-            @selected_character.apply_passive_skills
-            @selected_character.update_elixir_effect
-            @selected_character.save
-            redirect_to @selected_character
+            @character.modify_stats_based_on_attributes
+            @character.apply_passive_skills
+            @character.update_elixir_effect
+            @character.save
+            redirect_to @character
         else
-            flash[:alert] = @selected_character.errors.full_messages.join(',')
-            redirect_to @selected_character
+            flash[:alert] = @character.errors.full_messages.join(',')
+            redirect_to @character
         end
     end
 

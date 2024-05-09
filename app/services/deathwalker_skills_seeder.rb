@@ -64,7 +64,8 @@ class DeathwalkerSkillsSeeder
       effect: "
               self.total_max_health *= 1.66;
               self.total_health *= 1.66;
-              self.total_necrosurge *= 0.5;"
+              self.total_min_necrosurge *= 0.5;
+              self.total_max_necrosurge *= 0.5;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'cadaverouspact.jpg')
     cadaverous_pact.skill_image.attach(io: File.open(image_path), filename: 'cadaverouspact.jpg', content_type: 'image/jpeg')
@@ -104,7 +105,8 @@ class DeathwalkerSkillsSeeder
       level_requirement: 100,
       character_class: deathwalker_class,
       character_id: character.id,
-      effect: "self.total_necrosurge = (self.total_necrosurge + (self.total_max_health * 0.02))"
+      effect: "self.total_min_necrosurge = (self.total_min_necrosurge + (self.total_max_health * 0.02));
+              self.total_max_necrosurge = (self.total_max_necrosurge + (self.total_max_health * 0.02))"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'bloodforging.jpg')
     bloodforging.skill_image.attach(io: File.open(image_path), filename: 'bloodforging.jpg', content_type: 'image/jpeg')
@@ -120,7 +122,8 @@ class DeathwalkerSkillsSeeder
       character_id: character.id,
       effect: "
               if self.total_health <= self.total_max_health / 2
-                self.buffed_necrosurge = (self.total_necrosurge * 2.0)
+                self.buffed_min_necrosurge = (self.total_min_necrosurge * 2.0);
+                self.buffed_max_necrosurge = (self.total_max_necrosurge * 2.0)
               end "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'deathwalker_skills', 'sanguineeclipse.jpg')

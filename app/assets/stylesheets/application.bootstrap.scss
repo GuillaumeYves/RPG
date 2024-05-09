@@ -104,6 +104,13 @@ body {
   text-shadow: 1px 1px 1px black;
 }
 
+.item-legendary-effect-name {
+  font-size: 18px;
+  color: gold;
+  animation: legendarycolorChange 1s infinite alternate;
+  text-shadow: 1px 1px 1px black;
+}
+
 @keyframes legendarycolorChange {
   from {
     color: gold;
@@ -127,4 +134,10 @@ body {
   to {
     color: rgb(153, 0, 255);
   }
+}
+
+.item-legendary-effect-description br {
+  display: block;
+  content: "";
+  margin-bottom: 0;
 }

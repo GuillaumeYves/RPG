@@ -218,8 +218,9 @@
           <div class="col-md-4">
             <div class="text-center">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">General</h4><br>
-              <span data-tooltip="tooltip" title="Total amount of Health"><strong>Health:</strong> <%= number_with_delimiter(@character.total_health) %>/<%= number_with_delimiter(@character.total_max_health) %></span><br>
-              <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= number_with_delimiter(@character.total_attack - @character.elixir_attack) %></span>
+              <span data-tooltip="tooltip" title="Total amount of Health"><strong>Health:</strong> <%= number_with_delimiter(@character.total_health) %> / <%= number_with_delimiter(@character.total_max_health) %></span><br>
+              <% average_attack = (@character.total_min_attack + @character.total_max_attack) / 2 %>
+              <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_min_attack %> - <%= @character.total_max_attack %> <small class="text-muted">(~<%= number_with_delimiter(average_attack) %>)</small></span>              
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
                 <% if (elixir.name == "Elixir of Might").present? %>
@@ -227,7 +228,8 @@
                 <% end %>
               <% end %>
               <br>
-              <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= number_with_delimiter(@character.total_spellpower - @character.elixir_spellpower) %></span>
+              <% average_spellpower = (@character.total_min_spellpower + @character.total_max_spellpower) / 2 %>
+              <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_min_spellpower %> - <%= @character.total_max_spellpower %> <small class="text-muted">(~<%= number_with_delimiter(average_spellpower) %>)</small></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
                 <% if (elixir.name == "Elixir of Power").present? %>
@@ -235,7 +237,8 @@
                 <% end %>
               <% end %> 
               <br>             
-              <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= number_with_delimiter(@character.total_necrosurge - @character.elixir_necrosurge) %></span>
+              <% average_necrosurge = (@character.total_min_necrosurge + @character.total_max_necrosurge) / 2 %>
+              <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_min_necrosurge %> - <%= @character.total_max_necrosurge %> <small class="text-muted">(~<%= number_with_delimiter(average_necrosurge) %>)</small></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
                 <% if (elixir.name == "Elixir of Decay").present? %>
