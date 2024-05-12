@@ -46,7 +46,7 @@ module ApplicationHelper
                 elsif attribute == 'critical_strike_damage'
                     value = (value * 100).to_i.to_s + "%"
                 elsif attribute == 'global_damage'
-                    value = (value * 100).to_i.to_s + "%"
+                    value = number_to_percentage(value * 100, precision: 2)
                 end
                 html += content_tag(:div, "#{attribute.humanize}: #{value}", class: 'tooltip-item-attribute')
             end

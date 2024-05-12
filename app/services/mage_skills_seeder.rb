@@ -95,14 +95,14 @@ class MageSkillsSeeder
 
     wisdom_and_power = Skill.create(
       name: "Wisdom and Power",
-      description: "Your Magic Resistance increases your Spellpower by 150% of its value and your Spellpower is increased by 50%.",
+      description: "Your Magic Resistance increases your Spellpower by 120% of its value.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance * 1.5));
-              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance * 1.5));"
+      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance * 1.2));
+              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance * 1.2));"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wisdomandpower.jpg')
     wisdom_and_power.skill_image.attach(io: File.open(image_path), filename: 'wisdomandpower.jpg', content_type: 'image/jpeg')

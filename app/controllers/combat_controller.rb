@@ -487,12 +487,12 @@ class CombatController < ApplicationController
                         # Proceed with diverse triggers after attacking
                         if rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
                             sharpened_blade_image = "<img src='/assets/rogue_skills/sharpenedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                            sharpened_blade = (physical_damage * 0.5).round
+                            sharpened_blade = [(physical_damage * 0.5).round, 0].max
                             @opponent_health_in_combat -= [sharpened_blade, 0].max
                             log_message += ", #{sharpened_blade_image} Sharpened Blade - <strong>#{sharpened_blade}</strong> additional physical damage"
                         elsif rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
                             poisoned_blade_image = "<img src='/assets/rogue_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                            poisoned_blade = (magic_damage * 0.5).round
+                            poisoned_blade = [(magic_damage * 0.5).round, 0].max
                             @opponent_health_in_combat -= [poisoned_blade, 0].max
                             log_message += ", #{poisoned_blade_image} Poisoned Blade - <strong>#{poisoned_blade}</strong> additional magic damage"
                         end
@@ -595,17 +595,16 @@ class CombatController < ApplicationController
             @combat_logs << log_message
 
             # After attack healing
-            if @character_has_crit == true && @character.skills.find_by(name: 'Path of the Dead', unlocked: true).present? && damage.positive?
+            if damage.positive? && @character_has_crit == true && @character.skills.find_by(name: 'Path of the Dead', unlocked: true).present?
                 path_of_the_dead_image = "<img src='/assets/deathwalker_skills/pathofthedead.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 path_of_the_dead = (damage * 0.33).round
-                @character.total_health += [path_of_the_dead, @character.total_max_health - @character.total_health].min
+                @character.total_health += [path_of_the_dead, @character.total_max_health].max
                 log_message = "#{@character.character_name}: #{path_of_the_dead_image} - <strong>#{path_of_the_dead}</strong> health recovery"
                 @combat_logs << log_message
             end
 
         # Apply combat skills
         @character.apply_combat_skills
-
             # Dawnbreaker
             if (@opponent_health_in_combat <= (@opponent.total_max_health * 0.10)) && (@character.main_hand.present? && @character.main_hand.name == "Dawnbreaker") ||
             (@character.off_hand.present? && @character.off_hand.name == "Dawnbreaker")
@@ -684,6 +683,16 @@ class CombatController < ApplicationController
                     @combat_logs << log_message
             # Apply combat skills
             @character.apply_combat_skills
+            end
+            # The First Flame
+            if (@character.neck.present? && @character.neck.name == "The First Flame")
+                thefirstflame_image = "<img src='/assets/legendary_items/thefirstflame.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                if rand(0.00..100.00) <= 10.0
+                    thefirstflame_damage = [(@opponent.total_max_health * 0.08).round, 0].max
+                    @opponent_health_in_combat -= [thefirstflame_damage, 0].max
+                    log_message = "#{@character.character_name}: #{thefirstflame_image} Flicker of Destruction - <strong>#{thefirstflame_damage}</strong> fire damage"
+                    @combat_logs << log_message
+                end
             end
             # Laceration
             if (@character.main_hand.present? && @character.main_hand.name == "Laceration") ||

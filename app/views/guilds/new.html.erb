@@ -1,0 +1,59 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <!-- Form to create a new guild -->
+      <div class="card text-left mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; position: relative; height: 500px; width: 600px;">
+        <h4 class="card-header text-center text-white bg-primary mb-5" style="width: 200px; margin: 0 auto;">Create a Guild</h4>
+        <%= form_with(model: @guild, local: true) do |form| %>
+          <% if @guild.errors.any? %>
+            <div id="error_explanation">
+              <h2><%= pluralize(@guild.errors.count, 'error') %> prohibited this guild from being saved:</h2>
+              <ul>
+                <% @guild.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <div class="field">
+            <%= form.text_field :name, class: 'form-control', placeholder: 'Guild name', style: 'text-align: center; font-size: 20px;' %>
+          </div>
+          <div class="field mt-3" style="text-align: center;">
+            <label><strong>Membership Status</strong></label>
+            <div>
+              <%= form.select :membership_status, Guild.membership_statuses.keys.map { |status| [status.humanize, status] }, {}, { class: 'form-control' } %>
+            </div>
+          </div>
+          <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px;">
+            <%= form.submit 'Create', class: "btn btn-outline-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- List of existing guilds -->
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+      <div class="card text-center" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding-top: 15px;">
+        <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Guilds</h4>
+        <hr style="margin-bottom: 0;">
+        <div class="row justify-content-center" style="max-height: 400px; overflow-y: auto;">
+          <div class="card-body">
+            <% @guilds.each do |guild| %>
+              <div class="row">
+                <div class="col">
+                  <h5><%= link_to guild.name, guild %></h5>
+                  <p>Members: <%= guild.members.count %> / 30</p>
+                </div>
+              </div>
+              <% unless guild == @guilds.last %>
+                <hr>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

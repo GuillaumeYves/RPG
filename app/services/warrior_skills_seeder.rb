@@ -95,15 +95,15 @@ class WarriorSkillsSeeder
 
     berserk = Skill.create(
       name: "Berserk",
-      description: "When you reach 20% Health, your Attack is increased by 70%.",
+      description: "When you reach 20% Health, your Attack is increased by 100%.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
       effect: " if (self.total_health <= (0.2 * self.total_max_health))
-            self.buffed_min_attack = (self.total_min_attack * 0.7);
-            self.buffed_max_attack = (self.total_max_attack * 0.7);
+            self.buffed_min_attack = (self.total_min_attack);
+            self.buffed_max_attack = (self.total_max_attack);
           end  "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'berserk.jpg')

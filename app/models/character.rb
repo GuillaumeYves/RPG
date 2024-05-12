@@ -1,6 +1,6 @@
 class Character < ApplicationRecord
     belongs_to :user
-
+    belongs_to :guild, optional: true
     belongs_to :hunt, optional: true, dependent: :destroy
     belongs_to :quest, optional: true, dependent: :destroy
     has_one :accepted_hunt, class_name: 'Hunt', foreign_key: 'character_id'

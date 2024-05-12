@@ -1,0 +1,24 @@
+<div class="card text-left mt-5 mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 500px; width: 500px; margin-right: 20px; position: relative;">
+  <h2 class="text-center"><strong><%= @guild.name %></strong></h2>
+  <p><strong>Leader:</strong> <%= @guild.leader.character_name %></p>
+  <p><strong>Membership Status:</strong> <%= @guild.membership_status.humanize %></p>
+  <% if @guild.membership_status == 'invite_only' && @guild.leader == current_user.selected_character %>
+    <div class="actions" style="text-align: center;">
+      <%= link_to "Invite Member", invite_member_guild_path(@guild), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+
+    <% if current_user.selected_character == @guild.leader %>
+        <div class="actions" style="text-align: center;">
+            <%= form_with(model: @guild, url: disband_guild_path(@guild), method: :delete, local: true) do |form| %>
+                <%= form.submit "Disband", class: "btn btn-danger" %>
+            <% end %>
+        </div>    
+    <% end %>
+
+    <div class="actions" style="text-align: center;">
+        <%= form_tag(apply_to_join_guild_guild_path(guild_id: @guild.id), method: :post, class: "join-guild-form") do %>
+            <%= submit_tag "Apply to Join", class: "btn btn-primary" %>
+        <% end %>
+    </div>
+</div>

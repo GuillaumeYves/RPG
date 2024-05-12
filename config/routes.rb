@@ -70,6 +70,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :guilds do
+    member do
+      post 'invite_member'
+      post 'respond_to_invitation'
+      post 'apply_to_join_guild'
+      delete 'disband'
+    end
+  end
+
   get '/user_characters', to: 'characters#user_characters', as: 'user_characters'
   post 'reset_merchant_items', to: 'items#reset_merchant_items', as: :reset_merchant_items
 end

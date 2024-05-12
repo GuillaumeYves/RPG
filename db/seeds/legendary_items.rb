@@ -128,6 +128,22 @@ end
     image_path: 'app/assets/images/legendary_items/tempestband.jpg'
   },
   {
+    name: "The First Flame",
+    item_type: "Neck",
+    item_class: "Amulet",
+    level_requirement: 100,
+    gold_price: 86250,
+    rarity: "Legendary",
+    health: (800 * (rand(0.8..1.0))).to_i,
+    global_damage: (0.10 * (rand(0.8..1.0))),
+    critical_strike_damage: (0.50 * (rand(0.8..1.0))),
+    legendary_effect_name: "Flicker of Destruction",
+    legendary_effect_description: "At the end of you turn:<br>
+    10% chance to deal 8% of opponent's Maximum Health as fire damage.",
+    description: "A reminder that from the flicker of a spark, entire worlds blaze into existence.",
+    image_path: 'app/assets/images/legendary_items/thefirstflame.jpg'
+  },
+  {
     name: "The Nexus",
     item_type: "Neck",
     item_class: "Amulet",
