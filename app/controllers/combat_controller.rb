@@ -173,9 +173,9 @@ class CombatController < ApplicationController
         # Character's turn
         if @character_turn
             if @character.neck.present? && @character.neck.name == "The Nexus"
-                damage_roll = rand((@character.total_min_attack + @character.buffed_min_attack)..(@character.total_max_attack + @character.buffed_max_attack))
-            else
                 damage_roll = (@character.total_max_attack + @character.buffed_max_attack)
+            else
+                damage_roll = rand((@character.total_min_attack + @character.buffed_min_attack)..(@character.total_max_attack + @character.buffed_max_attack))
             end
             # Check for a miss with Forged in Battle
             if @character.skills.find_by(name: 'Forged in Battle', unlocked: true).present? && rand(0.00..100.00) <= 20.00

@@ -628,59 +628,72 @@ class Character < ApplicationRecord
         item.update(inventory_id: nil)
     end
 
+    def has_legendary_item_equipped?
+        equipment_slots = %i[head chest hands feet main_hand off_hand finger1 finger2 neck waist]
+
+        equipment_slots.any? do |slot|
+        equipped_item = self.send(slot)
+        equipped_item&.rarity == 'Legendary'
+        end
+    end
+
     def can_equip?(item)
         if self.level >= item.level_requirement
-            case item.item_class
-                when 'Sword'
-                    # All characters can equip one-handed swords
-                    return true if item.item_type == 'One-handed Weapon'
-                    # For two-handed swords, restrict to warriors and paladins
-                    return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin deathwalker].include?(character_class)
-                    errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Two-handed Swords.")
-                    return false
-                when 'Great Shield'
-                    return true if character_class == 'paladin'
-                    errors.add(:base, "Only Paladins can equip Great Shields.")
-                    return false
-                when 'Small Shield'
-                    return true if %w[warrior paladin mage].include?(character_class)
-                    errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
-                    return false
-                when 'Axe'
-                    return true if character_class == 'warrior'
-                    errors.add(:base, "Only Warriors can equip Axes.")
-                    return false
-                when 'Mace'
-                    return true if character_class == 'paladin'
-                    errors.add(:base, "Only Paladins can equip Maces.")
-                    return false
-                when 'Dagger'
-                    return true if character_class == 'rogue'
-                    errors.add(:base, "Only Rogues can equip Daggers.")
-                    return false
-                when 'Staff'
-                    return true if character_class == 'mage'
-                    errors.add(:base, "Only Mages can equip Staves.")
-                    return false
-                when 'Plate'
-                    return true if %w[warrior paladin deathwalker].include?(character_class)
-                    errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
-                    return false
-                when 'Leather'
-                    return true if character_class == 'rogue'
-                    errors.add(:base, "Only Rogues can equip leather.")
-                    return false
-                when 'Cloth'
-                    return true if %w[mage].include?(character_class)
-                    errors.add(:base, "Only Mages can equip cloth.")
-                    return false
-                when 'Ring'
-                    return true
-                when 'Amulet'
-                    return true
-                when 'Belt'
-                    return true
+            if item.rarity == 'Legendary' && has_legendary_item_equipped?
+                errors.add(:base, "You can only equip one Legendary item.")
+                return false
             end
+                case item.item_class
+                    when 'Sword'
+                        # All characters can equip one-handed swords
+                        return true if item.item_type == 'One-handed Weapon'
+                        # For two-handed swords, restrict to warriors and paladins
+                        return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin deathwalker].include?(character_class)
+                        errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Two-handed Swords.")
+                        return false
+                    when 'Great Shield'
+                        return true if character_class == 'paladin'
+                        errors.add(:base, "Only Paladins can equip Great Shields.")
+                        return false
+                    when 'Small Shield'
+                        return true if %w[warrior paladin mage].include?(character_class)
+                        errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
+                        return false
+                    when 'Axe'
+                        return true if character_class == 'warrior'
+                        errors.add(:base, "Only Warriors can equip Axes.")
+                        return false
+                    when 'Mace'
+                        return true if character_class == 'paladin'
+                        errors.add(:base, "Only Paladins can equip Maces.")
+                        return false
+                    when 'Dagger'
+                        return true if character_class == 'rogue'
+                        errors.add(:base, "Only Rogues can equip Daggers.")
+                        return false
+                    when 'Staff'
+                        return true if character_class == 'mage'
+                        errors.add(:base, "Only Mages can equip Staves.")
+                        return false
+                    when 'Plate'
+                        return true if %w[warrior paladin deathwalker].include?(character_class)
+                        errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
+                        return false
+                    when 'Leather'
+                        return true if character_class == 'rogue'
+                        errors.add(:base, "Only Rogues can equip leather.")
+                        return false
+                    when 'Cloth'
+                        return true if %w[mage].include?(character_class)
+                        errors.add(:base, "Only Mages can equip cloth.")
+                        return false
+                    when 'Ring'
+                        return true
+                    when 'Amulet'
+                        return true
+                    when 'Belt'
+                        return true
+                end
         else
             errors.add(:base, "You do not have the required level to equip that item.")
             return false
