@@ -8,7 +8,15 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  root "characters#user_characters"
+  devise_scope :user do
+    authenticated :user do
+      root "characters#user_characters", as: :authenticated_root
+    end
+
+    unauthenticated :user do
+      root "devise/sessions#new", as: :unauthenticated_root
+    end
+  end
 
   resources :characters do
     collection do
@@ -28,6 +36,7 @@ Rails.application.routes.draw do
       delete 'remove_from_inventory/:item_id', to: 'characters#remove_from_inventory', as: :remove_from_inventory
       post '/combat', to: 'combat#combat', as: :combat
       post 'equip_item/:item_id', to: 'characters#equip_item', as: :equip_item
+      post 'unequip_item/:item_id', to: 'characters#unequip_item', as: :unequip_item
       post 'sell_item/:item_id', to: 'characters#sell_item', as: :sell_item
       post 'use_elixir/:item_id', to: 'characters#use_elixir', as: :use_elixir
       post 'equip_prompt'

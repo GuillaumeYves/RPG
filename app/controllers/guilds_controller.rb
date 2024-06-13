@@ -7,6 +7,7 @@ class GuildsController < ApplicationController
 
   def show
     @guild = Guild.find(params[:id])
+    @members = @guild.members
   end
 
   def create
@@ -27,9 +28,11 @@ class GuildsController < ApplicationController
     if @guild.leader == current_user.selected_character
       @guild.members.update_all(guild_id: nil)
       @guild.destroy
-      redirect_to root_path, notice: "Guild disbanded successfully."
+      respond_to do |format|
+        format.js { render js: "window.location.reload(); alert('Guild disbanded successfully.');" }
+      end
     else
-      redirect_to @guild, alert: "Only the guild leader can disband the guild."
+      redirect_to @guild, notice: "Only the guild leader can disband the guild."
     end
   end
 

@@ -10,7 +10,6 @@ class Monster < ApplicationRecord
 
     attr_accessor :buffed_min_attack, :buffed_max_attack, :buffed_min_spellpower, :buffed_max_spellpower, :buffed_min_necrosurge, :buffed_max_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
     attr_accessor :took_damage
-    attr_accessor :temp_health
 
     def calculate_strength_bonus
         self.strength_bonus = (self.strength * 0.2)

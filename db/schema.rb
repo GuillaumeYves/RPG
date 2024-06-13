@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_12_145828) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_08_173658) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -77,7 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_12_145828) do
     t.bigint "feet"
     t.string "gender"
     t.integer "agility", default: 5
-    t.decimal "critical_strike_damage", precision: 5, scale: 2, default: "1.2"
+    t.decimal "critical_strike_damage", precision: 5, scale: 2, default: "0.1"
     t.integer "max_health", default: 100
     t.integer "total_attack"
     t.integer "total_spellpower"

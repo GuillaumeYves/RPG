@@ -12,7 +12,7 @@ class RogueSkillsSeeder
     poisoned_blade = Skill.create(
       name: "Poisoned Blade",
       skill_type: "combat",
-      description: "You have a 30% chance to poison your opponent after attacking, dealing 50% of your Attack as magic damage.",
+      description: "After attacking you have a 30% chance to inflict 50% of initial attack damage as magic damage.",
       row: 1,
       level_requirement: 25,
       character_class: rogue_class,
@@ -25,7 +25,7 @@ class RogueSkillsSeeder
     sharpened_blade = Skill.create(
       name: "Sharpened Blade",
       skill_type: "combat",
-      description: "You have a 30% chance to maim your opponent after attacking, dealing 50% of your Attack as physical damage.",
+      description: "After attacking you have a 30% chance to inflict 50% of initial attack damage as physical damage.",
       row: 1,
       level_requirement: 25,
       character_class: rogue_class,
@@ -37,7 +37,7 @@ class RogueSkillsSeeder
 
     hidden_blade = Skill.create(
       name: "Hidden Blade",
-      description: "While dual wielding Daggers, your Critical Strike Chance by 5% and your Critical Strikes deal 50% increased damage.",
+      description: "While dual wielding Daggers your Critical Strike Chance by 5% and your Critical Strikes deal 50% increased damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -74,7 +74,7 @@ class RogueSkillsSeeder
       name: "Swift Movements",
       skill_type: "passive",
       description: "You gain increased Attack based on your Agility instead of your Strength.
-      You have an increasing chance of performing an additional attack, for 50% damage, the more Agility you have.",
+      You have an increasing chance the more Agility you have to attack for 50% of your damage.",
       row: 3,
       level_requirement: 75,
       character_class: rogue_class,
@@ -86,7 +86,7 @@ class RogueSkillsSeeder
 
     from_the_shadows = Skill.create(
       name: "From the Shadows",
-      description: "Your Critical Strikes deal 25% of their damage as additional true damage.",
+      description: "When dealing a Critical Strike with an attack you inflict 25% of initial damage as additional true damage.",
       skill_type: "trigger",
       row: 3,
       level_requirement: 75,
@@ -99,7 +99,7 @@ class RogueSkillsSeeder
 
     unnatural_instinct = Skill.create(
       name: "Unnatural Instinct",
-      description: "When you reach 50% Health, your Attack is increased by 30% and your Critical Strike Damage by 100%.",
+      description: "When you reach 50% Health your Attack is increased by 30% and your Critical Strike Damage by 100%.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
@@ -117,7 +117,7 @@ class RogueSkillsSeeder
 
     death_mark = Skill.create(
       name: "Death Mark",
-      description: "After each attack, your Critical Strike Damage is increased by 20% and your Critical Strike Chance by 2%.",
+      description: "After attacking your Critical Strike Damage is increased by 20% and your Critical Strike Chance by 2%.",
       skill_type: "combat",
       row: 4,
       level_requirement: 100,

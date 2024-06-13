@@ -44,6 +44,8 @@ class Character < ApplicationRecord
     attr_accessor :piety
     attr_accessor :nullify
     attr_accessor :ephemeral_rebirth
+    attr_accessor :blessing_of_kings
+    attr_accessor :deathsbargain
 
     def self.recovery
         Character.find_each do |character|
@@ -146,8 +148,8 @@ class Character < ApplicationRecord
 
     def set_default_values_for_total_stats
         if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
-            self.total_min_attack = ((self.min_attack + self.agility_bonus) + (self.min_attack * self.paragon_attack))
-            self.total_max_attack = ((self.max_attack + self.agility_bonus) + (self.max_attack * self.paragon_attack))
+            self.total_min_attack = ((self.min_attack + (self.agility_bonus * 0.80)) + (self.min_attack * self.paragon_attack))
+            self.total_max_attack = ((self.max_attack + (self.agility_bonus * 0.80)) + (self.max_attack * self.paragon_attack))
         else
             self.total_min_attack = ((self.min_attack + self.strength_bonus) + (self.min_attack * self.paragon_attack))
             self.total_max_attack = ((self.max_attack + self.strength_bonus) + (self.max_attack * self.paragon_attack))
@@ -164,7 +166,7 @@ class Character < ApplicationRecord
         self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
         self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance)
         if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
-            self.total_critical_strike_damage = ((self.critical_strike_damage + (self.intelligence_bonus * 0.005).to_d) + self.paragon_critical_strike_damage)
+            self.total_critical_strike_damage = ((self.critical_strike_damage + (self.intelligence_bonus * 0.001).to_d) + self.paragon_critical_strike_damage)
         else
             self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage)
         end
@@ -630,17 +632,20 @@ class Character < ApplicationRecord
 
     def has_legendary_item_equipped?
         equipment_slots = %i[head chest hands feet main_hand off_hand finger1 finger2 neck waist]
+        legendary_items_count = 0
 
-        equipment_slots.any? do |slot|
-        equipped_item = self.send(slot)
-        equipped_item&.rarity == 'Legendary'
+        equipment_slots.each do |slot|
+            equipped_item = self.send(slot)
+            legendary_items_count += 1 if equipped_item&.rarity == 'Legendary'
         end
+
+        legendary_items_count >= 3
     end
 
     def can_equip?(item)
         if self.level >= item.level_requirement
             if item.rarity == 'Legendary' && has_legendary_item_equipped?
-                errors.add(:base, "You can only equip one Legendary item.")
+                errors.add(:base, "You can only equip a maximum of 3 Legendary items.")
                 return false
             end
                 case item.item_class
@@ -649,19 +654,19 @@ class Character < ApplicationRecord
                         return true if item.item_type == 'One-handed Weapon'
                         # For two-handed swords, restrict to warriors and paladins
                         return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin deathwalker].include?(character_class)
-                        errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Two-handed Swords.")
+                        errors.add(:base, "Only Warriors and Paladins can equip Two-handed Swords.")
                         return false
                     when 'Great Shield'
-                        return true if character_class == 'paladin'
-                        errors.add(:base, "Only Paladins can equip Great Shields.")
+                        return true if %w[paladin deathwalker].include?(character_class)
+                        errors.add(:base, "Only Paladins and Deathwalkers can equip Great Shields.")
                         return false
                     when 'Small Shield'
                         return true if %w[warrior paladin mage].include?(character_class)
                         errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
                         return false
                     when 'Axe'
-                        return true if character_class == 'warrior'
-                        errors.add(:base, "Only Warriors can equip Axes.")
+                        return true if %w[warrior deathwalker].include?(character_class)
+                        errors.add(:base, "Only Warriors and Deathwalkers can equip Axes.")
                         return false
                     when 'Mace'
                         return true if character_class == 'paladin'
@@ -700,7 +705,7 @@ class Character < ApplicationRecord
         end
     end
 
-    def unequip_main_hand(main_hand)
+    def unequip_main_hand
         return unless self.main_hand
             if self.main_hand.name == "Hellbound"
                 skullsplitter = self.skills.find_by(name: "Skullsplitter")
@@ -714,7 +719,7 @@ class Character < ApplicationRecord
         self.main_hand = nil
     end
 
-    def unequip_off_hand(off_hand)
+    def unequip_off_hand
         return unless self.off_hand
             if self.off_hand.name == "Hellbound"
                 skullsplitter = self.skills.find_by(name: "Skullsplitter")
@@ -752,12 +757,12 @@ class Character < ApplicationRecord
                     modify_stats_based_on_item(item)
                     return
                 end
-                unequip_main_hand(self.main_hand)
+                unequip_main_hand
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.main_hand.item_type == 'Two-handed Weapon'
-                unequip_main_hand(self.main_hand)
+                unequip_main_hand
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -775,7 +780,7 @@ class Character < ApplicationRecord
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
-                unequip_off_hand(self.off_hand)
+                unequip_off_hand
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -789,26 +794,26 @@ class Character < ApplicationRecord
         elsif self.main_hand.present? && self.off_hand.present?
             Rails.logger.debug("################## Entering Case 4")
             if self.off_hand.item_type == 'Shield'
-                unequip_main_hand(self.main_hand)
+                unequip_main_hand
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 if (self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && self.character_class == 'rogue'
-                    unequip_off_hand(self.off_hand)
+                    unequip_off_hand
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                     return
                 end
-                unequip_main_hand(self.main_hand)
-                unequip_off_hand(self.off_hand)
+                unequip_main_hand
+                unequip_off_hand
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon'
-                unequip_main_hand(self.main_hand)
-                unequip_off_hand(self.off_hand)
+                unequip_main_hand
+                unequip_off_hand
                 self.main_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -836,7 +841,7 @@ class Character < ApplicationRecord
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
-                    unequip_main_hand(self.main_hand)
+                    unequip_main_hand
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -846,18 +851,18 @@ class Character < ApplicationRecord
         elsif self.main_hand.present? && self.off_hand.present?
             Rails.logger.debug("################## Entering Case 3")
             if self.off_hand.item_type == 'Shield'
-                unequip_off_hand(self.off_hand)
+                unequip_off_hand
                 self.off_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
-                unequip_off_hand(self.off_hand)
+                unequip_off_hand
                 self.off_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon'
-                unequip_main_hand(self.main_hand)
-                unequip_off_hand(self.off_hand)
+                unequip_main_hand
+                unequip_off_hand
                 self.off_hand = item
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -872,7 +877,7 @@ class Character < ApplicationRecord
             self.main_hand = item
                 if item.name == "Hellbound"
                     skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                    skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                    skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                 end
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
@@ -881,11 +886,11 @@ class Character < ApplicationRecord
             Rails.logger.debug("################## Entering Case 2")
             if self.main_hand.item_type == 'One-handed Weapon'
                     # Replace the existing one-handed weapon in main hand
-                    unequip_main_hand(self.main_hand)
+                    unequip_main_hand
                     self.main_hand = item
                         if item.name == "Hellbound"
                             skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                         end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -895,16 +900,16 @@ class Character < ApplicationRecord
                     self.off_hand = item
                         if item.name == "Hellbound"
                             skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                         end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
-                    unequip_main_hand(self.main_hand)
+                    unequip_main_hand
                     self.main_hand = item
                         if item.name == "Hellbound"
                             skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                         end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -920,27 +925,27 @@ class Character < ApplicationRecord
                     self.main_hand = item
                     if item.name == "Hellbound"
                         skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                     end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
-                    unequip_off_hand(self.off_hand)
+                    unequip_off_hand
                     self.main_hand = item
                         if item.name == "Hellbound"
                             skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                         end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 # Remove the main hand and off hand then equip the item in main hand
-                unequip_off_hand(self.off_hand)
+                unequip_off_hand
                 self.main_hand = item
                     if item.name == "Hellbound"
                         skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                     end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -949,7 +954,7 @@ class Character < ApplicationRecord
                 self.main_hand = item
                     if item.name == "Hellbound"
                         skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                     end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -961,43 +966,43 @@ class Character < ApplicationRecord
             Rails.logger.debug("################## Entering Case 4")
             if self.off_hand.item_type == 'Shield'
                 if skills.find_by(name: 'Divine Strength', unlocked: true).present?
-                    unequip_main_hand(self.main_hand)
+                    unequip_main_hand
                     self.main_hand = item
                         if item.name == "Hellbound"
                             skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                         end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
-                    unequip_main_hand(self.main_hand)
-                    unequip_off_hand(self.off_hand)
+                    unequip_main_hand
+                    unequip_off_hand
                     self.main_hand = item
                         if item.name == "Hellbound"
                             skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                         end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 # Remove the main hand and off hand then equip the item
-                unequip_main_hand(self.main_hand)
-                unequip_off_hand(self.off_hand)
+                unequip_main_hand
+                unequip_off_hand
                 self.main_hand = item
                     if item.name == "Hellbound"
                         skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                     end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
                 # Equip the item in off hand if Forged in Battle talent
-                unequip_off_hand(self.off_hand)
+                unequip_off_hand
                 self.off_hand = item
                     if item.name == "Hellbound"
                         skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "Upon Critical Strike with a Basic attack, you attack once more for 70% of your damage.")
+                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                     end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
@@ -1005,7 +1010,7 @@ class Character < ApplicationRecord
         end
     end
 
-    def unequip_helmet(head)
+    def unequip_head
         return unless self.head
         # Add the helmet back to the inventory
         add_item_to_inventory(head)
@@ -1014,7 +1019,7 @@ class Character < ApplicationRecord
         # Clear the character's helmet
         self.head = nil
     end
-    def equip_helmet(item)
+    def equip_head(item)
         if self.head.nil?
             # No existing helmet
             self.head = item
@@ -1024,7 +1029,7 @@ class Character < ApplicationRecord
             modify_stats_based_on_item(item)
         else
             # Replace the existing helmet
-            unequip_helmet(self.head)
+            unequip_head
             self.head = item
             # Remove the new helmet from the inventory without deleting it
             remove_item_from_inventory(item)
@@ -1033,7 +1038,7 @@ class Character < ApplicationRecord
         end
     end
 
-    def unequip_chest(chest)
+    def unequip_chest
         return unless self.chest
         # Add the chest back to the inventory
         add_item_to_inventory(chest)
@@ -1052,7 +1057,7 @@ class Character < ApplicationRecord
             modify_stats_based_on_item(item)
         else
             # Replace the existing chest
-            unequip_chest(self.chest)
+            unequip_chest
             self.chest = item
             # Remove the new chest from the inventory without deleting it
             remove_item_from_inventory(item)
@@ -1061,40 +1066,36 @@ class Character < ApplicationRecord
         end
     end
 
-    def unequip_legs(legs)
-        return unless self.legs
-        # Add the legs back to the inventory
-        add_item_to_inventory(self.legs)
-        # Modify stats based on the removed legs
-        revert_stats_based_on_item(self.legs)
-        # Clear the character's legs
-        self.legs = nil
-    end
-
-    def unequip_amulet(neck)
+    def unequip_neck
         return unless self.neck
         add_item_to_inventory(self.neck)
         revert_stats_based_on_item(self.neck)
         self.neck = nil
     end
-    def equip_amulet(item)
+    def equip_neck(item)
         if self.neck.nil?
             self.neck = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         else
-            unequip_amulet(self.neck)
+            unequip_neck
             self.neck = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         end
     end
 
-    def unequip_ring(finger1)
+    def unequip_finger1
         return unless self.finger1
         add_item_to_inventory(self.finger1)
         revert_stats_based_on_item(self.finger1)
         self.finger1 = nil
+    end
+    def unequip_finger2
+        return unless self.finger2
+        add_item_to_inventory(self.finger2)
+        revert_stats_based_on_item(self.finger2)
+        self.finger2 = nil
     end
     def equip_ring(item)
         if self.finger1.nil?
@@ -1106,14 +1107,14 @@ class Character < ApplicationRecord
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         else
-            unequip_ring(self.finger1)
+            unequip_finger1
             self.finger1 = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         end
     end
 
-    def unequip_waist(waist)
+    def unequip_waist
         return unless self.waist
         add_item_to_inventory(self.waist)
         revert_stats_based_on_item(self.waist)
@@ -1125,14 +1126,14 @@ class Character < ApplicationRecord
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         else
-            unequip_waist(self.waist)
+            unequip_waist
             self.waist = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         end
     end
 
-    def unequip_hands(hands)
+    def unequip_hands
         return unless self.hands
         add_item_to_inventory(self.hands)
         revert_stats_based_on_item(self.hands)
@@ -1144,14 +1145,14 @@ class Character < ApplicationRecord
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         else
-            unequip_amulet(self.hands)
+            unequip_amulet
             self.hands = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         end
     end
 
-    def unequip_feet(feet)
+    def unequip_feet
         return unless self.feet
         add_item_to_inventory(self.feet)
         revert_stats_based_on_item(self.feet)
@@ -1163,7 +1164,7 @@ class Character < ApplicationRecord
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         else
-            unequip_feet(self.feet)
+            unequip_feet
             self.feet = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)

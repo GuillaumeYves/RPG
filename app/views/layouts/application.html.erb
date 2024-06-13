@@ -135,15 +135,6 @@
         <!-- Sidebar -->
         <div id="mySidenav" class="sidenav">
           <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-          <% if user_signed_in? %>
-            <% if current_user.selected_character.nil? %>
-              <%= link_to "Create Guild", new_guild_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
-            <% elsif current_user.selected_character.guild.present? %>
-              <%= link_to "Guild Hall", guild_path(current_user.selected_character.guild), class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
-            <% else %>
-              <%= link_to "Create Guild", new_guild_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
-            <% end %>
-          <% end %>
           <% if user_signed_in? && current_user.selected_character.nil? %>
             <% if current_user.characters.count == 3 %>
               <%= link_to "Select Character", user_characters_path, class: "btn btn-outline-primary", style: "margin-top: 10px;" %>
@@ -160,6 +151,11 @@
             <%= link_to "Quest", quests_path, class: "btn btn-outline-primary" %>
             <%= link_to "Hunt", hunts_path, class: "btn btn-outline-primary" %>
             <%= link_to "Arena", arena_characters_path, class: "btn btn-outline-primary" %>
+              <% if current_user.selected_character.guild.present? %>
+                <%= link_to "Guild", guild_path(current_user.selected_character.guild), class: "btn btn-outline-primary" %>
+              <% else %>
+                <%= link_to "Guild", new_guild_path, class: "btn btn-outline-primary" %>
+              <% end %>
             <%= link_to "Leaderboard", leaderboard_characters_path, class: "btn btn-outline-primary" %>
           <% end %>
           <br>
@@ -295,24 +291,21 @@
   <script>
     $(document).ready(function() {
       var messages = [
-        "Welcome to the Closed Beta of Tedorha!",
         "Talent points are aquired at levels 25, 50, 75 and 100.",
-        "Legendary items are obtainable through Bosses... and a bit of luck.",
+        "Legendary items also give access to special abilities.",
         "At level 100 and beyond, you unlock a Paragon point each level and you can spend them on your Paragon tree.",
-        "Damage reduction occurs after all damage modifiers have been applied.",
-        "Hunts are a great way to gain experience along Quests.",
+        "Damage reduction occurs before other types of mitigation.",
         "A character cannot dual wield a One-handed Weapon and a Two-handed Weapon simultaneously.",
-        "Having more Spellpower than Attack will allow you to deal Magic damage.",
+        "Having more Spellpower than Attack will allow you to deal Magic damage and the same goes for Necrosurge, allowing you to deal shadow damage.",
         "True damage cannot be reduced by any source of damage reduction.",
         "Every hour you will recover some Energy, Health and Arena tickets.",
-        "Modifiers like 'Global Damage' only apply to your normal attacks and not your talents.",
-        "A 'normal attack' is the attack made each turn, whereas a talent activates only if unlocked and/or condition is met.",
+        "A 'Basic attack' is the attack automatically made each turn, whereas a talent activates only if unlocked and/or condition is met.",
         "There's a 50% chance for you or for your opponent to start first during a combat.",
         "Magic attacks cannot be evaded.",
         "'Passive' talents apply all the time to your character, 'Trigger' passives apply when condition is met and 'Combat' talents apply during your combat turn.",
         "Shadow damage cannot be reduced by Armor or Magic Resistance.",
         "Be cautious with your Health, with each combat it gets lower. Visit Mekail if you need to heal up.",
-        "Each race start with different stats, and each class modify further these stats. But nothing stops you from being an Orc Mage.",
+        "Each race start with different stats, and each class modify further these stats.",
       ];
 
       var messageIndex = parseInt(localStorage.getItem("messageIndex")) || 0;

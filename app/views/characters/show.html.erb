@@ -5,14 +5,21 @@
       <div class="row no-gutters">
         <!-- Left column with helmet, chest, hands, and feet -->
         <div class="col-md-3">
-
           <% head_item = @character.head %>
           <% if head_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= head_item.id %>)" onmouseover="showTooltip(<%= head_item.id %>)" onmouseout="hideTooltip(<%= head_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(head_item) %>
-              <!-- Item Image -->
-              <%= image_tag(head_item.item_image, alt: "head_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+            <div class="item-container" style="position: relative; padding: 0;">
+              <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= head_item.id %>)" onmouseover="showTooltip(<%= head_item.id %>)" onmouseout="hideTooltip(<%= head_item.id %>)">
+                <!-- Tooltip content -->
+                <%= display_item_tooltip(head_item) %>
+                <!-- Item Image -->
+                <%= image_tag(head_item.item_image, alt: "head_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+              </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: head_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
             </div>
           <% else %>
             <!-- Empty card content -->
@@ -21,11 +28,19 @@
 
           <% chest_item = @character.chest %>
           <% if chest_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= chest_item.id %>)" onmouseover="showTooltip(<%= chest_item.id %>)" onmouseout="hideTooltip(<%= chest_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(chest_item) %>
-              <!-- Item Image -->
-              <%= image_tag(chest_item.item_image, alt: "chest_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+            <div class="item-container" style="position: relative; padding: 0;">
+              <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= chest_item.id %>)" onmouseover="showTooltip(<%= chest_item.id %>)" onmouseout="hideTooltip(<%= chest_item.id %>)">
+                <!-- Tooltip content -->
+                <%= display_item_tooltip(chest_item) %>
+                <!-- Item Image -->
+                <%= image_tag(chest_item.item_image, alt: "chest_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+              </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: chest_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
             </div>
           <% else %>
             <!-- Empty card content -->
@@ -34,11 +49,19 @@
 
           <% hands_item = @character.hands %>
           <% if hands_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= hands_item.id %>)" onmouseover="showTooltip(<%= hands_item.id %>)" onmouseout="hideTooltip(<%= hands_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(hands_item) %>
-              <!-- Item Image -->
-              <%= image_tag(hands_item.item_image, alt: "hands_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+            <div class="item-container" style="position: relative; padding: 0;">
+              <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= hands_item.id %>)" onmouseover="showTooltip(<%= hands_item.id %>)" onmouseout="hideTooltip(<%= hands_item.id %>)">
+                <!-- Tooltip content -->
+                <%= display_item_tooltip(hands_item) %>
+                <!-- Item Image -->
+                <%= image_tag(hands_item.item_image, alt: "hands_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+              </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: hands_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
             </div>
           <% else %>
             <!-- Empty card content -->
@@ -47,17 +70,24 @@
 
           <% feet_item = @character.feet %>
           <% if feet_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= feet_item.id %>)" onmouseover="showTooltip(<%= feet_item.id %>)" onmouseout="hideTooltip(<%= feet_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(feet_item) %>
-              <!-- Item Image -->
-              <%= image_tag(feet_item.item_image, alt: "feet_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+            <div class="item-container" style="position: relative; padding: 0;">
+              <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= feet_item.id %>)" onmouseover="showTooltip(<%= feet_item.id %>)" onmouseout="hideTooltip(<%= feet_item.id %>)">
+                <!-- Tooltip content -->
+                <%= display_item_tooltip(feet_item) %>
+                <!-- Item Image -->
+                <%= image_tag(feet_item.item_image, alt: "feet_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+              </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: feet_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
             </div>
           <% else %>
             <!-- Empty card content -->
             <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
           <% end %>
-
         </div>
 
         <!-- Character details-->
@@ -118,94 +148,138 @@
             </div>
         </div>
 
-        <!-- Right column with amulet, waist, finger1, and finger2 -->
-        <div class="col-md-3">
+          <!-- Right column with amulet, waist, finger1, and finger2 -->
+          <div class="col-md-3">
+            <% neck_item = @character.neck %>
+            <% if neck_item.present? %>
+              <div class="item-container" style="position: relative; padding: 0;">
+                <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= neck_item.id %>)" onmouseover="showTooltip(<%= neck_item.id %>)" onmouseout="hideTooltip(<%= neck_item.id %>)">
+                  <!-- Tooltip content -->
+                  <%= display_item_tooltip(neck_item) %>
+                  <!-- Item Image -->
+                  <%= image_tag(neck_item.item_image, alt: "neck_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: neck_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+            <% end %>
 
-          <% neck_item = @character.neck %>
-          <% if neck_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= neck_item.id %>)" onmouseover="showTooltip(<%= neck_item.id %>)" onmouseout="hideTooltip(<%= neck_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(neck_item) %>
-              <!-- Item Image -->
-              <%= image_tag(neck_item.item_image, alt: "neck_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
-            </div>
-          <% else %>
-            <!-- Empty card content -->
-            <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
-          <% end %>
+            <% waist_item = @character.waist %>
+            <% if waist_item.present? %>
+              <div class="item-container" style="position: relative; padding: 0;">
+                <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= waist_item.id %>)" onmouseover="showTooltip(<%= waist_item.id %>)" onmouseout="hideTooltip(<%= waist_item.id %>)">
+                  <!-- Tooltip content -->
+                  <%= display_item_tooltip(waist_item) %>
+                  <!-- Item Image -->
+                  <%= image_tag(waist_item.item_image, alt: "waist_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: waist_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+            <% end %>
 
-          <% waist_item = @character.waist %>
-          <% if waist_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= waist_item.id %>)" onmouseover="showTooltip(<%= waist_item.id %>)" onmouseout="hideTooltip(<%= waist_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(waist_item) %>
-              <!-- Item Image -->
-              <%= image_tag(waist_item.item_image, alt: "waist_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
-            </div>
-          <% else %>
-            <!-- Empty card content -->
-            <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
-          <% end %>
-          
-          <% finger1_item = @character.finger1 %>
-          <% if finger1_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger1_item.id %>)" onmouseover="showTooltip(<%= finger1_item.id %>)" onmouseout="hideTooltip(<%= finger1_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(finger1_item) %>
-              <!-- Item Image -->
-              <%= image_tag(finger1_item.item_image, alt: "finger1_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
-            </div>
-          <% else %>
-            <!-- Empty card content -->
-            <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
-          <% end %>
+            <% finger1_item = @character.finger1 %>
+            <% if finger1_item.present? %>
+              <div class="item-container" style="position: relative; padding: 0;">
+                <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger1_item.id %>)" onmouseover="showTooltip(<%= finger1_item.id %>)" onmouseout="hideTooltip(<%= finger1_item.id %>)">
+                  <!-- Tooltip content -->
+                  <%= display_item_tooltip(finger1_item) %>
+                  <!-- Item Image -->
+                  <%= image_tag(finger1_item.item_image, alt: "finger1_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: finger1_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+            <% end %>
 
-          <% finger2_item = @character.finger2 %>
-          <% if finger2_item.present? %>
-          <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger2_item.id %>)" onmouseover="showTooltip(<%= finger2_item.id %>)" onmouseout="hideTooltip(<%= finger2_item.id %>)">
-              <!-- Tooltip content -->
-              <%= display_item_tooltip(finger2_item) %>
-              <!-- Item Image -->
-              <%= image_tag(finger2_item.item_image, alt: "finger2_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
-            </div>
-          <% else %>
-            <!-- Empty card content -->
-            <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
-          <% end %>
-        </div>
+            <% finger2_item = @character.finger2 %>
+            <% if finger2_item.present? %>
+              <div class="item-container" style="position: relative; padding: 0;">
+                <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger2_item.id %>)" onmouseover="showTooltip(<%= finger2_item.id %>)" onmouseout="hideTooltip(<%= finger2_item.id %>)">
+                  <!-- Tooltip content -->
+                  <%= display_item_tooltip(finger2_item) %>
+                  <!-- Item Image -->
+                  <%= image_tag(finger2_item.item_image, alt: "finger2_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: finger2_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <!-- Empty card content -->
+              <span style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+            <% end %>
+          </div>
 
         <!-- Main Hand and Off Hand Slots -->
         <div class="container">
-          
-          <div class="row justify-content-center">
-
+          <div class="row justify-content-center mt-3">
             <% main_hand_item = @character.main_hand %>
             <% if main_hand_item.present? %>
-            <div class="hover-item col-2 text-center" onmousemove="updateTooltipPosition(event, <%= main_hand_item.id %>)" onmouseover="showTooltip(<%= main_hand_item.id %>)" onmouseout="hideTooltip(<%= main_hand_item.id %>)">
-                <!-- Tooltip content -->
-                <%= display_item_tooltip(main_hand_item) %>
-                <!-- Item Image -->
-                <%= image_tag(main_hand_item.item_image, alt: "main_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+              <div class="item-container col-2 text-center" style="position: relative; padding: 0;">
+                <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= main_hand_item.id %>)" onmouseover="showTooltip(<%= main_hand_item.id %>)" onmouseout="hideTooltip(<%= main_hand_item.id %>)">
+                  <!-- Tooltip content -->
+                  <%= display_item_tooltip(main_hand_item) %>
+                  <!-- Item Image -->
+                  <%= image_tag(main_hand_item.item_image, alt: "main_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: main_hand_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
               </div>
             <% else %>
               <!-- Empty card content -->
               <span style="display: inline-block; margin-left: 15.66px; margin-right: 15.66px; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
             <% end %>
-              
-            <% off_hand_item = @character.off_hand %> 
+
+            <% off_hand_item = @character.off_hand %>
             <% if off_hand_item.present? %>
-            <div class="hover-item col-2 text-center" onmousemove="updateTooltipPosition(event, <%= off_hand_item.id %>)" onmouseover="showTooltip(<%= off_hand_item.id %>)" onmouseout="hideTooltip(<%= off_hand_item.id %>)">
-                <!-- Tooltip content -->
-                <%= display_item_tooltip(off_hand_item) %>
-                <!-- Item Image -->
-                <%= image_tag(off_hand_item.item_image, alt: "off_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+              <div class="item-container col-2 text-center" style="position: relative; padding: 0;">
+                <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= off_hand_item.id %>)" onmouseover="showTooltip(<%= off_hand_item.id %>)" onmouseout="hideTooltip(<%= off_hand_item.id %>)">
+                  <!-- Tooltip content -->
+                  <%= display_item_tooltip(off_hand_item) %>
+                  <!-- Item Image -->
+                  <%= image_tag(off_hand_item.item_image, alt: "off_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
+                </div>
+                <% if current_user.selected_character.id == @character.id %>
+                <!-- Unequip button -->
+                <%= button_to unequip_item_character_path(item_id: off_hand_item.id), method: :post, class: 'btn btn-outline-danger unequip-button', style: 'position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 100px; background-color: transparent;', remote: true do %>
+                  🚫
+                <% end %>
+                <% end %>
               </div>
             <% else %>
               <!-- Empty card content -->
               <span style="display: inline-block; margin-left: 15.66px; margin-right: 15.66px; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
             <% end %>
           </div>
-
         </div>
       </div>
     </div>

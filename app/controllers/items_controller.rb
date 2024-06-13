@@ -17,7 +17,9 @@ before_action :authenticate_user!
         @character.gold -= 10
         @character.save
 
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
 end
