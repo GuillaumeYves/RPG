@@ -64,6 +64,12 @@ Rails.application.routes.draw do
 
   resources :items
 
+  resources :forge, only: [:index] do
+    collection do
+      post 'upgrade', to: 'forge#upgrade'
+    end
+  end
+
   resources :hunts, only: [:index] do
     member do
       post '/combat', to: 'combat#combat', as: :combat
@@ -90,4 +96,5 @@ Rails.application.routes.draw do
 
   get '/user_characters', to: 'characters#user_characters', as: 'user_characters'
   post 'reset_merchant_items', to: 'items#reset_merchant_items', as: :reset_merchant_items
+
 end

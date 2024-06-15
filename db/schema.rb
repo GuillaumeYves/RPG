@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_08_173658) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_15_205913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -249,6 +249,24 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_08_173658) do
     t.integer "max_spellpower"
     t.integer "min_necrosurge"
     t.integer "max_necrosurge"
+    t.integer "upgraded_min_attack", default: 0
+    t.integer "upgraded_max_attack", default: 0
+    t.integer "upgraded_min_spellpower", default: 0
+    t.integer "upgraded_max_spellpower", default: 0
+    t.integer "upgraded_min_necrosurge", default: 0
+    t.integer "upgraded_max_necrosurge", default: 0
+    t.integer "upgraded_health", default: 0
+    t.decimal "upgraded_global_damage", precision: 6, scale: 3, default: "0.0"
+    t.decimal "upgraded_critical_strike_chance", precision: 5, scale: 2, default: "0.0"
+    t.decimal "upgraded_critical_strike_damage", precision: 5, scale: 2, default: "0.0"
+    t.integer "upgraded_armor", default: 0
+    t.integer "upgraded_magic_resistance", default: 0
+    t.integer "upgraded_strength", default: 0
+    t.integer "upgraded_intelligence", default: 0
+    t.integer "upgraded_agility", default: 0
+    t.integer "upgraded_dreadmight", default: 0
+    t.integer "upgraded_luck", default: 0
+    t.integer "upgraded_willpower", default: 0
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 

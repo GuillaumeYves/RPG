@@ -213,8 +213,6 @@ class CombatController < ApplicationController
                     end
                     if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                         [(damage * 1.5).round, 0].max # Return damage with Nemesis
-                    else
-                        [damage.round, 0].max # Return damage
                     end
                     # Apply blessing of kings reduction if active
                     if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
@@ -244,8 +242,6 @@ class CombatController < ApplicationController
                     end
                     if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                         [(damage * 1.5).round, 0].max # Return damage with Nemesis
-                    else
-                        [damage.round, 0].max # Return damage
                     end
                     # Apply blessing of kings reduction if active
                     if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
@@ -313,8 +309,6 @@ class CombatController < ApplicationController
         end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
-        else
-            [damage.round, 0].max # Return damage
         end
         # Apply blessing of kings reduction if active
         if @character.blessing_of_kings == true && @character_blessing_of_kings_turn > 0
@@ -359,8 +353,6 @@ class CombatController < ApplicationController
                 end
                 if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                     [(damage * 1.5).round, 0].max # Return damage with Nemesis
-                else
-                    [damage.round, 0].max # Return damage
                 end
                 # Apply blessing of kings reduction if active
                 if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
@@ -396,8 +388,6 @@ class CombatController < ApplicationController
         end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
-        else
-            [damage.round, 0].max # Return damage
         end
         # Apply blessing of kings reduction if active
         if (@character.blessing_of_kings == true && @character_blessing_of_kings_turn > 0)
@@ -450,8 +440,6 @@ class CombatController < ApplicationController
                 end
                 if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                     [(damage * 1.5).round, 0].max # Return damage with Nemesis
-                else
-                    [damage.round, 0].max # Return damage
                 end
                 # Apply blessing of kings reduction if active
                 if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
@@ -495,8 +483,6 @@ class CombatController < ApplicationController
         end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
-        else
-            [damage.round, 0].max # Return damage
         end
         # Apply blessing of kings reduction if active
         if @character.blessing_of_kings == true && @character_blessing_of_kings_turn > 0
@@ -1669,38 +1655,29 @@ class CombatController < ApplicationController
     end
 
     def log_health_values
-        if @opponent.is_a?(Character)
+        if (@opponent.is_a?(Character) && @opponent.took_damage == true)
             if @opponent_health_in_combat <= 0
-                log_message = "#{@character.character_name}: <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
                 log_message = "#{@opponent.character_name}: ☠ <span style=\"text-decoration: underline;\"><strong>#{@opponent_health_in_combat} / #{@opponent.total_max_health}</strong></span> Health"
                 @combat_logs << log_message
-            elsif @character.total_health <= 0
-                log_message = "#{@character.character_name}: ☠ <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
-                log_message = "#{@opponent.character_name}: <span style=\"text-decoration: underline;\"><strong>#{@opponent_health_in_combat} / #{@opponent.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
             else
-                log_message = "#{@character.character_name}: <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
                 log_message = "#{@opponent.character_name}: <span style=\"text-decoration: underline;\"><strong>#{@opponent_health_in_combat} / #{@opponent.total_max_health}</strong></span> Health"
                 @combat_logs << log_message
             end
-        elsif @opponent.is_a?(Monster)
+        elsif (@opponent.is_a?(Monster) && @opponent.took_damage == true)
             if @opponent_health_in_combat <= 0
-                log_message = "#{@character.character_name}: <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
                 log_message = "#{@opponent.monster_name}: ☠ <span style=\"text-decoration: underline;\"><strong>#{@opponent_health_in_combat} / #{@opponent.total_max_health}</strong></span> Health"
                 @combat_logs << log_message
-            elsif @character.total_health <= 0
-                log_message = "#{@character.character_name}: ☠ <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
+            else
                 log_message = "#{@opponent.monster_name}: <span style=\"text-decoration: underline;\"><strong>#{@opponent_health_in_combat} / #{@opponent.total_max_health}</strong></span> Health"
+                @combat_logs << log_message
+            end
+        end
+        if @character.took_damage == true
+            if @character.total_health <= 0
+                log_message = "#{@character.character_name}: ☠ <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
                 @combat_logs << log_message
             else
                 log_message = "#{@character.character_name}: <span style=\"text-decoration: underline;\"><strong>#{@character.total_health} / #{@character.total_max_health}</strong></span> Health"
-                @combat_logs << log_message
-                log_message = "#{@opponent.monster_name}: <span style=\"text-decoration: underline;\"><strong>#{@opponent_health_in_combat} / #{@opponent.total_max_health}</strong></span> Health"
                 @combat_logs << log_message
             end
         end
@@ -1745,8 +1722,6 @@ class CombatController < ApplicationController
         cheat_deaths
         log_health_values
 
-        # Ensure health doesn't go lower than 0
-        @opponent_health_in_combat = [0, @opponent_health_in_combat].max
         # Reset took damage to false
         @character.took_damage = false
     end
@@ -1788,7 +1763,6 @@ class CombatController < ApplicationController
         cheat_deaths
         log_health_values
 
-        @character.total_health = [0, @character.total_health].max
         @opponent.took_damage = false
     end
 

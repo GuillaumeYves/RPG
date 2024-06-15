@@ -52,7 +52,7 @@ end
     magic_resistance: (30 * (rand(0.8..1.0))).to_i,
     strength: (250 * (rand(0.8..1.0))).to_i,
     willpower: (250 * (rand(0.8..1.0))).to_i,
-    legendary_effect_name: "Wrathful Obesession",
+    legendary_effect_name: "Wrathful Obsession",
     legendary_effect_description: "After attacking :<br>
     Your Attack is increased by 15%.",
     description: "Anger is a weapon, not just a mere emotion.",

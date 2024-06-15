@@ -1,0 +1,2 @@
+module ForgeHelper
+end

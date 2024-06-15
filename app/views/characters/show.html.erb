@@ -405,7 +405,6 @@
                               countdownElements.forEach(function(element) {
                                 var expirationTime = parseInt(element.getAttribute('data-expiration-time')) * 1000;
                                 var remainingTime = expirationTime - Date.now();
-
                                 if (remainingTime > 0) {
                                   element.innerHTML = formatDuration(remainingTime / 1000); // convert back to seconds for the format function
                                 } else {
@@ -413,7 +412,6 @@
                                 }
                               });
                             }
-
                             function formatDuration(seconds) {
                               var hours = Math.floor(seconds / 3600);
                               var minutes = Math.floor((seconds % 3600) / 60);
@@ -421,10 +419,8 @@
 
                               return `${hours}:${minutes}:${seconds}`;
                             }
-
                             // Initial update
                             updateCountdown();
-
                             // Update every second
                             setInterval(updateCountdown, 1000);
                           </script>
@@ -435,9 +431,7 @@
                   <p>No elixir active.</p>
                 <% end %>
               </div>
-              
             </div>
-          
           </div>
 
           <!-- Right column -->
