@@ -9,9 +9,9 @@ class ForgeController < ApplicationController
   def upgrade_item_stat(item)
     stats = %i[health global_damage critical_strike_chance critical_strike_damage armor magic_resistance strength intelligence agility dreadmight luck willpower]
     available_stats = stats.select { |stat| item.respond_to?(stat) && item.send(stat).present? }
-    stat_to_upgrade = available_stats.sample
+    @stat_to_upgrade = available_stats.sample
 
-    case stat_to_upgrade
+    case @stat_to_upgrade
       when :health
         upgrade_increase = (item.health * 0.10).round
         item.health += upgrade_increase
@@ -69,14 +69,14 @@ class ForgeController < ApplicationController
     @item = Item.find_by(id: params[:item_id])
 
     if @item.nil?
-      flash[:alert] = "Item not found or does not belong to you!"
+      flash[:alert] = "Item not found or does not belong to you"
     elsif @item.upgrade < 5
       upgrade_item_stat(@item)
       @item.upgrade += 1
       @item.save
-      flash[:notice] = "Item successfully upgraded and a random stat increased by 10%!"
+      flash[:notice] = "Item successfully upgraded : #{(@stat_to_upgrade.to_s.capitalize.humanize)} increased by 10%"
     else
-      flash[:alert] = "Item is already at maximum upgrade level!"
+      flash[:alert] = "Item is already at maximum upgrade level"
     end
 
     redirect_to forge_index_path
