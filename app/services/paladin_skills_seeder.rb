@@ -25,7 +25,7 @@ class PaladinSkillsSeeder
     judgement = Skill.create(
       name: "Judgement",
       skill_type: "passive",
-      description: "5% of the damage you deal is added as additional true damage.",
+      description: "Your attacks deal an additional 5% of their initial damage as true damage.",
       row: 1,
       level_requirement: 25,
       character_class: paladin_class,
@@ -37,19 +37,12 @@ class PaladinSkillsSeeder
 
     blessingofkings = Skill.create(
       name: "Blessing of Kings",
-      description: "Your Attack and Spellpower are increased by 20%, your Armor and Magic Resistance are increased by 50%.",
-      skill_type: "passive",
+      description: "During your first turn reduce the damage you take by 15% for 4 turns. This can only happen once per combat.",
+      skill_type: "trigger",
       row: 2,
       level_requirement: 50,
       character_class: paladin_class,
       character_id: character.id,
-      effect:
-        " self.total_min_attack *= 1.2;
-          self.total_min_spellpower *= 1.2;
-          self.total_max_attack *= 1.2;
-          self.total_max_spellpower *= 1.2;
-          self.total_armor *= 1.5;
-          self.total_magic_resistance *= 1.5; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'blessingofkings.jpg')
     blessingofkings.skill_image.attach(io: File.open(image_path), filename: 'blessingofkings.jpg', content_type: 'image/jpeg')
@@ -70,7 +63,7 @@ class PaladinSkillsSeeder
 
     smite = Skill.create(
       name: "Smite",
-      description: "100% of your Attack is converted into Spellpower. Your Spellpower is increased by 30%.",
+      description: "100% of your Attack is converted into Spellpower.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
@@ -79,8 +72,6 @@ class PaladinSkillsSeeder
       effect:
         " self.total_min_spellpower += self.total_min_attack;
           self.total_max_spellpower += self.total_max_attack;
-          self.total_min_spellpower *= 1.3;
-          self.total_max_spellpower *= 1.3;
           self.total_min_attack = 0;
           self.total_max_attack = 0; "
       )
@@ -88,9 +79,9 @@ class PaladinSkillsSeeder
     smite.skill_image.attach(io: File.open(image_path), filename: 'smite.jpg', content_type: 'image/jpeg')
     paladin_skills << smite
 
-    dcondemn = Skill.create(
+    condemn = Skill.create(
       name: "Condemn",
-      description: "100% of your Spellpower is converted into Attack. Your Attack is increased by 30%.",
+      description: "100% of your Spellpower is converted into Attack.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
@@ -99,14 +90,12 @@ class PaladinSkillsSeeder
       effect:
         " self.total_min_attack += self.total_min_spellpower;
           self.total_max_attack += self.total_max_spellpower;
-          self.total_min_attack *= 1.3;
-          self.total_max_attack *= 1.3;
           self.total_min_spellpower = 0;
           self.total_max_spellpower = 0;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'condemn.jpg')
-    dcondemn.skill_image.attach(io: File.open(image_path), filename: 'condemn.jpg', content_type: 'image/jpeg')
-    paladin_skills << dcondemn
+    condemn.skill_image.attach(io: File.open(image_path), filename: 'condemn.jpg', content_type: 'image/jpeg')
+    paladin_skills << condemn
 
     divine_strength = Skill.create(
       name: "Divine Strength",
@@ -126,16 +115,12 @@ class PaladinSkillsSeeder
 
     fervor = Skill.create(
       name: "Fervor",
-      description: "While wielding a One-handed Weapon, your Health is increased by 30%.",
+      description: "You have a 30% chance to attack for 80% of your damage each of your turns.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: paladin_class,
       character_id: character.id,
-      effect: "if self.main_hand.present? && self.main_hand.item_type == 'One-handed Weapon'
-        self.total_health *= 1.3;
-        self.total_max_health *= 1.3;
-      end"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'fervor.jpg')
     fervor.skill_image.attach(io: File.open(image_path), filename: 'fervor.jpg', content_type: 'image/jpeg')

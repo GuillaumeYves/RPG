@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  guild: one
+  invited_character: one
+  inviting_character: one
+  status: 1
+
+two:
+  guild: two
+  invited_character: two
+  inviting_character: two
+  status: 1

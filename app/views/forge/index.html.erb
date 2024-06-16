@@ -1,0 +1,67 @@
+<div class="mt-5" style="display: flex; flex-direction: row;">
+  <div class="card text-left" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 600px; width: 500px; margin-right: 20px; align-items: center;">
+    <div class="card-body">
+      <div style="position: relative; max-width: 100%;">
+        <%= image_tag('npcs/rudy.jpg', style: 'max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;', class: 'card-img-top', alt: "character_image") %>
+        <h5 style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); color: white; font-size: 24px; font-weight: bold; text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000; width: 90%; text-align: center;">Rudy, the Blacksmith</h5>
+      </div>
+      <br>
+      <p class="card-text">There you are <%= @character.character_name %>!</p>
+      <p id="forge-dialogue">Need anything forged?</p>
+    </div>
+    <div class="card text-left mt-4" style="width: 500px; height: 200px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div class="card-body">
+        <h4 class="card-header text-center text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: 20px;">Upgrade item</h4>
+        <p class="text-center" style="margin-top: -20px;"><small>Select an item from your inventory to put into the forge</small></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <div class="card text-center mx-auto mb-5" style="width: 250px; height: 300px; border: 2px solid #000; box-shadow: 5px 5px 10px #888888;">
+      <div id="forge-slot" class="mt-4">
+      <% if @selected_item %>
+        <div>
+          <%= image_tag(@selected_item.item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
+          <p id="selected-item-upgrade">Upgrade: <%= @selected_item.upgrade %>/5</p>
+            <form action="<%= upgrade_forge_index_path %>" method="post" id="upgrade-form-<%= @selected_item.id %>">
+              <%= hidden_field_tag :item_id, @selected_item.id %>
+              <input type="submit" value="Upgrade" id="upgrade-button-<%= @selected_item.id %>" class="btn btn-primary">
+            </form>
+        </div>
+      <% else %>
+        <span class="mb-5" style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+      <% end %>
+      </div>
+    </div>
+
+    <div class="mx-auto">
+      <!-- Inventory card -->
+      <%= render partial: 'characters/inventory', locals: { character: current_user.selected_character } %>
+    </div>
+  </div>
+
+<script>
+  // Function to send an item to the forge slot
+  function sendToForge(itemId, itemUpgrade, itemImage) {
+    document.getElementById("forge-slot").innerHTML = `
+      <div>
+        <img src="${itemImage}" style="width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;">
+        <p id="selected-item-upgrade">${itemUpgrade} / 5</p>
+        <form action="/forge/upgrade" method="post" id="upgrade-form-${itemId}">
+          <input type="hidden" name="item_id" value="${itemId}" id="selected-item-id-${itemId}">
+          <input type="submit" value="Upgrade" id="upgrade-button-${itemId}" class="btn btn-primary">
+        </form>
+      </div>
+    `;
+  }
+
+  // Function to reset forge slot after upgrade (if needed)
+  function resetForgeSlot() {
+    document.getElementById("forge-slot").innerHTML = `
+      <span class="mb-5" style="display: inline-block; width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; background-color: lightgrey;"></span>
+      <p id="selected-item-upgrade">No item selected</p>
+    `;
+  }
+</script>
+

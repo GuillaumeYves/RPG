@@ -11,7 +11,7 @@ class WarriorSkillsSeeder
 
     rage = Skill.create(
       name: "Rage",
-      description: "Your Attack increases by 5% after each attack.",
+      description: "After attacking your Attack increases by 5%.",
       skill_type: "combat",
       row: 1,
       level_requirement: 25,
@@ -39,7 +39,7 @@ class WarriorSkillsSeeder
 
     skullsplitter = Skill.create(
       name: "Skullsplitter",
-      description: "Upon Critical Strike with a Basic attack, your opponent suffers an additional 3% of their Maximum Health as true damage.",
+      description: "When dealing a Critical Strike with an attack you inflict 1% of your opponent's Maximum Health as additional true damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -52,7 +52,7 @@ class WarriorSkillsSeeder
 
     deep_wounds = Skill.create(
       name: "Deep Wounds",
-      description: "Your Basic attacks cause the opponent to suffer physical damage equivalent to the initial attack, applied as bleeding over 3 turns.
+      description: "After attacking cause the opponent to suffer physical damage equivalent to the initial attack damage applied as bleeding over 3 turns.
       Only one instance of Deep Wounds can be active on the opponent at a time.",
       skill_type: "passive",
       row: 2,
@@ -95,15 +95,15 @@ class WarriorSkillsSeeder
 
     berserk = Skill.create(
       name: "Berserk",
-      description: "When you reach 20% Health, your Attack is increased by 70%.",
+      description: "When you reach 20% Health your Attack is increased by 100%.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
       effect: " if (self.total_health <= (0.2 * self.total_max_health))
-            self.buffed_min_attack = (self.total_min_attack * 0.7);
-            self.buffed_max_attack = (self.total_max_attack * 0.7);
+            self.buffed_min_attack = (self.total_min_attack);
+            self.buffed_max_attack = (self.total_max_attack);
           end  "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'berserk.jpg')

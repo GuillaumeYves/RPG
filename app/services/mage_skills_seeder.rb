@@ -11,13 +11,13 @@ class MageSkillsSeeder
 
     arcane_protection = Skill.create(
       name: "Arcane Protection",
-      description: "Your Magic Resistance is increased by 50%. Your Magic Resistance increases your Armor by 20% of its value.",
+      description: "Your Magic Resistance is increased by 30%. Your Magic Resistance increases your Armor by 20% of its value.",
       skill_type: "passive",
       row: 1,
       level_requirement: 25,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_magic_resistance *= 1.5;
+      effect: " self.total_magic_resistance *= 1.3;
                 self.total_armor =  (self.total_armor + (self.total_magic_resistance * 0.2)); "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'arcaneprotection.jpg')
@@ -53,7 +53,7 @@ class MageSkillsSeeder
     nullify = Skill.create(
       name: "Nullify",
       skill_type: "trigger",
-      description: "During combat if your Health drops to 0, you nullify your death, keeping you at 1 Health. This can only happen once per combat.",
+      description: "When your Health drops to 0 you nullify your death keeping you at 1 Health. This can only happen once per combat.",
       row: 2,
       level_requirement: 50,
       character_class: mage_class,
@@ -65,7 +65,7 @@ class MageSkillsSeeder
 
     runic_empowerment = Skill.create(
       name: "Runic Empowerment",
-      description: "After taking damage, your Spellpower is increased by 7%.",
+      description: "After taking damage your Spellpower is increased by 7%.",
       skill_type: "trigger",
       row: 3,
       level_requirement: 75,
@@ -95,14 +95,14 @@ class MageSkillsSeeder
 
     wisdom_and_power = Skill.create(
       name: "Wisdom and Power",
-      description: "Your Magic Resistance increases your Spellpower by 150% of its value and your Spellpower is increased by 50%.",
+      description: "Your Magic Resistance increases your Spellpower by 107% of its value.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance * 1.5));
-              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance * 1.5));"
+      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance * 1.07));
+              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance * 1.07));"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wisdomandpower.jpg')
     wisdom_and_power.skill_image.attach(io: File.open(image_path), filename: 'wisdomandpower.jpg', content_type: 'image/jpeg')
@@ -110,7 +110,7 @@ class MageSkillsSeeder
 
     wrath = Skill.create(
       name: "Wrath",
-      description: "Your Spellpower increases by 10% and your Critical Strike Chance by 2% each turn.",
+      description: "After attacking your Spellpower increases by 10% and your Critical Strike Chance by 2%.",
       skill_type: "combat",
       row: 4,
       level_requirement: 100,

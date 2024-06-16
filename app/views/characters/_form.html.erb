@@ -17,37 +17,37 @@
       <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name', style: 'text-align: center; font-size: 20px;' %>
     </div>
     
-    <div class="field mt-3" style="text-align: center;">
-      <label><strong>Gender</strong></label>
+    <div class="field mt-3 mb-3" style="text-align: center;">
+      <label class="mb-2"><strong>Gender</strong></label>
       <div>
         <%= form.hidden_field :gender, id: 'selectedGender' %>
         <input type="hidden" id="gender" name="gender" value="male" />
-        <button type="button" style="width: 60px; height: 40px;" id="maleButton">♂</button>
-        <button type="button" style="width: 60px; height: 40px;" id="femaleButton">♀</button>
+        <button type="button" style="width: 40px; height: 40px; margin-right: 25px;" id="maleButton">♂</button>
+        <button type="button" style="width: 40px; height: 40px;" id="femaleButton">♀</button>
       </div>
     </div>
 
     <div class="field mt-3" style="text-align: center;">
-      <label><strong>Race</strong></label>
+      <label class="mb-2"><strong>Race</strong></label>
       <div>
         <%= form.hidden_field :race, id: 'selectedRace' %>
         <button type="button" id="prevRace">&lt;</button>
-        <span id="raceDisplay">Human</span>
+        <span id="raceDisplay" style="display: inline-block; width: 100px; text-align: center;">Human</span>
         <button type="button" id="nextRace">&gt;</button>
       </div>
     </div>
-    <p class="" id="raceDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
+    <p class="mb-3 mt-2" id="raceDescription" style="height: 50px; overflow-y: auto; text-align: center;"></p>
 
     <div class="field " style="text-align: center;">
-      <label><strong>Class</strong></label>
+      <label class="mb-2"><strong>Class</strong></label>
       <div>
         <%= form.hidden_field :character_class, id: 'selectedClass' %>
         <button type="button" id="prevClass">&lt;</button>
-        <span id="classDisplay">Warrior</span>
+        <span id="classDisplay" style="display: inline-block; width: 100px; text-align: center;">Warrior</span>
         <button type="button" id="nextClass">&gt;</button>
       </div>
     </div>
-    <p class="mb-5" id="classDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
+    <p class="mb-3 mt-2" id="classDescription" style="height: 50px; overflow-y: auto; text-align: center;"></p>
 
     <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px;">
       <%= form.submit 'Create', class: "btn btn-outline-primary" %>

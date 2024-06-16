@@ -32,7 +32,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             flash[:alert] = "Your health is already full."
         end
 
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+        format.js { render js: "window.location.reload()" }
+        end
     end
 
     def create
@@ -149,7 +151,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+        format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_armor
@@ -173,7 +177,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+        format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_spellpower
@@ -197,7 +203,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+        format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_magic_resistance
@@ -221,7 +229,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+        format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_critical_strike_chance
@@ -245,7 +255,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_critical_strike_damage
@@ -269,7 +281,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_total_health
@@ -293,7 +307,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_increase_global_damage
@@ -317,7 +333,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_attack
@@ -338,7 +356,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_armor
@@ -359,7 +379,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_spellpower
@@ -380,7 +402,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_magic_resistance
@@ -401,7 +425,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_critical_strike_chance
@@ -422,7 +448,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_critical_strike_damage
@@ -443,7 +471,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_total_health
@@ -464,7 +494,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     def paragon_reset_global_damage
@@ -485,7 +517,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         else
             flash[:alert] = "You must be at least level 100 to unlock Paragon powers."
         end
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
 
@@ -563,13 +597,13 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                     @character.equip_shield(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Head"
-                    @character.equip_helmet(item)
+                    @character.equip_head(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Chest"
                     @character.equip_chest(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Neck"
-                    @character.equip_amulet(item)
+                    @character.equip_neck(item)
                     flash[:notice] = "#{item.name} equipped."
                 when "Finger"
                     @character.equip_ring(item)
@@ -595,82 +629,93 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
-
     def unequip_item
-        @selected_character = current_user.selected_character
+        @character = current_user.selected_character
         item = Item.find(params[:item_id])
 
-        case item.item_type
-        when "One-handed Weapon"
-            @selected_character.unequip_one_handed_weapon(@selected_character.main_hand)
-        when "Two-handed Weapon"
-            @selected_character.unequip_two_handed_weapon(@selected_character.main_hand)
-        when "Shield"
-            @selected_character.unequip_shield(@selected_character.off_hand)
-        when "Head"
-            @selected_character.unequip_helmet(@selected_character.helmet)
-        when "Chest"
-            @selected_character.unequip_chest(@selected_character.chest)
-        when "Amulet"
-            @selected_character.unequip_amulet(@selected_character.neck)
-        when "Ring"
-            @selected_character.unequip_ring(@selected_character.finger1)
-        when "Waist"
-            @selected_character.unequip_waist(@selected_character.waist)
-        when "Gloves"
-            @selected_character.unequip_hands(@selected_character.hands)
-        when "Boots"
-            @selected_character.unequip_feet(@selected_character.feet)
+        if @character.main_hand == item
+            @character.unequip_main_hand
+        elsif @character.off_hand == item
+            @character.unequip_off_hand
+        elsif @character.head == item
+            @character.unequip_head
+        elsif @character.chest == item
+            @character.unequip_chest
+        elsif @character.neck == item
+            @character.unequip_neck
+        elsif @character.finger1 == item
+            @character.unequip_finger1
+        elsif @character.finger2 == item
+            @character.unequip_finger2
+        elsif @character.waist == item
+            @character.unequip_waist
+        elsif @character.hands == item
+            @character.unequip_hands
+        elsif @character.feet == item
+            @character.unequip_feet
+        else
+            flash[:error] = "Item not equipped in any slot"
+            redirect_to @character and return
         end
 
-        @selected_character.modify_stats_based_on_attributes
-        @selected_character.apply_passive_skills
-        @selected_character.update_elixir_effect
-        @selected_character.save
+        @character.modify_stats_based_on_attributes
+        @character.apply_passive_skills
+        @character.update_elixir_effect
+        @character.save
 
-        redirect_to @selected_character, notice: "#{item.name} unequipped."
+        redirect_to @character, notice: "#{item.name} unequipped."
     end
 
     def add_to_inventory
-        @selected_character = Character.find(session[:selected_character_id])
-        inventory = @selected_character.inventory
+        @character = current_user.selected_character
+        inventory = @character.inventory
         item = Item.find(params[:item_id])
 
-        if @selected_character.gold >= item.gold_price
+        if @character.gold >= item.gold_price
             if inventory.items.count < 10
-                @selected_character.gold -= item.gold_price
+                @character.gold -= item.gold_price
                 flash[:notice] = "#{item.name} bought for #{item.gold_price} gold."
                 inventory.items << item
                 inventory.save
-                @selected_character.save
+                @character.save
                 item.update(purchased: true)
-                redirect_back fallback_location: root_path
+                respond_to do |format|
+                    format.js { render js: "window.location.reload()" }
+                end
             else
                 flash[:alert] = 'Inventory is full.'
-                redirect_back fallback_location: root_path
+                respond_to do |format|
+                    format.js { render js: "window.location.reload()" }
+                end
             end
         else
             flash[:alert] = 'You do not have enough gold for this item.'
-            redirect_back fallback_location: root_path
+            respond_to do |format|
+                format.js { render js: "window.location.reload()" }
+            end
         end
     end
 
     def sell_item
-        @selected_character = Character.find(session[:selected_character_id])
-        inventory = @selected_character.inventory
+        @character = current_user.selected_character
+        inventory = @character.inventory
         item = Item.find(params[:item_id])
 
         if inventory.items.include?(item)
             selling_price = (item.gold_price * 0.65).round
-            @selected_character.gold += selling_price
+            @character.gold += selling_price
             flash[:notice] = "#{item.name} sold for #{selling_price} gold."
             inventory.items.delete(item)
             inventory.save
-            @selected_character.save
-            redirect_back fallback_location: root_path
+            @character.save
+            respond_to do |format|
+                format.js { render js: "window.location.reload()" }
+            end
         else
             flash[:alert] = 'Item not found in inventory.'
-            redirect_back fallback_location: root_path
+            respond_to do |format|
+                format.js { render js: "window.location.reload()" }
+            end
         end
     end
 
@@ -753,7 +798,9 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
             flash[:alert] = 'You already have 3 elixirs active.'
         end
 
-        redirect_back fallback_location: root_path
+        respond_to do |format|
+            format.js { render js: "window.location.reload()" }
+        end
     end
 
     private

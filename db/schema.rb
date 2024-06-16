@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_15_205913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -77,7 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
     t.bigint "feet"
     t.string "gender"
     t.integer "agility", default: 5
-    t.decimal "critical_strike_damage", precision: 5, scale: 2, default: "1.2"
+    t.decimal "critical_strike_damage", precision: 5, scale: 2, default: "0.1"
     t.integer "max_health", default: 100
     t.integer "total_attack"
     t.integer "total_spellpower"
@@ -143,6 +143,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
     t.integer "total_max_spellpower"
     t.integer "total_min_necrosurge"
     t.integer "total_max_necrosurge"
+    t.bigint "guild_id"
+    t.index ["guild_id"], name: "index_characters_on_guild_id"
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
   end
@@ -154,6 +156,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
     t.text "combat_logs", default: [], array: true
     t.string "result"
     t.integer "opponent_health_in_combat"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "guilds", force: :cascade do |t|
+    t.string "name"
+    t.integer "leader_id"
+    t.integer "membership_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -180,6 +190,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["character_id"], name: "index_inventories_on_character_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.bigint "guild_id", null: false
+    t.bigint "invited_character_id", null: false
+    t.bigint "inviting_character_id", null: false
+    t.integer "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guild_id"], name: "index_invitations_on_guild_id"
+    t.index ["invited_character_id"], name: "index_invitations_on_invited_character_id"
+    t.index ["inviting_character_id"], name: "index_invitations_on_inviting_character_id"
   end
 
   create_table "items", force: :cascade do |t|
@@ -227,6 +249,24 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
     t.integer "max_spellpower"
     t.integer "min_necrosurge"
     t.integer "max_necrosurge"
+    t.integer "upgraded_min_attack", default: 0
+    t.integer "upgraded_max_attack", default: 0
+    t.integer "upgraded_min_spellpower", default: 0
+    t.integer "upgraded_max_spellpower", default: 0
+    t.integer "upgraded_min_necrosurge", default: 0
+    t.integer "upgraded_max_necrosurge", default: 0
+    t.integer "upgraded_health", default: 0
+    t.decimal "upgraded_global_damage", precision: 6, scale: 3, default: "0.0"
+    t.decimal "upgraded_critical_strike_chance", precision: 5, scale: 2, default: "0.0"
+    t.decimal "upgraded_critical_strike_damage", precision: 5, scale: 2, default: "0.0"
+    t.integer "upgraded_armor", default: 0
+    t.integer "upgraded_magic_resistance", default: 0
+    t.integer "upgraded_strength", default: 0
+    t.integer "upgraded_intelligence", default: 0
+    t.integer "upgraded_agility", default: 0
+    t.integer "upgraded_dreadmight", default: 0
+    t.integer "upgraded_luck", default: 0
+    t.integer "upgraded_willpower", default: 0
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
@@ -327,6 +367,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "characters", "guilds"
   add_foreign_key "characters", "hunts"
   add_foreign_key "characters", "items", column: "chest"
   add_foreign_key "characters", "items", column: "feet"
@@ -343,6 +384,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_06_200954) do
   add_foreign_key "hunts", "characters"
   add_foreign_key "hunts", "combat_results"
   add_foreign_key "inventories", "characters"
+  add_foreign_key "invitations", "characters", column: "invited_character_id"
+  add_foreign_key "invitations", "characters", column: "inviting_character_id"
+  add_foreign_key "invitations", "guilds"
   add_foreign_key "skills", "characters"
   add_foreign_key "users", "characters", column: "selected_character_id"
 end
