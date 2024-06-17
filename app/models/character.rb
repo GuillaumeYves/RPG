@@ -654,11 +654,11 @@ class Character < ApplicationRecord
                         return true if item.item_type == 'One-handed Weapon'
                         # For two-handed swords, restrict to warriors and paladins
                         return true if item.item_type == 'Two-handed Weapon' && %w[warrior paladin deathwalker].include?(character_class)
-                        errors.add(:base, "Only Warriors and Paladins can equip Two-handed Swords.")
+                        errors.add(:base, "Only Warriors, Deathwalkers and Paladins can equip Two-handed Swords.")
                         return false
                     when 'Great Shield'
-                        return true if %w[paladin deathwalker].include?(character_class)
-                        errors.add(:base, "Only Paladins and Deathwalkers can equip Great Shields.")
+                        return true if %w[paladin warrior].include?(character_class)
+                        errors.add(:base, "Only Paladins and Warriors can equip Great Shields.")
                         return false
                     when 'Small Shield'
                         return true if %w[warrior paladin mage].include?(character_class)
@@ -836,16 +836,10 @@ class Character < ApplicationRecord
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.main_hand.item_type == 'Two-handed Weapon'
-                if skills.find_by(name: 'Divine Strength', unlocked: true).present?
-                    self.off_hand = item
-                    remove_item_from_inventory(item)
-                    modify_stats_based_on_item(item)
-                else
-                    unequip_main_hand
-                    self.off_hand = item
-                    remove_item_from_inventory(item)
-                    modify_stats_based_on_item(item)
-                end
+                unequip_main_hand
+                self.off_hand = item
+                remove_item_from_inventory(item)
+                modify_stats_based_on_item(item)
             end
         # Case 3: Main hand and off hand
         elsif self.main_hand.present? && self.off_hand.present?
@@ -921,24 +915,14 @@ class Character < ApplicationRecord
         elsif self.main_hand.nil? && self.off_hand.present?
             Rails.logger.debug("################## Entering Case 3")
             if self.off_hand.item_type == 'Shield'
-                if skills.find_by(name: 'Divine Strength', unlocked: true).present?
-                    self.main_hand = item
+                unequip_off_hand
+                self.main_hand = item
                     if item.name == "Hellbound"
                         skullsplitter = self.skills.find_by(name: "Skullsplitter")
                         skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
                     end
-                    remove_item_from_inventory(item)
-                    modify_stats_based_on_item(item)
-                else
-                    unequip_off_hand
-                    self.main_hand = item
-                        if item.name == "Hellbound"
-                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                        end
-                    remove_item_from_inventory(item)
-                    modify_stats_based_on_item(item)
-                end
+                remove_item_from_inventory(item)
+                modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 # Remove the main hand and off hand then equip the item in main hand
                 unequip_off_hand
@@ -965,26 +949,15 @@ class Character < ApplicationRecord
         elsif self.main_hand.present? && self.off_hand.present?
             Rails.logger.debug("################## Entering Case 4")
             if self.off_hand.item_type == 'Shield'
-                if skills.find_by(name: 'Divine Strength', unlocked: true).present?
-                    unequip_main_hand
-                    self.main_hand = item
-                        if item.name == "Hellbound"
-                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                        end
-                    remove_item_from_inventory(item)
-                    modify_stats_based_on_item(item)
-                else
-                    unequip_main_hand
-                    unequip_off_hand
-                    self.main_hand = item
-                        if item.name == "Hellbound"
-                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                        end
-                    remove_item_from_inventory(item)
-                    modify_stats_based_on_item(item)
-                end
+                unequip_main_hand
+                unequip_off_hand
+                self.main_hand = item
+                    if item.name == "Hellbound"
+                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
+                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
+                    end
+                remove_item_from_inventory(item)
+                modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 # Remove the main hand and off hand then equip the item
                 unequip_main_hand

@@ -27,9 +27,9 @@
     <div style="flex-row">
       <div class="mb-4">
         <div class="mx-auto">
-          <% if current_user.present? && @selected_character.user_id == current_user.id && current_user.selected_character.present? && current_user.selected_character.id == @selected_character.id %>
+          <% if current_user.present? && @character.user_id == current_user.id && current_user.selected_character.present? && current_user.selected_character.id == @selected_character.id %>
             <!-- Inventory card -->
-            <%= render partial: 'characters/inventory', locals: { character: @selected_character } %>
+            <%= render partial: 'characters/inventory', locals: { character: @character } %>
           <% end %>
         </div>
       </div>
@@ -41,9 +41,9 @@
           <% (1..5).each do |index| %>
             <% if @random_weapon_items[index - 1] %>
               <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= @random_weapon_items[index - 1].id %>)" onmouseover="showTooltip(<%= @random_weapon_items[index - 1].id %>, 'Weapon')" onmouseout="hideTooltip(<%= @random_weapon_items[index - 1].id %>)">
-                <%= display_item_tooltip(@random_weapon_items[index - 1]) %>
+                <%= display_item_tooltip(@random_weapon_items[index - 1], @character) %>
                 <%= image_tag(@random_weapon_items[index - 1].item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
-                <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: @random_weapon_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_weapon_items[index - 1].id}" %>
+                <%= button_to "Purchase", add_to_inventory_character_path(@character, item_id: @random_weapon_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_weapon_items[index - 1].id}" %>
                 <script>
                   // JavaScript code to show gold price on hover
                   document.getElementById('purchaseButton<%= @random_weapon_items[index - 1].id %>').addEventListener('mouseover', function() {
@@ -73,9 +73,9 @@
           <% (1..5).each do |index| %>
             <% if @random_armor_items[index - 1] %>
               <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= @random_armor_items[index - 1].id %>)" onmouseover="showTooltip(<%= @random_armor_items[index - 1].id %>, 'Weapon')" onmouseout="hideTooltip(<%= @random_armor_items[index - 1].id %>)">
-                <%= display_item_tooltip(@random_armor_items[index - 1]) %>
+                <%= display_item_tooltip(@random_armor_items[index - 1], @character) %>
                 <%= image_tag(@random_armor_items[index - 1].item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
-                <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: @random_armor_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_armor_items[index - 1].id}" %>
+                <%= button_to "Purchase", add_to_inventory_character_path(@character, item_id: @random_armor_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_armor_items[index - 1].id}" %>
                 <script>
                   // JavaScript code to show gold price on hover
                   document.getElementById('purchaseButton<%= @random_armor_items[index - 1].id %>').addEventListener('mouseover', function() {
@@ -105,9 +105,9 @@
           <% (1..5).each do |index| %>
             <% if @random_jewelry_items[index - 1] %>
               <div class="merchant-item text-center item-tooltip" onmousemove="updateTooltipPosition(event, <%= @random_jewelry_items[index - 1].id %>)" onmouseover="showTooltip(<%= @random_jewelry_items[index - 1].id %>, 'Weapon')" onmouseout="hideTooltip(<%= @random_jewelry_items[index - 1].id %>)">
-                <%= display_item_tooltip(@random_jewelry_items[index - 1]) %>
+                <%= display_item_tooltip(@random_jewelry_items[index - 1], @character) %>
                 <%= image_tag(@random_jewelry_items[index - 1].item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
-                <%= button_to "Purchase", add_to_inventory_character_path(@selected_character, item_id: @random_jewelry_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_jewelry_items[index - 1].id}" %>
+                <%= button_to "Purchase", add_to_inventory_character_path(@character, item_id: @random_jewelry_items[index - 1].id), method: :post, class: "btn btn-outline-primary btn-sm mt-1 mb-1", style:"width: 100px;", id: "purchaseButton#{@random_jewelry_items[index - 1].id}" %>
                 <script>
                   // JavaScript code to show gold price on hover
                   document.getElementById('purchaseButton<%= @random_jewelry_items[index - 1].id %>').addEventListener('mouseover', function() {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_15_205913) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_16_182438) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -267,6 +267,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_15_205913) do
     t.integer "upgraded_dreadmight", default: 0
     t.integer "upgraded_luck", default: 0
     t.integer "upgraded_willpower", default: 0
+    t.boolean "generated_item", default: false
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 

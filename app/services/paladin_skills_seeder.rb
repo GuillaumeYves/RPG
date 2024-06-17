@@ -100,14 +100,14 @@ class PaladinSkillsSeeder
     divine_strength = Skill.create(
       name: "Divine Strength",
       skill_type: "passive",
-      description: "You can wield a Two-handed Weapon while having a Shield but your Health is reduced by 20%.",
+      description: "Your Maximum Attack and Maximum Spellpower are increased by 112%.",
       row: 4,
       level_requirement: 100,
       character_class: paladin_class,
       character_id: character.id,
       effect: "
-        self.total_health *= 0.80;
-        self.total_max_health *= 0.80;"
+        self.total_max_attack *= 2.12;
+        self.total_max_spellpower *= 2.12;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'divinestrength.jpg')
     divine_strength.skill_image.attach(io: File.open(image_path), filename: 'divinestrength.jpg', content_type: 'image/jpeg')

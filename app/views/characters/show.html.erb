@@ -10,7 +10,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= head_item.id %>)" onmouseover="showTooltip(<%= head_item.id %>)" onmouseout="hideTooltip(<%= head_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(head_item) %>
+                <%= display_item_tooltip(head_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(head_item.item_image, alt: "head_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -31,7 +31,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= chest_item.id %>)" onmouseover="showTooltip(<%= chest_item.id %>)" onmouseout="hideTooltip(<%= chest_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(chest_item) %>
+                <%= display_item_tooltip(chest_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(chest_item.item_image, alt: "chest_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -52,7 +52,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= hands_item.id %>)" onmouseover="showTooltip(<%= hands_item.id %>)" onmouseout="hideTooltip(<%= hands_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(hands_item) %>
+                <%= display_item_tooltip(hands_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(hands_item.item_image, alt: "hands_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -73,7 +73,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= feet_item.id %>)" onmouseover="showTooltip(<%= feet_item.id %>)" onmouseout="hideTooltip(<%= feet_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(feet_item) %>
+                <%= display_item_tooltip(feet_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(feet_item.item_image, alt: "feet_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -155,7 +155,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= neck_item.id %>)" onmouseover="showTooltip(<%= neck_item.id %>)" onmouseout="hideTooltip(<%= neck_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(neck_item) %>
+                  <%= display_item_tooltip(neck_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(neck_item.item_image, alt: "neck_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -176,7 +176,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= waist_item.id %>)" onmouseover="showTooltip(<%= waist_item.id %>)" onmouseout="hideTooltip(<%= waist_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(waist_item) %>
+                  <%= display_item_tooltip(waist_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(waist_item.item_image, alt: "waist_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -197,7 +197,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger1_item.id %>)" onmouseover="showTooltip(<%= finger1_item.id %>)" onmouseout="hideTooltip(<%= finger1_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(finger1_item) %>
+                  <%= display_item_tooltip(finger1_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(finger1_item.item_image, alt: "finger1_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -218,7 +218,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger2_item.id %>)" onmouseover="showTooltip(<%= finger2_item.id %>)" onmouseout="hideTooltip(<%= finger2_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(finger2_item) %>
+                  <%= display_item_tooltip(finger2_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(finger2_item.item_image, alt: "finger2_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -243,7 +243,7 @@
               <div class="item-container col-2 text-center" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= main_hand_item.id %>)" onmouseover="showTooltip(<%= main_hand_item.id %>)" onmouseout="hideTooltip(<%= main_hand_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(main_hand_item) %>
+                  <%= display_item_tooltip(main_hand_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(main_hand_item.item_image, alt: "main_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -264,7 +264,7 @@
               <div class="item-container col-2 text-center" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= off_hand_item.id %>)" onmouseover="showTooltip(<%= off_hand_item.id %>)" onmouseout="hideTooltip(<%= off_hand_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(off_hand_item) %>
+                  <%= display_item_tooltip(off_hand_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(off_hand_item.item_image, alt: "off_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
