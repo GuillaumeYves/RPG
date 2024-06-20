@@ -522,7 +522,6 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
-
     def gain_experience
         @character = current_user.selected_character
 

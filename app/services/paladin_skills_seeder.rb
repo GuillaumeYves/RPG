@@ -37,7 +37,7 @@ class PaladinSkillsSeeder
 
     blessingofkings = Skill.create(
       name: "Blessing of Kings",
-      description: "During your first turn reduce the damage you take by 15% for 4 turns. This can only happen once per combat.",
+      description: "During your first turn reduce the damage you take from attacks by 15% for 4 turns. This can only happen once per combat.",
       skill_type: "trigger",
       row: 2,
       level_requirement: 50,
@@ -100,14 +100,14 @@ class PaladinSkillsSeeder
     divine_strength = Skill.create(
       name: "Divine Strength",
       skill_type: "passive",
-      description: "Your Maximum Attack and Maximum Spellpower are increased by 112%.",
+      description: "Your Maximum Attack and Maximum Spellpower are increased by 50%.",
       row: 4,
       level_requirement: 100,
       character_class: paladin_class,
       character_id: character.id,
       effect: "
-        self.total_max_attack *= 2.12;
-        self.total_max_spellpower *= 2.12;"
+        self.total_max_attack *= 1.5;
+        self.total_max_spellpower *= 1.5;"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'divinestrength.jpg')
     divine_strength.skill_image.attach(io: File.open(image_path), filename: 'divinestrength.jpg', content_type: 'image/jpeg')

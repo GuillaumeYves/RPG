@@ -130,6 +130,28 @@
       </div>
     </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Array of possible texts
+    var possibleTexts = [
+      "Take a look at my merchandise... You'll surely find something...",
+      "Looking for something? I've got just what you need...",
+      "Please take a seat and let's negociate...",
+      "Weapons, armor... I've got it all...",
+      "Your shiny coins for my shiny merchandise. Deal?",
+      "I know exactly what you need.",
+    ];
+
+    // Get the element by its id
+    var merchantDialogue = document.getElementById("merchant-dialogue");
+
+    // Randomly select a text from the array
+    var randomText = possibleTexts[Math.floor(Math.random() * possibleTexts.length)];
+
+    // Set the new text
+    merchantDialogue.innerText = randomText;
+  });
+</script>
 
 <script>
   function showTooltip(itemId, itemType) {
@@ -162,28 +184,4 @@
       tooltip.style.bottom = ''; // Reset bottom property
     }
   }
-</script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Array of possible texts
-    var possibleTexts = [
-      "May I interest you in some of my fine wares?",
-      "Take a look at my merchandise... You'll surely find something...",
-      "Looking for something? I've got just what you need...",
-      "Please take a seat and let's negociate...",
-      "Weapons, armor... I've got it all...",
-      "Your shiny coins for my shiny merchandise. Deal?",
-      "I know exactly what you need.",
-    ];
-
-    // Get the element by its id
-    var merchantDialogue = document.getElementById("merchant-dialogue");
-
-    // Randomly select a text from the array
-    var randomText = possibleTexts[Math.floor(Math.random() * possibleTexts.length)];
-
-    // Set the new text
-    merchantDialogue.innerText = randomText;
-  });
 </script>

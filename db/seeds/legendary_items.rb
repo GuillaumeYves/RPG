@@ -13,9 +13,9 @@ end
     rarity: "Legendary",
     min_attack: 384 ,
     max_attack: 640 ,
-    strength: 229 ,
-    luck: 145 ,
-    willpower: 126 ,
+    strength: 300 ,
+    luck: 100 ,
+    willpower: 200 ,
     legendary_effect_name: "Dawn's Judgment",
     legendary_effect_description: "When opponent's Health reaches 10% :<br>
     Attempt to execute them for 111% of your damage.",
@@ -32,7 +32,7 @@ end
     health: 1500 ,
     armor: 150 ,
     magic_resistance: 80 ,
-    willpower: 500 ,
+    willpower: 600 ,
     legendary_effect_name: "Pact of the Undying",
     legendary_effect_description: "When your Health drops to 0 :<br>
     You are reborn with 1 Health.<br>
@@ -50,13 +50,31 @@ end
     health: 1000 ,
     armor: 75 ,
     magic_resistance: 30 ,
-    strength: 250 ,
-    willpower: 250 ,
+    strength: 300 ,
+    luck: 200 ,
+    willpower: 100 ,
     legendary_effect_name: "Wrathful Obsession",
     legendary_effect_description: "After attacking :<br>
     Your Attack is increased by 15%.",
     description: "Anger is a weapon, not just a mere emotion.",
     image_path: 'app/assets/images/legendary_items/eternalrage.jpg'
+  },
+  {
+    name: "Havoc",
+    item_type: "Two-handed Weapon",
+    item_class: "Bow",
+    level_requirement: 100,
+    gold_price: 57500,
+    rarity: "Legendary",
+    min_attack: 368 ,
+    max_attack: 550 ,
+    intelligence: 250 ,
+    agility: 250 ,
+    luck: 100 ,
+    legendary_effect_name: "Chaos Reign",
+    legendary_effect_description: "50% chance to attack an additional time for 50% of your damage.",
+    description: "Unleash relentless waves of chaos and ruin with each draw of its string.",
+    image_path: 'app/assets/images/legendary_items/havoc.jpg'
   },
   {
     name: "Helion",
@@ -67,8 +85,8 @@ end
     rarity: "Legendary",
     min_spellpower: 228 ,
     max_spellpower: 380 ,
-    intelligence: 403 ,
-    luck: 97 ,
+    intelligence: 500 ,
+    luck: 100 ,
     legendary_effect_name: "Solar Flare",
     legendary_effect_description: "When dealing a Critical Strike with an attack :<br>
     Your Spellpower is increased by 20%.",
@@ -84,11 +102,10 @@ end
     rarity: "Legendary",
     min_attack: 152 ,
     max_attack: 760 ,
-    strength: 420 ,
-    luck: 80 ,
+    strength: 400 ,
+    luck: 200 ,
     legendary_effect_name: "Might of the Underworld",
-    legendary_effect_description: "Skullsplitter talent effect change :<br>
-    You attack for 30% of your damage each of your turns.",
+    legendary_effect_description: "10% chance to attack an additional time for 150% of your damage",
     description: "Unleash the wrath of the underworld upon your foes.",
     image_path: 'app/assets/images/legendary_items/hellbound.jpg'
   },
@@ -101,9 +118,9 @@ end
     rarity: "Legendary",
     min_attack: 152 ,
     max_attack: 190 ,
-    strength: 205 ,
-    agility: 205 ,
-    luck: 90 ,
+    strength: 200 ,
+    agility: 200 ,
+    luck: 200 ,
     legendary_effect_name: "Lethal Strikes",
     legendary_effect_description: "At the end of your turn :<br>
     Inflict 30% physical damage.",
@@ -120,9 +137,9 @@ end
     health: 1000 ,
     armor: 75 ,
     magic_resistance: 30 ,
-    dreadmight: 170 ,
-    strength: 164 ,
-    intelligence: 164 ,
+    dreadmight: 300 ,
+    willpower: 200 ,
+    luck: 100 ,
     legendary_effect_name: "Vile Embrace",
     legendary_effect_description: "At the end of your turn :<br>
     You lose 6% of your Maximum Health.<br>
@@ -139,9 +156,9 @@ end
     rarity: "Legendary",
     min_spellpower: 133 ,
     max_spellpower: 880 ,
-    intelligence: 355 ,
-    agility: 62 ,
-    luck: 83 ,
+    intelligence: 400 ,
+    agility: 50 ,
+    luck: 150 ,
     legendary_effect_name: "Enemy of Life",
     legendary_effect_description: "You deal 50% increased damage to opponents above 70% Health.",
     description: "Become the enemy of a nation. The doom of an entire kingdom.",
@@ -156,8 +173,8 @@ end
     rarity: "Legendary",
     min_necrosurge: 114 ,
     max_necrosurge: 190 ,
-    dreadmight: 355 ,
-    luck: 145 ,
+    dreadmight: 400 ,
+    willpower: 200 ,
     legendary_effect_name: "Necrotic Touch",
     legendary_effect_description: "At the end of your turn :<br>
     Deal 333 shadow damage and heal for that same amount.<br>
@@ -177,10 +194,10 @@ end
     magic_resistance: 75 ,
     strength: 200 ,
     agility: 200 ,
-    luck: 100 ,
+    luck: 200 ,
     legendary_effect_name: "Inferno Heart",
     legendary_effect_description: "When dealing a Critical Strike with an attack :<br>
-    Inflict 22% of initial attack damage as fire damage.<br>
+    Inflict 22% of initial attack damage as additional fire damage.<br>
     Cannot Crit, Miss or be mitigated.",
     description: "Embrace the inferno within and leave only ashes in your wake.",
     image_path: 'app/assets/images/legendary_items/pandemonium.jpg'
@@ -194,12 +211,12 @@ end
     rarity: "Legendary",
     min_attack: 42 ,
     max_attack: 530 ,
-    intelligence: 298 ,
-    strength: 145 ,
-    luck: 57 ,
+    intelligence: 250 ,
+    strength: 250 ,
+    willpower: 100 ,
     legendary_effect_name: "Sentence of the Skies",
     legendary_effect_description: "After attacking :<br>
-    Inflict 20% of initial attack damage as magic damage.<br>
+    Inflict 40% of initial attack damage as additional magic damage.<br>
     Cannot Crit, Miss or be mitigated.",
     description: "Shaping destiny with each resounding strike",
     image_path: 'app/assets/images/legendary_items/rulerofstorms.jpg'
@@ -214,7 +231,7 @@ end
     health: 600 ,
     armor: 30 ,
     magic_resistance: 75 ,
-    luck: 100 ,
+    luck: 200 ,
     agility: 100 ,
     intelligence: 300 ,
     legendary_effect_name: "Arcane Tempest",
@@ -248,7 +265,6 @@ end
     rarity: "Legendary",
     health: 800 ,
     global_damage: 0.10 ,
-    critical_strike_damage: 1.00 ,
     legendary_effect_name: "Flicker of Destruction",
     legendary_effect_description: "At the end of you turn :<br>
     10% chance to inflict 8% of opponent's Maximum Health as fire damage.<br>
@@ -263,8 +279,6 @@ end
     level_requirement: 100,
     gold_price: 86250,
     rarity: "Legendary",
-    health: 800 ,
-    global_damage: 0.10 ,
     legendary_effect_name: "Cosmic Resonance",
     legendary_effect_description: "Your damage always results in the highest outcome.",
     description: "It bends the fabric of reality, whispering secrets of the universe.",
@@ -280,10 +294,9 @@ end
     health: 800 ,
     armor: 50 ,
     magic_resistance: 50 ,
-    luck: 100 ,
+    luck: 200 ,
     agility: 150 ,
     strength: 150 ,
-    willpower: 100 ,
     legendary_effect_name: "Void Stride",
     legendary_effect_description: "Convert 100% of your Attack into Necrosurge when attacking.",
     description: "Within the Void lies the enigma of shadows, where silence and oblivion awaits",
@@ -299,8 +312,8 @@ end
     health: 1000 ,
     armor: 40 ,
     magic_resistance: 40 ,
-    intelligence: 200 ,
-    willpower: 200 ,
+    intelligence: 250 ,
+    willpower: 250 ,
     luck: 100 ,
     legendary_effect_name: "Life Drinker",
     legendary_effect_description: "When dealing a Critical Strike with an attack :<br>

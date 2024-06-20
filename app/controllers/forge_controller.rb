@@ -72,66 +72,66 @@ class ForgeController < ApplicationController
     case @stat_to_degrade
     when :health
       reduction_amount = (item.health * 0.10).round
-      item.health -= reduction_amount
-      item.upgraded_health -= reduction_amount
+      item.health -= [reduction_amount, 0].max
+      item.upgraded_health -= [reduction_amount, 0].max
     when :global_damage
       reduction_amount = (item.global_damage * 0.10).to_d
-      item.global_damage -= reduction_amount
-      item.upgraded_global_damage -= reduction_amount
+      item.global_damage -= [reduction_amount, 0].max
+      item.upgraded_global_damage -= [reduction_amount, 0].max
     when :critical_strike_chance
       reduction_amount = (item.critical_strike_chance * 0.10).to_d
-      item.critical_strike_chance -= reduction_amount
-      item.upgraded_critical_strike_chance -= reduction_amount
+      item.critical_strike_chance -= [reduction_amount, 0].max
+      item.upgraded_critical_strike_chance -= [reduction_amount, 0].max
     when :critical_strike_damage
       reduction_amount = (item.critical_strike_damage * 0.10).to_d
-      item.critical_strike_damage -= reduction_amount
-      item.upgraded_critical_strike_damage -= reduction_amount
+      item.critical_strike_damage -= [reduction_amount, 0].max
+      item.upgraded_critical_strike_damage -= [reduction_amount, 0].max
     when :armor
       reduction_amount = (item.armor * 0.10).round
-      item.armor -= reduction_amount
-      item.upgraded_armor -= reduction_amount
+      item.armor -= [reduction_amount, 0].max
+      item.upgraded_armor -= [reduction_amount, 0].max
     when :magic_resistance
       reduction_amount = (item.magic_resistance * 0.10).round
-      item.magic_resistance -= reduction_amount
-      item.upgraded_magic_resistance -= reduction_amount
+      item.magic_resistance -= [reduction_amount, 0].max
+      item.upgraded_magic_resistance -= [reduction_amount, 0].max
     when :strength
       reduction_amount = (item.strength * 0.10).round
-      item.strength -= reduction_amount
-      item.upgraded_strength -= reduction_amount
+      item.strength -= [reduction_amount, 0].max
+      item.upgraded_strength -= [reduction_amount, 0].max
     when :intelligence
       reduction_amount = (item.intelligence * 0.10).round
-      item.intelligence -= reduction_amount
-      item.upgraded_intelligence -= reduction_amount
+      item.intelligence -= [reduction_amount, 0].max
+      item.upgraded_intelligence -= [reduction_amount, 0].max
     when :agility
       reduction_amount = (item.agility * 0.10).round
-      item.agility -= reduction_amount
-      item.upgraded_agility -= reduction_amount
+      item.agility -= [reduction_amount, 0].max
+      item.upgraded_agility -= [reduction_amount, 0].max
     when :dreadmight
       reduction_amount = (item.dreadmight * 0.10).round
-      item.dreadmight -= reduction_amount
-      item.upgraded_dreadmight -= reduction_amount
+      item.dreadmight -= [reduction_amount, 0].max
+      item.upgraded_dreadmight -= [reduction_amount, 0].max
     when :luck
       reduction_amount = (item.luck * 0.10).round
-      item.luck -= reduction_amount
-      item.upgraded_luck -= reduction_amount
+      item.luck -= [reduction_amount, 0].max
+      item.upgraded_luck -= [reduction_amount, 0].max
     when :willpower
       reduction_amount = (item.willpower * 0.10).round
-      item.willpower -= reduction_amount
-      item.upgraded_willpower -= reduction_amount
+      item.willpower -= [reduction_amount, 0].max
+      item.upgraded_willpower -= [reduction_amount, 0].max
     end
 
     item.save
   end
 
   def upgrade_success_message
-    "Upgrade successful. #{@item.name} upgraded to +#{@item.upgrade}: #{(@stat_to_upgrade.to_s.capitalize.humanize)} increased by 10%"
+    "Success. #{@item.name} upgraded to +#{@item.upgrade}: +10% #{(@stat_to_upgrade.to_s.capitalize.humanize)}"
   end
 
   def upgrade_failure_message
     if @item.upgrade <= 10
-      "Upgrade failed. #{@item.name} preserved at +#{@item.upgrade}"
+      "Failure. #{@item.name} preserved at +#{@item.upgrade}"
     else
-      "Upgrade failed. #{@item.name} downgraded to +#{@item.upgrade}: #{(@stat_to_degrade.to_s.capitalize.humanize)} decreased by 10%"
+      "Failure. #{@item.name} downgraded to +#{@item.upgrade}: -10% #{(@stat_to_degrade.to_s.capitalize.humanize)}"
     end
   end
 

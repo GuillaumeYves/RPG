@@ -147,7 +147,7 @@ class Character < ApplicationRecord
     end
 
     def set_default_values_for_total_stats
-        if self.character_class == 'rogue' && skills.find_by(name: 'Swift Movements', unlocked: true)
+        if self.character_class == 'nightstalker' && skills.find_by(name: 'Swift Movements', unlocked: true)
             self.total_min_attack = ((self.min_attack + (self.agility_bonus * 0.80)) + (self.min_attack * self.paragon_attack))
             self.total_max_attack = ((self.max_attack + (self.agility_bonus * 0.80)) + (self.max_attack * self.paragon_attack))
         else
@@ -210,7 +210,7 @@ class Character < ApplicationRecord
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
-        elsif self.character_class == 'rogue'
+        elsif self.character_class == 'nightstalker'
             skills.where(skill_type: "combat", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
@@ -237,7 +237,7 @@ class Character < ApplicationRecord
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
-        elsif self.character_class == 'rogue'
+        elsif self.character_class == 'nightstalker'
             skills.where(skill_type: "passive", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
@@ -262,7 +262,7 @@ class Character < ApplicationRecord
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
-        elsif self.character_class == 'rogue'
+        elsif self.character_class == 'nightstalker'
             skills.where(skill_type: "trigger", unlocked: true).each do |skill|
             instance_eval(skill.effect) if skill.effect.present?
             end
@@ -339,54 +339,54 @@ class Character < ApplicationRecord
         case character_class
         when 'warrior'
             # Modify attributes for warrior class
-            self.min_attack += 4
-            self.max_attack += 12
-            self.min_spellpower -= 1
-            self.max_spellpower -= 7
-            self.min_necrosurge -= 2
+            self.min_attack += 5
+            self.max_attack += 10
+            self.min_spellpower -= 15
+            self.max_spellpower -= 10
+            self.min_necrosurge -= 10
             self.max_necrosurge -= 5
-            self.armor += 1
-            self.magic_resistance -= 2
+            self.armor += 3
+            self.magic_resistance -= 3
         when 'mage'
             # Modify attributes for mage class
-            self.min_attack -= 5
-            self.max_attack -= 13
-            self.min_spellpower += 2
-            self.max_spellpower += 16
-            self.min_necrosurge -= 1
-            self.max_necrosurge -= 7
-            self.armor -= 2
-            self.magic_resistance += 2
-        when 'rogue'
-            # Modify attributes for rogue class
-            self.min_attack += 1
-            self.max_attack += 8
-            self.min_spellpower -= 1
-            self.max_spellpower -= 5
-            self.min_necrosurge -= 2
+            self.min_attack -= 15
+            self.max_attack -= 10
+            self.min_spellpower += 5
+            self.max_spellpower += 10
+            self.min_necrosurge -= 10
             self.max_necrosurge -= 5
-            self.armor -= 1
-            self.magic_resistance -= 1
+            self.armor -= 3
+            self.magic_resistance += 3
+        when 'nightstalker'
+            # Modify attributes for nightstalker class
+            self.min_attack += 5
+            self.max_attack += 10
+            self.min_spellpower -= 10
+            self.max_spellpower -= 5
+            self.min_necrosurge -= 10
+            self.max_necrosurge -= 5
+            self.armor -= 2
+            self.magic_resistance -= 2
         when 'paladin'
             # Modify attributes for paladin class
             self.min_attack += 2
-            self.max_attack += 6
-            self.min_spellpower += 1
-            self.max_spellpower += 7
-            self.min_necrosurge -= 4
-            self.max_necrosurge -= 9
+            self.max_attack += 5
+            self.min_spellpower += 2
+            self.max_spellpower += 5
+            self.min_necrosurge -= 15
+            self.max_necrosurge -= 10
             self.armor += 1
             self.magic_resistance += 1
         when 'deathwalker'
             # Modify attributes for deathwalker class
-            self.min_attack -= 1
-            self.max_attack -= 3
-            self.min_spellpower -= 3
-            self.max_spellpower -= 7
-            self.min_necrosurge += 4
-            self.max_necrosurge += 9
-            self.armor -= 2
-            self.magic_resistance -= 2
+            self.min_attack -= 15
+            self.max_attack -= 10
+            self.min_spellpower -= 15
+            self.max_spellpower -= 10
+            self.min_necrosurge += 5
+            self.max_necrosurge += 10
+            self.armor -= 1
+            self.magic_resistance -= 1
         end
     end
 
@@ -465,10 +465,10 @@ class Character < ApplicationRecord
                 # Seed mage skills
                 mage_skills_seeder = MageSkillsSeeder.new(self)
                 mage_skills_seeder.seed_skills
-            when 'rogue'
-                # Seed rogue skills
-                rogue_skills_seeder = RogueSkillsSeeder.new(self)
-                rogue_skills_seeder.seed_skills
+            when 'nightstalker'
+                # Seed nightstalker skills
+                nightstalker_skills_seeder = NightstalkerSkillsSeeder.new(self)
+                nightstalker_skills_seeder.seed_skills
             when 'paladin'
                 # Seed paladin skills
                 paladin_skills_seeder = PaladinSkillsSeeder.new(self)
@@ -542,7 +542,7 @@ class Character < ApplicationRecord
             self.health += 14
         when 'mage'
             self.health += 10
-        when 'rogue'
+        when 'nightstalker'
             self.health += 12
         when 'paladin'
             self.health += 16
@@ -673,8 +673,12 @@ class Character < ApplicationRecord
                         errors.add(:base, "Only Paladins can equip Maces.")
                         return false
                     when 'Dagger'
-                        return true if character_class == 'rogue'
-                        errors.add(:base, "Only Rogues can equip Daggers.")
+                        return true if %w[nightstalker pathfinder].include?(character_class)
+                        errors.add(:base, "Only Nightstalkers and Pathfinders can equip Daggers.")
+                        return false
+                    when 'Bow'
+                        return true if character_class == 'pathfinder'
+                        errors.add(:base, "Only Pathfinders can equip Bows.")
                         return false
                     when 'Staff'
                         return true if character_class == 'mage'
@@ -685,8 +689,8 @@ class Character < ApplicationRecord
                         errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
                         return false
                     when 'Leather'
-                        return true if character_class == 'rogue'
-                        errors.add(:base, "Only Rogues can equip leather.")
+                        return true if %w[nightstalker pathfinder].include?(character_class)
+                        errors.add(:base, "Only Nightstalkers and Pathfinders can equip leather.")
                         return false
                     when 'Cloth'
                         return true if %w[mage].include?(character_class)
@@ -707,10 +711,6 @@ class Character < ApplicationRecord
 
     def unequip_main_hand
         return unless self.main_hand
-            if self.main_hand.name == "Hellbound"
-                skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                skullsplitter.update(description: "Upon Critical Strike with a Basic attack, your opponent suffers an additional 3% of their Maximum Health as true damage.")
-            end
         # Add the two-handed weapon back to the inventory
         add_item_to_inventory(self.main_hand)
         # Modify stats based on the unequipped two-handed weapon
@@ -721,10 +721,6 @@ class Character < ApplicationRecord
 
     def unequip_off_hand
         return unless self.off_hand
-            if self.off_hand.name == "Hellbound"
-                skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                skullsplitter.update(description: "Upon Critical Strike with a Basic attack, your opponent suffers an additional 3% of their Maximum Health as true damage.")
-            end
         # Add the two-handed weapon back to the inventory
         add_item_to_inventory(self.off_hand)
         # Modify stats based on the unequipped two-handed weapon
@@ -744,14 +740,14 @@ class Character < ApplicationRecord
         elsif self.main_hand.present? && self.off_hand.nil?
             Rails.logger.debug("################## Entering Case 2")
             if self.main_hand.item_type == 'One-handed Weapon'
-                if (self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && self.character_class == 'rogue'
-                    Rails.logger.debug("################## Case 2 - Character is a rogue and item is either sword or dagger")
+                if ((self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'pathfinder'))
+                    Rails.logger.debug("################## Case 2 - Character is a nightstalker and item is either sword or dagger")
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                     return
-                elsif self.main_hand.item_class == 'Sword' && self.character_class == 'deathwalker'
-                    Rails.logger.debug("################## Case 2 - Character is a deathwalker and item is a sword")
+                elsif ((self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'pathfinder'))
+                    Rails.logger.debug("################## Case 2 - Character is a nightstalker and item is a sword")
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -775,7 +771,7 @@ class Character < ApplicationRecord
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
-                if self.character_class == 'rogue' && (item.item_class == 'Dagger' || item.item_class == 'Sword')
+                if ((self.character_class == 'nightstalker' || self.character_class == 'pathfinder') && (item.item_class == 'Dagger' || item.item_class == 'Sword'))
                     self.main_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -799,7 +795,7 @@ class Character < ApplicationRecord
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
-                if (self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && self.character_class == 'rogue'
+                if (self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && self.character_class == 'nightstalker'
                     unequip_off_hand
                     self.off_hand = item
                     remove_item_from_inventory(item)
@@ -869,10 +865,6 @@ class Character < ApplicationRecord
         if self.main_hand.nil? && self.off_hand.nil?
             Rails.logger.debug("################## Entering Case 1")
             self.main_hand = item
-                if item.name == "Hellbound"
-                    skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                    skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                end
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         # Case 2: Only main hand has a weapon
@@ -882,29 +874,17 @@ class Character < ApplicationRecord
                     # Replace the existing one-handed weapon in main hand
                     unequip_main_hand
                     self.main_hand = item
-                        if item.name == "Hellbound"
-                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
             elsif self.main_hand.item_type == 'Two-handed Weapon'
                 if skills.find_by(name: 'Forged in Battle', unlocked: true).present?
                     # Equip the weapon in the off hand if two-handed and Forged in Battle talent
                     self.off_hand = item
-                        if item.name == "Hellbound"
-                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 else
                     unequip_main_hand
                     self.main_hand = item
-                        if item.name == "Hellbound"
-                            skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                            skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                        end
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                 end
@@ -917,29 +897,17 @@ class Character < ApplicationRecord
             if self.off_hand.item_type == 'Shield'
                 unequip_off_hand
                 self.main_hand = item
-                    if item.name == "Hellbound"
-                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
                 # Remove the main hand and off hand then equip the item in main hand
                 unequip_off_hand
                 self.main_hand = item
-                    if item.name == "Hellbound"
-                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
                 # Equip the item in main hand if Forged in Battle talent
                 self.main_hand = item
-                    if item.name == "Hellbound"
-                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             else
@@ -952,10 +920,6 @@ class Character < ApplicationRecord
                 unequip_main_hand
                 unequip_off_hand
                 self.main_hand = item
-                    if item.name == "Hellbound"
-                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
@@ -963,20 +927,12 @@ class Character < ApplicationRecord
                 unequip_main_hand
                 unequip_off_hand
                 self.main_hand = item
-                    if item.name == "Hellbound"
-                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'Two-handed Weapon' && skills.find_by(name: 'Forged in Battle', unlocked: true)
                 # Equip the item in off hand if Forged in Battle talent
                 unequip_off_hand
                 self.off_hand = item
-                    if item.name == "Hellbound"
-                        skullsplitter = self.skills.find_by(name: "Skullsplitter")
-                        skullsplitter.update(description: "You strike for 30% of your damage after your Basic Attack.")
-                    end
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             end

@@ -10,6 +10,7 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -298,12 +299,13 @@
         "Damage reduction occurs before other types of mitigation.",
         "A character cannot dual wield a One-handed Weapon and a Two-handed Weapon simultaneously.",
         "Having more Spellpower than Attack will allow you to deal Magic damage and the same goes for Necrosurge, allowing you to deal shadow damage.",
-        "True damage cannot be reduced by any source of damage reduction.",
+        "True damage cannot be mitigated.",
         "Every hour you will recover some Energy, Health and Arena tickets.",
-        "A 'Basic attack' is the attack automatically made each turn, whereas a talent activates only if unlocked and/or condition is met.",
+        "A 'Basic attack' is the attack automatically made each turn, some talents and items allow you do attack more than once per turn.",
         "There's a 50% chance for you or for your opponent to start first during a combat.",
         "Magic attacks cannot be evaded.",
-        "'Passive' talents apply all the time to your character, 'Trigger' passives apply when condition is met and 'Combat' talents apply during your combat turn.",
+        "Unless specified, a talent cannot result in a Critical Strike and can only be mitigated by Armor or Magic Resistance.",
+        "'Passive' talents apply at all times to your character, 'Trigger' talents apply when their condition is met and 'Combat' talents apply during your combat turn.",
         "Shadow damage cannot be reduced by Armor or Magic Resistance.",
         "Be cautious with your Health, with each combat it gets lower. Visit Mekail if you need to heal up.",
         "Each race start with different stats, and each class modify further these stats.",
