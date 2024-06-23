@@ -211,6 +211,9 @@ class CombatController < ApplicationController
                             end
                         end
                     end
+                    if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                        [(damage * 2).round, 0].max # Return damage with Divine Strength
+                    end
                     if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                         [(damage * 1.5).round, 0].max # Return damage with Nemesis
                     end
@@ -239,6 +242,9 @@ class CombatController < ApplicationController
                                 @opponent_has_ignored_pain = true
                             end
                         end
+                    end
+                    if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                        [(damage * 2).round, 0].max # Return damage with Divine Strength
                     end
                     if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                         [(damage * 1.5).round, 0].max # Return damage with Nemesis
@@ -307,6 +313,9 @@ class CombatController < ApplicationController
                 end
             end
         end
+        if @opponent.is_a?(Character) && ((rand(0..100) <= 15) && @opponent.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+            [(damage * 2).round, 0].max # Return damage with Divine Strength
+        end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
         end
@@ -351,6 +360,9 @@ class CombatController < ApplicationController
                         @opponent_has_ignored_pain = true
                     end
                 end
+                if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                    [(damage * 2).round, 0].max # Return damage with Divine Strength
+                end
                 if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                     [(damage * 1.5).round, 0].max # Return damage with Nemesis
                 end
@@ -385,6 +397,9 @@ class CombatController < ApplicationController
                     end
                 end
             end
+        end
+        if @opponent.is_a?(Character) && ((rand(0..100) <= 15) && @opponent.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+            [(damage * 2).round, 0].max # Return damage with Divine Strength
         end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
@@ -438,6 +453,9 @@ class CombatController < ApplicationController
                         end
                     end
                 end
+                if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                    [(damage * 2).round, 0].max # Return damage with Divine Strength
+                end
                 if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                     [(damage * 1.5).round, 0].max # Return damage with Nemesis
                 end
@@ -480,6 +498,9 @@ class CombatController < ApplicationController
                     end
                 end
             end
+        end
+        if @opponent.is_a?(Character) && ((rand(0..100) <= 15) && @opponent.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+            [(damage * 2).round, 0].max # Return damage with Divine Strength
         end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
@@ -528,11 +549,11 @@ class CombatController < ApplicationController
                 skullsplitter_image = "<img src='/assets/warrior_skills/skullsplitter.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 additional_damage = [((@opponent.total_max_health * 0.10).round - (@opponent.total_armor + @opponent.buffed_armor)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{@skullsplitter_image} Skullsplitter - <strong>#{additional_damage}</strong> additional physical damage"
+                log_message = "#{@character.character_name}: #{skullsplitter_image} Skullsplitter - <strong>#{additional_damage}</strong> additional physical damage"
                 @combat_logs << log_message
             end
             # Deep Wounds - Warrior talent initialize
-            if @character.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @character_deep_wounds_turn == 0
+            if (damage.positive? && @character.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @character_deep_wounds_turn == 0)
                 @character_deep_wounds_turn = 3
                 @character_deep_wounds_damage = [(damage / 3).round, 0].max
             end
@@ -598,7 +619,7 @@ class CombatController < ApplicationController
                 @combat_logs << log_message
             end
             # Deep Wounds - Warrior talent
-            if @opponent.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @opponent_deep_wounds_turn == 0
+            if (damage.positive? && @opponent.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @opponent_deep_wounds_turn == 0)
                 @opponent_deep_wounds_turn = 3
                 @opponent_deep_wounds_damage = [(damage / 3).round, 0].max
             end
@@ -649,7 +670,7 @@ class CombatController < ApplicationController
                 eternal_rage_image = "<img src='/assets/legendary_items/eternalrage.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Helion' class='log-skill-image'>"
                 @character.buffed_min_attack += (@character.min_attack * 0.15)
                 @character.buffed_max_attack += (@character.max_attack * 0.15)
-                log_message = "#{@character.character_name}: #{eternal_rage_image} Eternal Rage - ⬆️ Attack increased by <strong>15%</strong>"
+                log_message = "#{@character.character_name}: #{eternal_rage_image} Wrathful Obsession - ⬆️ Attack increased by <strong>15%</strong>"
                 @combat_logs << log_message
             end
         # Opponent turn
@@ -668,7 +689,7 @@ class CombatController < ApplicationController
                 eternal_rage_image = "<img src='/assets/legendary_items/eternalrage.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Helion' class='log-skill-image'>"
                 @opponent.buffed_min_attack += (@opponent.min_attack * 0.15)
                 @opponent.buffed_max_attack += (@opponent.max_attack * 0.15)
-                log_message = "#{@opponent.character_name}: #{eternal_rage_image} Eternal Rage - ⬆️ Attack increased by <strong>15%</strong>"
+                log_message = "#{@opponent.character_name}: #{eternal_rage_image} Wrathful Obsession - ⬆️ Attack increased by <strong>15%</strong>"
                 @combat_logs << log_message
             end
         end
@@ -1307,7 +1328,7 @@ class CombatController < ApplicationController
                 nethil_damage = 333
                 @opponent_health_in_combat -= [nethil_damage, 0].max
                 @character.total_health += [nethil_damage, @character.total_max_health - @character.total_health].min
-                log_message = "#{@character.character_name}: #{nethil_image} Necrotic Touch - <strong>#{nethil_damage}</strong> shadow damage, <strong>#{damage}</strong> Health recovery"
+                log_message = "#{@character.character_name}: #{nethil_image} Necrotic Touch - <strong>#{nethil_damage}</strong> shadow damage, <strong>#{nethil_damage}</strong> Health recovery"
                 @combat_logs << log_message
                 # Opponent took damage is now true if damage is positive
                 @opponent.took_damage = true if nethil_damage.positive?
@@ -1336,7 +1357,7 @@ class CombatController < ApplicationController
                 @character.took_damage = true if lifetap_damage.positive?
             end
             # Deep Wounds
-            if (@opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Deep Wounds', unlocked: true).present?) && @opponent_deep_wounds_turn > 0
+            if ((@opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Deep Wounds', unlocked: true).present?) && @opponent_deep_wounds_turn > 0)
                 deep_wounds_image = "<img src='/assets/warrior_skills/deepwounds.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 @character.total_health -= [@opponent_deep_wounds_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{deep_wounds_image} Deep Wounds - <strong>#{@opponent_deep_wounds_damage}</strong> physical damage"
@@ -1526,7 +1547,7 @@ class CombatController < ApplicationController
             end
 
             # Deep Wounds
-            if @character.skills.find_by(name: 'Deep Wounds', unlocked: true).present? && @character_deep_wounds_turn > 0
+            if (@character.skills.find_by(name: 'Deep Wounds', unlocked: true).present? && @character_deep_wounds_turn > 0)
                 deep_wounds_image = "<img src='/assets/warrior_skills/deepwounds.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 @opponent_health_in_combat -= [@character_deep_wounds_damage, 0].max
                 log_message = "#{@character.character_name}: #{deep_wounds_image} Deep Wounds - <strong>#{@character_deep_wounds_damage}</strong> physical damage"

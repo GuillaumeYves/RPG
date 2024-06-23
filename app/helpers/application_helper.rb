@@ -29,16 +29,16 @@ module ApplicationHelper
       concat(content_tag(:div, item.rarity.upcase, class: 'item-rarity',style: 'margin-top: -8px;')) if item.rarity.present?
       concat(content_tag(:div, "#{(item.duration / 3600).to_i} hours", class: 'item-duration')) if item.duration.present?
       concat(content_tag(:div, "Level : #{item.level_requirement}", class: 'item-level_requirement', style: 'font-size: small')) if item.level_requirement.present?
-      concat(content_tag(:div, image_tag(item.item_image, alt: "#{item.class.name.downcase}_item", style: 'width: 200px; height: 200px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;'), class: 'item-image-tooltip'))
+      concat(content_tag(:div, image_tag(item.item_image, alt: "#{item.class.name.downcase}_item", style: 'width: 300px; height: 300px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;'), class: 'item-image-tooltip'))
       concat(content_tag(:div, item.item_type, class: 'item-item_type', style: 'font-size: small')) if item.item_type.present?
       concat(content_tag(:div, item.item_class, class: 'item-item_class mb-3', style: 'font-weight: 400')) if item.item_class.present?
       concat(display_item_attributes(item, character))
       concat(content_tag(:div, item.description, class: 'item-description')) if item.description.present? && ["Healing Potion", "Elixir"].include?(item.item_type)
       concat(content_tag(:div, item.legendary_effect_name, class: 'item-legendary-effect-name mt-3')) if item.rarity == "Legendary" && item.legendary_effect_name.present?
       concat(content_tag(:div, class: 'mb-3') { content_tag(:small, simple_format(item.legendary_effect_description), class: 'item-legendary-effect-description', style: 'font-size: small;') }) if item.rarity == "Legendary" && item.legendary_effect_description.present?
-      concat(content_tag(:hr, '', style: 'width: 50%; margin: auto;', class: 'mt-3'))
+      concat(content_tag(:hr, '', style: 'width: 30%; margin: auto;', class: 'mt-3'))
       concat(content_tag(:div, item.description, class: 'item-description', style: 'font-size: smaller; font-style: italic;')) if item.description.present? && !["Healing Potion", "Elixir"].include?(item.item_type)
-      concat(content_tag(:div, "#{number_with_delimiter(item.gold_price)} #{image_tag('misc/goldcoin.png', alt: 'Gold Coin', style: 'width: 20px; height: 20px; margin-bottom:3px;')}".html_safe, style: 'margin-top: 20px;', class: 'item-gold_price')) if item.gold_price.present?
+      concat(content_tag(:div, "#{number_with_delimiter(item.gold_price)} #{image_tag('misc/goldcoin.png', alt: 'Gold Coin', style: 'width: 20px; height: 20px; margin-bottom:3px;')}".html_safe, class: 'item-gold_price mt-2')) if item.gold_price.present?
     end
   end
 
@@ -48,29 +48,74 @@ module ApplicationHelper
 
     equipped_item = get_equipped_item(character, item.item_type)
 
-    # Damage ranges
-    attack_range = [item.min_attack, item.max_attack].compact.join(" - ")
-    spellpower_range = [item.min_spellpower, item.max_spellpower].compact.join(" - ")
-    necrosurge_range = [item.min_necrosurge, item.max_necrosurge].compact.join(" - ")
+  # Damage ranges
+  attack_range = [item.min_attack, item.max_attack].compact.join(" - ")
+  spellpower_range = [item.min_spellpower, item.max_spellpower].compact.join(" - ")
+  necrosurge_range = [item.min_necrosurge, item.max_necrosurge].compact.join(" - ")
 
-    if attack_range.present?
-      average_attack = calculate_average(item.min_attack, item.max_attack)
-      html += content_tag(:div, "<span style= 'font-weight: 400'>Attack:</span> #{attack_range} <small class='text-muted'>(~#{number_with_delimiter(average_attack.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+  if attack_range.present?
+    average_attack = calculate_average(item.min_attack, item.max_attack)
+    upgraded_min_attack = item.upgraded_min_attack
+    upgraded_max_attack = item.upgraded_max_attack
+
+    min_attack_display = "#{item.min_attack}"
+    max_attack_display = "#{item.max_attack}"
+
+    if upgraded_min_attack.present? && upgraded_min_attack != 0
+      min_attack_display += " <small class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-#{upgraded_min_attack > 0 ? 'success' : 'danger'}'>#{upgraded_min_attack > 0 ? '+' : ''}#{upgraded_min_attack}</span>)</small>"
     end
-    if spellpower_range.present?
-      average_spellpower = calculate_average(item.min_spellpower, item.max_spellpower)
-      html += content_tag(:div, "<span style= 'font-weight: 400'>Spellpower:</span> #{spellpower_range} <small class='text-muted'>(~#{number_with_delimiter(average_spellpower.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
-    end
-    if necrosurge_range.present?
-      average_necrosurge = calculate_average(item.min_necrosurge, item.max_necrosurge)
-      html += content_tag(:div, "<span style= 'font-weight: 400'>Necrosurge:</span> #{necrosurge_range} <small class='text-muted'>(~#{number_with_delimiter(average_necrosurge.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+    if upgraded_max_attack.present? && upgraded_max_attack != 0
+      max_attack_display += " <small class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-#{upgraded_max_attack > 0 ? 'success' : 'danger'}'>#{upgraded_max_attack > 0 ? '+' : ''}#{upgraded_max_attack}</span>)</small>"
     end
 
-    if item.health.present?
+    html += content_tag(:div, "<span style='font-weight: 400'>Attack:</span> #{min_attack_display} - #{max_attack_display} <small class='text-muted'>(~#{number_with_delimiter(average_attack.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+  end
+
+  if spellpower_range.present?
+    average_spellpower = calculate_average(item.min_spellpower, item.max_spellpower)
+    upgraded_min_spellpower = item.upgraded_min_spellpower
+    upgraded_max_spellpower = item.upgraded_max_spellpower
+
+    min_spellpower_display = "#{item.min_spellpower}"
+    max_spellpower_display = "#{item.max_spellpower}"
+
+    if upgraded_min_spellpower.present? && upgraded_min_spellpower != 0
+      min_spellpower_display += " <small class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-#{upgraded_min_spellpower > 0 ? 'success' : 'danger'}'>#{upgraded_min_spellpower > 0 ? '+' : ''}#{upgraded_min_spellpower}</span>)</small>"
+    end
+    if upgraded_max_spellpower.present? && upgraded_max_spellpower != 0
+      max_spellpower_display += " <small class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-#{upgraded_max_spellpower > 0 ? 'success' : 'danger'}'>#{upgraded_max_spellpower > 0 ? '+' : ''}#{upgraded_max_spellpower}</span>)</small>"
+    end
+
+    html += content_tag(:div, "<span style='font-weight: 400'>Spellpower:</span> #{min_spellpower_display} - #{max_spellpower_display} <small class='text-muted'>(~#{number_with_delimiter(average_spellpower.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+  end
+
+  if necrosurge_range.present?
+    average_necrosurge = calculate_average(item.min_necrosurge, item.max_necrosurge)
+    upgraded_min_necrosurge = item.upgraded_min_necrosurge
+    upgraded_max_necrosurge = item.upgraded_max_necrosurge
+
+    min_necrosurge_display = "#{item.min_necrosurge}"
+    max_necrosurge_display = "#{item.max_necrosurge}"
+
+    if upgraded_min_necrosurge.present? && upgraded_min_necrosurge != 0
+      min_necrosurge_display += " <small class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-#{upgraded_min_necrosurge > 0 ? 'success' : 'danger'}'>#{upgraded_min_necrosurge > 0 ? '+' : ''}#{upgraded_min_necrosurge}</span>)</small>"
+    end
+    if upgraded_max_necrosurge.present? && upgraded_max_necrosurge != 0
+      max_necrosurge_display += " <small class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-#{upgraded_max_necrosurge > 0 ? 'success' : 'danger'}'>#{upgraded_max_necrosurge > 0 ? '+' : ''}#{upgraded_max_necrosurge}</span>)</small>"
+    end
+
+    html += content_tag(:div, "<span style='font-weight: 400'>Necrosurge:</span> #{min_necrosurge_display} - #{max_necrosurge_display} <small class='text-muted'>(~#{number_with_delimiter(average_necrosurge.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+  end
+
+    if item.health.present? && item.upgraded_health.positive?
+      html += content_tag(:div, "<span style= 'font-weight: 400'>Health:</span> #{item.health} <small style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-success'>+#{(item.upgraded_health)}</span>)</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+    elsif item.health.present? && item.upgraded_health.negative?
+      html += content_tag(:div, "<span style= 'font-weight: 400'>Health:</span> #{item.health} <small style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<span class='text-danger'>#{(item.upgraded_health)}</span>)</small>".html_safe, class: 'tooltip-item-attribute mb-2')
+    elsif item.health.present?
       html += content_tag(:div, "<span style= 'font-weight: 400'>Health:</span> #{item.health}".html_safe, class: 'tooltip-item-attribute mb-2')
     end
 
-    # Group 1: Health, Armor, Magic Resistance
+    # Group 1: Armor, Magic Resistance
     grouped_attributes_1 = %w(armor magic_resistance)
     html += content_tag(:div, class: 'mb-2') do
       grouped_attributes_1.map do |attribute|
@@ -82,9 +127,12 @@ module ApplicationHelper
 
           upgraded_value = item.upgraded_stats[attribute.to_sym]
           attribute_html = ""
-          if upgraded_value.present? && upgraded_value != 0
+          if upgraded_value.present? && upgraded_value.positive?
             upgraded_value_display = upgraded_value
-            attribute_html += "(+<span'>#{upgraded_value_display}</span>)"
+            attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-success'>+#{(upgraded_value_display)}</small>)</span>"
+          elsif upgraded_value.present? && upgraded_value.negative? && upgraded_value != 0
+            upgraded_value_display = upgraded_value
+            attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-danger'>#{(upgraded_value_display)}</small>)</span>"
           end
 
           if equipped_item
@@ -150,7 +198,13 @@ module ApplicationHelper
                                     else
                                       upgraded_value
                                     end
-            attribute_html += "(+<span'>#{upgraded_value_display}</span>)"
+            if upgraded_value.present? && upgraded_value.positive?
+              upgraded_value_display = upgraded_value
+              attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-success'>+#{(upgraded_value_display)}</small>)</span>"
+            elsif upgraded_value.present? && upgraded_value.negative? && upgraded_value != 0
+              upgraded_value_display = upgraded_value
+              attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-danger'>#{(upgraded_value_display)}</small>)</span>"
+            end
           end
 
           if equipped_item
@@ -188,10 +242,10 @@ module ApplicationHelper
         attribute_html = ""
         if upgraded_value.present? && upgraded_value.positive?
           upgraded_value_display = upgraded_value
-          attribute_html += "(<small class='text-success'>+#{upgraded_value_display}</small>)"
+          attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-success'>+#{(upgraded_value_display)}</small>)</span>"
         elsif upgraded_value.present? && upgraded_value.negative? && upgraded_value != 0
           upgraded_value_display = upgraded_value
-          attribute_html += "(<small class='text-danger'>#{upgraded_value_display}</small>)"
+          attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-danger'>#{(upgraded_value_display)}</small>)</span>"
         end
 
         if equipped_item

@@ -746,7 +746,7 @@ class Character < ApplicationRecord
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                     return
-                elsif ((self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'pathfinder'))
+                elsif ((self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'deathwalker'))
                     Rails.logger.debug("################## Case 2 - Character is a nightstalker and item is a sword")
                     self.off_hand = item
                     remove_item_from_inventory(item)
@@ -1107,8 +1107,8 @@ class Character < ApplicationRecord
     end
 
     def valid_character_name
-        unless character_name.match?(/\A[a-zA-Z0-9]+\z/)
-            errors.add(:character_name, 'can only contain letters and numbers.')
+        unless character_name.match?(/\A[a-zA-Z0-9']+\z/)
+            errors.add(:character_name, 'can only contain letters, numbers, and the single quote character.')
         end
     end
 

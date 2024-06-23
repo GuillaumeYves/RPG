@@ -12,7 +12,7 @@ before_action :authenticate_user!
     def reset_merchant_items
         @character = current_user.selected_character
         Item.reset_items
-        Item.set_merchant_items
+        Item.set_merchant_items(@character)
 
         @character.gold -= 10
         @character.save

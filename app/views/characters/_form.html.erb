@@ -77,13 +77,13 @@ $(document).ready(function() {
     var classDescription = $('#classDescription');
     var races = ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin', 'morvandir'];
     var classes = {
-      'human': ['warrior', 'mage', 'nightstalker', 'paladin', 'deathwalker', 'demonologist'],
-      'elf': ['mage', 'paladin', 'demonologist'],
+      'human': ['warrior', 'mage', 'nightstalker', 'paladin', 'deathwalker', 'acolyte'],
+      'elf': ['mage', 'paladin', 'acolyte'],
       'dwarf': ['warrior', 'mage', 'paladin'],
       'troll': ['warrior', 'nightstalker', 'paladin'],
-      'orc': ['warrior', 'deathwalker', 'demonologist'],
-      'goblin': ['mage', 'nightstalker', 'demonologist'],
-      'morvandir': ['mage', 'deathwalker', 'demonologist']
+      'orc': ['warrior', 'deathwalker', 'acolyte'],
+      'goblin': ['mage', 'nightstalker', 'acolyte'],
+      'morvandir': ['mage', 'deathwalker', 'acolyte']
     };
     var currentRaceIndex = 0;
     var currentClassIndex = 0;
@@ -178,7 +178,7 @@ $(document).ready(function() {
         case 'deathwalker':
           classDescription.text("Embracers of decay, feeding on life's essence to wield death's unyielding power.");
           break;
-        case 'demonologist':
+        case 'acolyte':
           classDescription.text('Dark disciples of forbidden magics, bound by pacts to dreaded Demons.');
           break;
       }
@@ -249,7 +249,6 @@ $(document).ready(function() {
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('generate-random-name').addEventListener('click', function() {
       var randomNames = {
         'human': {
@@ -339,5 +338,4 @@ $(document).ready(function() {
 
       $('.character-name-field').val(randomName);
     });
-  });
 </script>

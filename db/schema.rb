@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_16_182438) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_20_120208) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -268,6 +268,24 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_16_182438) do
     t.integer "upgraded_luck", default: 0
     t.integer "upgraded_willpower", default: 0
     t.boolean "generated_item", default: false
+    t.integer "initial_min_attack", default: 0
+    t.integer "initial_max_attack", default: 0
+    t.integer "initial_min_spellpower", default: 0
+    t.integer "initial_max_spellpower", default: 0
+    t.integer "initial_min_necrosurge", default: 0
+    t.integer "initial_max_necrosurge", default: 0
+    t.integer "initial_health", default: 0
+    t.decimal "initial_global_damage", precision: 6, scale: 3, default: "0.0"
+    t.decimal "initial_critical_strike_chance", precision: 5, scale: 2, default: "0.0"
+    t.decimal "initial_critical_strike_damage", precision: 5, scale: 2, default: "0.0"
+    t.integer "initial_armor", default: 0
+    t.integer "initial_magic_resistance", default: 0
+    t.integer "initial_strength", default: 0
+    t.integer "initial_intelligence", default: 0
+    t.integer "initial_agility", default: 0
+    t.integer "initial_dreadmight", default: 0
+    t.integer "initial_luck", default: 0
+    t.integer "initial_willpower", default: 0
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
