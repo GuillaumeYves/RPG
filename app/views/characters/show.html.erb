@@ -286,7 +286,7 @@
   </div>
 
     <!-- Character stats card -->
-    <div class="card text-center mt-1" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; width: 800px;" id="character-stats-display">
+    <div class="card text-center mt-1" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; width: 800px; height: auto;" id="character-stats-display">
       <div class="card-body">
         <div class="row">
           <!-- Left column -->
@@ -354,7 +354,7 @@
           </div>
           <!-- Middle column -->
           <div class="col-md-4">
-            <div class="text-center" style="height: 240px;">
+            <div class="text-center">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Defense</h4><br>
               <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor: </strong><%= number_with_delimiter(@character.total_armor - @character.elixir_armor) %></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
@@ -409,7 +409,7 @@
           <!-- Left column -->
           <div class="col-md-4">
             <div class="text-center">
-              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Attributes</h4><br>
+              <h4 class="card-header text-white bg-primary mt-3" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Attributes</h4><br>
                <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= number_with_delimiter(@character.strength) %></span><br>
               <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= number_with_delimiter(@character.intelligence) %></span><br>
               <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= number_with_delimiter(@character.dreadmight) %></span><br>
@@ -421,7 +421,7 @@
           <!-- Middle column -->
           <div class="col-md-4">
             <div class="text-center" style="height: 240px;">
-              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Resistances</h4><br>
+              <h4 class="card-header text-white bg-primary mt-3" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Resistances</h4><br>
               <span data-tooltip="tooltip" title="Reduces Fire damage taken"><strong>Fire Resistance:</strong> <%= number_with_delimiter(@character.total_fire_resistance) %></span><br>
               <span data-tooltip="tooltip" title="Reduces Cold damage taken"><strong>Cold Resistance:</strong> <%= number_with_delimiter(@character.total_cold_resistance) %></span><br>
               <span data-tooltip="tooltip" title="Reduces Lightning damage taken"><strong>Lightning Resistance:</strong> <%= number_with_delimiter(@character.total_lightning_resistance) %></span><br>
@@ -431,7 +431,7 @@
           <!-- Right column -->
           <div class="col-md-4">
             <div class="text-center">
-              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Elixirs</h4><br>
+              <h4 class="card-header text-white bg-primary mt-3" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Elixirs</h4><br>
               <div class="d-flex justify-content-center">
                 <% if @character.active_elixir_ids.present? %>
                   <% @character.active_elixir_ids.each do |elixir_id| %>

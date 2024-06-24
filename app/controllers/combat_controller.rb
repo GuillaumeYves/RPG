@@ -200,7 +200,7 @@ class CombatController < ApplicationController
                     else
                         # Check for a critical hit based on critical_strike_chance
                         if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
-                            damage =  ((damage_roll + (damage_roll * @character.total_global_damage)) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage)))
+                            damage =  (((damage_roll + (damage_roll * @character.total_global_damage)) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                             @character_has_crit = true
                         else
                             damage = (damage_roll + (damage_roll * @character.total_global_damage))
@@ -221,7 +221,7 @@ class CombatController < ApplicationController
                     if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
                         [(damage * 0.85).round, 0].max
                     end
-                    return damage.round
+                    return (damage - (damage * (@opponent.total_damage_reduction + @opponent.buffed_damage_reduction))).to_i
                 else
                     # Chance to evade damage
                     if rand(0.00..100.00) <= @opponent.evasion
@@ -232,7 +232,7 @@ class CombatController < ApplicationController
                     else
                         # Check for a critical hit based on critical_strike_chance
                         if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
-                            damage =  (((damage_roll + (damage_roll * @character.total_global_damage)) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))) - (@opponent.total_armor + @opponent.buffed_armor))
+                            damage =  (((((damage_roll + (damage_roll * @character.total_global_damage)) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))) - (@opponent.total_armor + @opponent.buffed_armor))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                             @character_has_crit = true
                         else
                             damage = ((damage_roll + (damage_roll * @character.total_global_damage)) - (@opponent.total_armor + @opponent.buffed_armor))
@@ -253,7 +253,7 @@ class CombatController < ApplicationController
                     if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
                         [(damage * 0.85).round, 0].max
                     end
-                    return damage.round
+                    return (damage - (damage * (@opponent.total_damage_reduction + @opponent.buffed_damage_reduction))).to_i
                 end
             end
         # Opponent's turn
@@ -278,7 +278,7 @@ class CombatController < ApplicationController
                     else
                         # Check for a critical hit based on critical_strike_chance
                         if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
-                            damage =  ((damage_roll + (damage_roll * @opponent.total_global_damage)) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage)))
+                            damage =  (((damage_roll + (damage_roll * @opponent.total_global_damage)) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                             @opponent_has_crit = true
                         else
                             damage = (damage_roll + (damage_roll * @opponent.total_global_damage))
@@ -299,7 +299,7 @@ class CombatController < ApplicationController
                     else
                         # Check for a critical hit based on critical_strike_chance
                         if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
-                            damage =  (((damage_roll + (damage_roll * @opponent.total_global_damage)) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))) - (@character.total_armor + @character.buffed_armor))
+                            damage =  (((((damage_roll + (damage_roll * @opponent.total_global_damage)) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))) - (@character.total_armor + @character.buffed_armor))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                             @opponent_has_crit = true
                         else
                             damage = ((damage_roll + (damage_roll * @opponent.total_global_damage)) - (@character.total_armor + @character.buffed_armor))
@@ -323,7 +323,7 @@ class CombatController < ApplicationController
         if @character.blessing_of_kings == true && @character_blessing_of_kings_turn > 0
             [(damage * 0.85).round, 0].max
         end
-        return damage.round
+        return (damage - (damage * (@character.total_damage_reduction + @character.buffed_damage_reduction))).to_i
     end
 
     def magic_damage
@@ -350,7 +350,7 @@ class CombatController < ApplicationController
             else
                 # Check for a critical hit based on critical_strike_chance
                 if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
-                    damage =  (((damage_roll + (damage_roll * @character.total_global_damage)) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance))
+                    damage =  (((((damage_roll + (damage_roll * @character.total_global_damage)) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                     @character_has_crit = true
                 else
                     damage = ((damage_roll + (damage_roll * @character.total_global_damage)) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance))
@@ -370,7 +370,7 @@ class CombatController < ApplicationController
                 if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
                     [(damage * 0.85).round, 0].max
                 end
-                return damage.round
+                return (damage - (damage * (@opponent.total_damage_reduction + @opponent.buffed_damage_reduction))).to_i
             end
         # Opponent's turn
         elsif @opponent_turn
@@ -386,7 +386,7 @@ class CombatController < ApplicationController
             else
                 # Check for a critical hit based on critical_strike_chance
                 if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
-                    damage =  (((damage_roll + (damage_roll * @opponent.total_global_damage)) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))) - (@character.total_magic_resistance + @character.buffed_magic_resistance))
+                    damage =  (((((damage_roll + (damage_roll * @opponent.total_global_damage)) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))) - (@character.total_magic_resistance + @character.buffed_magic_resistance))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                     @opponent_has_crit = true
                 else
                     damage = (damage_roll + (damage_roll * @opponent.total_global_damage) - (@character.total_magic_resistance + @character.buffed_magic_resistance))
@@ -408,7 +408,7 @@ class CombatController < ApplicationController
         if (@character.blessing_of_kings == true && @character_blessing_of_kings_turn > 0)
             [(damage * 0.85).round, 0].max
         end
-        return damage.round
+        return (damage - (damage * (@character.total_damage_reduction + @character.buffed_damage_reduction))).to_i
     end
 
     def shadow_damage
@@ -442,7 +442,7 @@ class CombatController < ApplicationController
                 else
                     # Check for a critical hit based on critical_strike_chance
                     if rand(0.00..100.00) <= (@character.total_critical_strike_chance + @character.buffed_critical_strike_chance)
-                        damage =  ((damage_roll + (damage_roll * @character.total_global_damage) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))))
+                        damage =  ((damage_roll + (damage_roll * @character.total_global_damage) + (damage_roll * (@character.total_critical_strike_damage + @character.buffed_critical_strike_damage))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                         @character_has_crit = true
                     else
                         damage = (damage_roll + (damage_roll * @character.total_global_damage))
@@ -463,7 +463,7 @@ class CombatController < ApplicationController
                 if (@opponent.is_a?(Character) && @opponent.blessing_of_kings == true) && @opponent_blessing_of_kings_turn > 0
                     [(damage * 0.85).round, 0].max
                 end
-                return damage.round
+                return (damage - (damage * (@opponent.total_damage_reduction + @opponent.buffed_damage_reduction))).to_i
             end
         # Opponent's turn
         elsif @opponent_turn
@@ -486,7 +486,7 @@ class CombatController < ApplicationController
                 else
                     # Check for a critical hit based on critical_strike_chance
                     if rand(0.00..100.00) <= (@opponent.total_critical_strike_chance + @opponent.buffed_critical_strike_chance)
-                        damage =  ((damage_roll + (damage_roll * @opponent.total_global_damage) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))))
+                        damage =  ((damage_roll + (damage_roll * @opponent.total_global_damage) + (damage_roll * (@opponent.total_critical_strike_damage + @opponent.buffed_critical_strike_damage))) - (@opponent.total_critical_resistance + @opponent.buffed_critical_resistance))
                         @opponent_has_crit = true
                     else
                         damage = (damage_roll + (damage_roll * @opponent.total_global_damage))
@@ -509,7 +509,7 @@ class CombatController < ApplicationController
         if @character.blessing_of_kings == true && @character_blessing_of_kings_turn > 0
             [(damage * 0.85).round, 0].max
         end
-        return damage.round
+        return (damage - (damage * (@character.total_damage_reduction + @character.buffed_damage_reduction))).to_i
     end
 
     def damage_after_attack(damage)
@@ -529,10 +529,10 @@ class CombatController < ApplicationController
             # Poisened Blade - Nightstalker talent
             elsif rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
                 poisoned_blade_image = "<img src='/assets/nightstalker_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [((damage * 0.8).round - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
+                additional_damage = [((damage * 0.8).round - (@opponent.total_poison_resistance + @opponent.buffed_poison_resistance)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
                 if additional_damage.positive?
-                    log_message = "#{@character.character_name}: #{@poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional magic damage"
+                    log_message = "#{@character.character_name}: #{@poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional poison damage"
                 end
                 @combat_logs << log_message
             end
@@ -541,7 +541,7 @@ class CombatController < ApplicationController
                 from_the_shadows_image = "<img src='/assets/nightstalker_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 additional_damage = [(damage * 0.25).round, 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{@from_the_shadows_image} From the Shadows - <strong>#{additional_damage}</strong> additional true damage"
+                log_message = "#{@character.character_name}: #{from_the_shadows_image} From the Shadows - <strong>#{additional_damage}</strong> additional true damage"
                 @combat_logs << log_message
             end
             # Skullsplitter - Warrior talent
@@ -566,20 +566,20 @@ class CombatController < ApplicationController
                 @combat_logs << log_message
             end
 ############# After attack items
-            # Pandemonium
-            if @character_has_crit == true && (@character.chest.present? && @character.chest.name == "Pandemonium")
-                pandemonium_image = "<img src='/assets/legendary_items/pandemonium.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                additional_damage = [(damage * 0.22).round, 0].max
+            # Rise of the Phoenix
+            if @character_has_crit == true && (@character.chest.present? && @character.chest.name == "Rise of the Phoenix")
+                rise_of_the_phoenix_image = "<img src='/assets/legendary_items/riseofthephoenix.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                additional_damage = [((damage * 0.30).round - (@opponent.total_fire_resistance + @opponent.buffed_fire_resistance)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{pandemonium_image} Inferno Heart - <strong>#{additional_damage}</strong> additional fire damage"
+                log_message = "#{@character.character_name}: #{rise_of_the_phoenix_image} Inferno Heart - <strong>#{additional_damage}</strong> additional fire damage"
                 @combat_logs << log_message
             end
             # Ruler of Storms
             if (@character.main_hand.present? && @character.main_hand.name == "Ruler of Storms") || (@character.off_hand.present? && @character.off_hand.name == "Ruler of Storms")
                 rulerofstorms_image = "<img src='/assets/legendary_items/rulerofstorms.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                additional_damage = [(((damage * 0.4).round) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
+                additional_damage = [(((damage * 0.4).round) - (@opponent.total_lightning_resistance + @opponent.buffed_lightning_resistance)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{rulerofstorms_image} Sentence of the Skies - <strong>#{additional_damage}</strong> additional magic damage"
+                log_message = "#{@character.character_name}: #{rulerofstorms_image} Sentence of the Skies - <strong>#{additional_damage}</strong> additional lightning damage"
                 @combat_logs << log_message
             end
             # Opponent took damage is now true if damage is positive
@@ -597,9 +597,9 @@ class CombatController < ApplicationController
                 # Poisened Blade - Nightstalker talent
             elsif rand(0.0..100.0) <= 30.0 && @opponent.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
                 poisoned_blade_image = "<img src='/assets/nightstalker_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [((damage * 0.8).round - (@character.total_magic_resistance + @character.buffed_magic_resistance)), 0].max
+                additional_damage = [((damage * 0.8).round - (@character.total_poison_resistance + @character.buffed_poison_resistance)), 0].max
                 @character.total_health -= [additional_damage, 0].max
-                log_message = "#{@opponent.character_name}: #{poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional magic damage"
+                log_message = "#{@opponent.character_name}: #{poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional poison damage"
                 @combat_logs << log_message
             end
             # From the Shadows - Nightstalker talent
@@ -632,18 +632,18 @@ class CombatController < ApplicationController
                 @combat_logs << log_message
             end
 ############# After attack items
-            # Pandemonium
-            if @opponent_has_crit == true && @opponent.is_a?(Character) && (@opponent.chest.present? && @opponent.chest.name == "Pandemonium")
-                pandemonium_image = "<img src='/assets/legendary_items/pandemonium.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                additional_damage = [(damage * 0.22).round, 0].max
+            # Rise of the Phoenix
+            if @opponent_has_crit == true && @opponent.is_a?(Character) && (@opponent.chest.present? && @opponent.chest.name == "Rise of the Phoenix")
+                rise_of_the_phoenix_image = "<img src='/assets/legendary_items/riseofthephoenix.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                additional_damage = [((damage * 0.30).round - (@character.total_fire_resistance + @character.buffed_fire_resistance)), 0].max
                 @character.total_health -= [additional_damage, 0].max
-                log_message = "#{@opponent.character_name}: #{pandemonium_image} Inferno Heart - <strong>#{additional_damage}</strong> additional fire damage"
+                log_message = "#{@opponent.character_name}: #{rise_of_the_phoenix_image} Inferno Heart - <strong>#{additional_damage}</strong> additional fire damage"
                 @combat_logs << log_message
             end
             # Ruler of Storms
             if (@opponent.main_hand.present? && @opponent.main_hand.name == "Ruler of Storms") || (@opponent.off_hand.present? && @opponent.off_hand.name == "Ruler of Storms")
                 rulerofstorms_image = "<img src='/assets/legendary_items/rulerofstorms.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                additional_damage = [((damage * 0.4).round), 0].max
+                additional_damage = [((damage * 0.4).round - (@character.total_lightning_resistance + @character.buffed_lightning_resistance)), 0].max
                 @character.total_health -= [additional_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{rulerofstorms_image} Sentence of the Skies - <strong>#{additional_damage}</strong> additional magic damage"
                 @combat_logs << log_message
@@ -1194,7 +1194,7 @@ class CombatController < ApplicationController
             the_first_flame_image = "<img src='/assets/legendary_items/thefirstflame.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
                 if rand(0.00..100.00) <= 10.0
                     the_first_flame_damage = [(@opponent.total_max_health * 0.08).round, 0].max
-                    @opponent_health_in_combat -= the_first_flame_damage
+                    @opponent_health_in_combat -= (the_first_flame_damage - (@opponent.total_fire_resistance + @opponent.buffed_fire_resistance))
                     log_message = "#{@character.character_name}: #{the_first_flame_image} Flicker of Destruction - <strong>#{the_first_flame_damage}</strong> fire damage"
                     @combat_logs << log_message
                     # Opponent took damage is now true if damage is positive
@@ -1205,16 +1205,8 @@ class CombatController < ApplicationController
             if (@character.main_hand.present? && @character.main_hand.name == "Laceration") ||
             (@character.off_hand.present? && @character.off_hand.name == "Laceration")
             laceration_image = "<img src='/assets/legendary_items/laceration.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                if @character_attack > @character_spellpower && @character_attack > @character_necrosurge
-                    laceration_damage = [(physical_damage * 0.30).round, 0].max
-                    damage_type = 'physical'
-                elsif @character_spellpower > @character_attack && @character_spellpower > @character_necrosurge
-                    laceration_damage = [(magic_damage * 0.30).round, 0].max
-                    damage_type = 'magic'
-                elsif @character_necrosurge > @character_attack && @character_necrosurge > @character_spellpower
-                    laceration_damage = [(shadow_damage * 0.30).round, 0].max
-                    damage_type = 'shadow'
-                end
+                laceration_damage = [(physical_damage * 0.50).round, 0].max
+                damage_type = 'physical'
                 # Check for the statuses
                 if laceration_damage == 0
                     if @character_has_missed == true
@@ -1243,71 +1235,71 @@ class CombatController < ApplicationController
             # Opponent took damage is now true if damage is positive
             @opponent.took_damage = true if laceration_damage.positive?
             end
-            # Tempest Band
-            if (@character.finger1.present? && @character.finger1.name == "Tempest Band") || (@character.finger2.present? && @character.finger2.name == "Tempest Band")
-                tempest_band_image = "<img src='/assets/legendary_items/tempestband.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                tempest_band_damage = [(magic_damage * 0.18).round, 0].max
+            # Grand Arcanist Band
+            if (@character.finger1.present? && @character.finger1.name == "Grand Arcanist Band") || (@character.finger2.present? && @character.finger2.name == "Grand Arcanist Band")
+                grand_arcanist_band_image = "<img src='/assets/legendary_items/grandarcanistband.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                grand_arcanist_band_damage = [(magic_damage * 0.18).round, 0].max
                 damage_type = 'magic'
                 # Check for the statuses
-                if [tempest_band_damage, 0].max == 0
+                if [grand_arcanist_band_damage, 0].max == 0
                     if @character_has_missed == true
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❌ (MISS)"
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - ❌ (MISS)"
                     elsif @opponent_has_evaded == true
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - 🚫 (EVADE)"
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - 🚫 (EVADE)"
                     else
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - Damage mitigated"
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - Damage mitigated"
                     end
                 else
                     if @character_has_crit == true && @opponent_has_ignored_pain == true
-                        @opponent_health_in_combat -= [tempest_band_damage, 0].max
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @character_has_crit == true
-                        @opponent_health_in_combat -= [tempest_band_damage, 0].max
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❗ (CRITICAL STRIKE) <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - ❗ (CRITICAL STRIKE) <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @opponent_has_ignored_pain == true
-                        @opponent_health_in_combat -= [tempest_band_damage, 0].max
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - 🛡️ (IGNORE PAIN) <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - 🛡️ (IGNORE PAIN) <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     else
-                        @opponent_health_in_combat -= [tempest_band_damage, 0].max
-                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@character.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     end
                 end
                 @combat_logs << log_message
                 # Opponent took damage is now true if damage is positive
-                @opponent.took_damage = true if tempest_band_damage.positive?
+                @opponent.took_damage = true if grand_arcanist_band_damage.positive?
             end
-            # Stormweavers
-            if (@character.hands.present? && @character.hands.name == "Stormweavers")
-                stormweavers_image = "<img src='/assets/legendary_items/stormweavers.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                stormweavers_damage = [(magic_damage * 0.20).round, 0].max
+            # Arcaneweavers
+            if (@character.hands.present? && @character.hands.name == "Arcaneweavers")
+                arcaneweavers_image = "<img src='/assets/legendary_items/arcaneweavers.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                arcaneweavers_damage = [(magic_damage * 0.20).round, 0].max
                 damage_type = 'magic'
                 # Check for the statuses
-                if [stormweavers_damage, 0].max == 0
+                if [arcaneweavers_damage, 0].max == 0
                     if @character_has_missed == true
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - ❌ (MISS)"
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - ❌ (MISS)"
                     elsif @opponent_has_evaded == true
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - 🚫 (EVADE)"
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - 🚫 (EVADE)"
                     else
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - Damage mitigated"
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - Damage mitigated"
                     end
                 else
                     if @character_has_crit == true && @opponent_has_ignored_pain == true
-                        @opponent_health_in_combat -= [stormweavers_damage, 0].max
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [arcaneweavers_damage, 0].max
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[arcaneweavers_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @character_has_crit == true
-                        @opponent_health_in_combat -= [stormweavers_damage, 0].max
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE) <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [arcaneweavers_damage, 0].max
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE) <strong>#{[arcaneweavers_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @opponent_has_ignored_pain == true
-                        @opponent_health_in_combat -= [stormweavers_damage, 0].max
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - 🛡️ (IGNORE PAIN) <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [arcaneweavers_damage, 0].max
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - 🛡️ (IGNORE PAIN) <strong>#{[arcaneweavers_damage, 0].max}</strong> #{damage_type} damage"
                     else
-                        @opponent_health_in_combat -= [stormweavers_damage, 0].max
-                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @opponent_health_in_combat -= [arcaneweavers_damage, 0].max
+                        log_message = "#{@character.character_name}: #{arcaneweavers_image} Arcane Tempest - <strong>#{[arcaneweavers_damage, 0].max}</strong> #{damage_type} damage"
                     end
                 end
                 @combat_logs << log_message
                 # Opponent took damage is now true if damage is positive
-                @opponent.took_damage = true if stormweavers_damage.positive?
+                @opponent.took_damage = true if arcaneweavers_damage.positive?
             end
             # Necroclasp
             if (@character.hands.present? && @character.hands.name == "Necroclasp")
@@ -1379,11 +1371,11 @@ class CombatController < ApplicationController
 ############# Damage end of turn items
             # The First Flame
             if @opponent.neck.present? && @opponent.neck.name == "The First Flame"
-            thefirstflame_image = "<img src='/assets/legendary_items/thefirstflame.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+            the_first_flame_image = "<img src='/assets/legendary_items/thefirstflame.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
                 if rand(0.00..100.00) <= 10.0
-                    damage = [(@character.total_max_health * 0.08).round, 0].max
-                    @character.total_health -= damage
-                    log_message = "#{@opponent.character_name}: #{thefirstflame_image} Flicker of Destruction - <strong>#{damage}</strong> fire damage"
+                    the_first_flame_damage = [(@character.total_max_health * 0.08).round, 0].max
+                    @character.total_health -= (the_first_flame_damage - (@opponent.total_fire_resistance + @opponent.buffed_fire_resistance))
+                    log_message = "#{@opponent.character_name}: #{the_first_flame_image } Flicker of Destruction - <strong>#{the_first_flame_damage}</strong> fire damage"
                     @combat_logs << log_message
                     # Character took damage is now true if damage is positive
                     @character.took_damage = true if the_first_flame_damage.positive?
@@ -1393,16 +1385,8 @@ class CombatController < ApplicationController
             if (@opponent.main_hand.present? && @opponent.main_hand.name == "Laceration") ||
             (@opponent.off_hand.present? && @opponent.off_hand.name == "Laceration")
             laceration_image = "<img src='/assets/legendary_items/laceration.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-            if @opponent_attack > @opponent_spellpower && @opponent_attack > @opponent_necrosurge
-                laceration_damage = [(physical_damage * 0.30).round, 0].max
-                damage_type = 'physical'
-            elsif @opponent_spellpower > @opponent_attack && @opponent_spellpower > @opponent_necrosurge
-                laceration_damage = [(magic_damage * 0.30).round, 0].max
-                damage_type = 'magic'
-            elsif @opponent_necrosurge > @opponent_attack && @opponent_necrosurge > @opponent_spellpower
-                laceration_damage = [(shadow_damage * 0.30).round, 0].max
-                damage_type = 'shadow'
-            end
+            laceration_damage = [(physical_damage * 0.50).round, 0].max
+            damage_type = 'physical'
             # Check for the statuses
             if laceration_damage == 0
                 if @opponent_has_missed == true
@@ -1431,71 +1415,71 @@ class CombatController < ApplicationController
             # Character took damage is now true if damage is positive
             @character.took_damage = true if laceration_damage.positive?
             end
-            # Tempest Band
-            if (@opponent.finger1.present? && @opponent.finger1.name == "Tempest Band") || (@opponent.finger2.present? && @opponent.finger2.name == "Tempest Band")
-                tempest_band_image = "<img src='/assets/legendary_items/tempestband.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                tempest_band_damage = [(magic_damage * 0.18).round, 0].max
+            # Grand Arcanist Band
+            if (@opponent.finger1.present? && @opponent.finger1.name == "Grand Arcanist Band") || (@opponent.finger2.present? && @opponent.finger2.name == "Grand Arcanist Band")
+                grand_arcanist_band_image = "<img src='/assets/legendary_items/grandarcanistband.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                grand_arcanist_band_damage = [(magic_damage * 0.18).round, 0].max
                 damage_type = 'magic'
                 # Check for the statuses
-                if [tempest_band_damage, 0].max == 0
+                if [grand_arcanist_band_damage, 0].max == 0
                     if @opponent_has_missed == true
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❌ (MISS)"
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - ❌ (MISS)"
                     elsif @character_has_evaded == true
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - 🚫 (EVADE)"
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - 🚫 (EVADE)"
                     else
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - Damage mitigated"
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - Damage mitigated"
                     end
                 else
                     if @opponent_has_crit == true && @character_has_ignored_pain == true
-                        @character.total_health -= [tempest_band_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @opponent_has_crit == true
-                        @character.total_health -= [tempest_band_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❗ (CRITICAL STRIKE) <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - ❗ (CRITICAL STRIKE) <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @character_has_ignored_pain == true
-                        @character.total_health -= [tempest_band_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - 🛡️ (IGNORE PAIN) <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - 🛡️ (IGNORE PAIN) <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     else
-                        @character.total_health -= [tempest_band_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - <strong>#{[tempest_band_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [grand_arcanist_band_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{grand_arcanist_band_image} Arcane's Embrace - <strong>#{[grand_arcanist_band_damage, 0].max}</strong> #{damage_type} damage"
                     end
                 end
                 @combat_logs << log_message
                 # Character took damage is now true if damage is positive
-                @character.took_damage = true if tempest_band_damage.positive?
+                @character.took_damage = true if grand_arcanist_band_damage.positive?
             end
-            # Stormweavers
-            if (@opponent.hands.present? && @opponent.hands.name == "Stormweavers")
-                stormweavers_image = "<img src='/assets/legendary_items/stormweavers.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                stormweavers_damage = [(magic_damage * 0.20).round, 0].max
+            # Arcane Weavers
+            if (@opponent.hands.present? && @opponent.hands.name == "Arcane Weavers")
+                arcane_weavers_image = "<img src='/assets/legendary_items/arcaneweavers.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
+                arcane_weavers_damage = [(magic_damage * 0.20).round, 0].max
                 damage_type = 'magic'
                 # Check for the statuses
-                if [stormweavers_damage, 0].max == 0
+                if [arcaneweavers_damage, 0].max == 0
                     if @opponent_has_missed == true
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - ❌ (MISS)"
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - ❌ (MISS)"
                     elsif @character_has_evaded == true
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - 🚫 (EVADE)"
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - 🚫 (EVADE)"
                     else
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - Damage mitigated"
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - Damage mitigated"
                     end
                 else
                     if @opponent_has_crit == true && @character_has_ignored_pain == true
-                        @character.total_health -= [stormweavers_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [arcane_weavers_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{[arcane_weavers_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @opponent_has_crit == true
-                        @character.total_health -= [stormweavers_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE) <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [arcane_weavers_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - ❗ (CRITICAL STRIKE) <strong>#{[arcane_weavers_damage, 0].max}</strong> #{damage_type} damage"
                     elsif @character_has_ignored_pain == true
-                        @character.total_health -= [stormweavers_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - 🛡️ (IGNORE PAIN) <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [arcane_weavers_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - 🛡️ (IGNORE PAIN) <strong>#{[arcane_weavers_damage, 0].max}</strong> #{damage_type} damage"
                     else
-                        @character.total_health -= [stormweavers_damage, 0].max
-                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - <strong>#{[stormweavers_damage, 0].max}</strong> #{damage_type} damage"
+                        @character.total_health -= [arcane_weavers_damage, 0].max
+                        log_message = "#{@opponent.character_name}: #{arcane_weavers_image} Arcane Tempest - <strong>#{[arcane_weavers_damage, 0].max}</strong> #{damage_type} damage"
                     end
                 end
                 @combat_logs << log_message
                 # Character took damage is now true if damage is positive
-                @character.took_damage = true if stormweavers_damage.positive?
+                @character.took_damage = true if arcane_weavers_damage.positive?
             end
             # Necroclasp
             if (@opponent.hands.present? && @opponent.hands.name == "Necroclasp")
