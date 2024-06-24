@@ -100,8 +100,65 @@ body {
 .legendary .item-rarity {
   font-size: 18px;
   color: gold;
-  animation: legendarycolorChange 1s infinite alternate;
+  animation: legendaryColorChange 1s infinite alternate;
   text-shadow: 1px 1px 1px black;
+}
+
+.epic .item-rarity {
+  font-size: 18px;
+  color: rgb(255, 0, 242);
+  animation: epicColorChange 1s infinite alternate;
+  text-shadow: 1px 1px 1px black;
+}
+
+.rare .item-rarity {
+  font-size: 18px;
+  color: dodgerblue;
+  animation: rareColorChange 1s infinite alternate;
+  text-shadow: 1px 1px 1px black;
+}
+
+.common .item-rarity {
+  font-size: 18px;
+  color: grey;
+  animation: commonColorChange 1s infinite alternate;
+  text-shadow: 1px 1px 1px black;
+}
+
+@keyframes legendaryColorChange {
+  from {
+    color: gold;
+  }
+  to {
+    color: orange;
+  }
+}
+
+@keyframes epicColorChange {
+  from {
+    color: rgb(255, 0, 242);
+  }
+  to {
+    color: rgb(153, 0, 255);
+  }
+}
+
+@keyframes rareColorChange {
+  from {
+    color: dodgerblue;
+  }
+  to {
+    color: deepskyblue;
+  }
+}
+
+@keyframes commonColorChange {
+  from {
+    color: grey;
+  }
+  to {
+    color: darkgrey;
+  }
 }
 
 .item-legendary-effect-name {
@@ -111,33 +168,42 @@ body {
   text-shadow: 1px 1px 1px black;
 }
 
-@keyframes legendarycolorChange {
-  from {
-    color: gold;
-  }
-  to {
-    color: orange;
-  }
-}
-
-.epic .item-rarity {
-  font-size: 18px;
-  color: rgb(255, 0, 242);
-  animation: epiccolorChange 1s infinite alternate;
-  text-shadow: 1px 1px 1px black;
-}
-
-@keyframes epiccolorChange {
-  from {
-    color: rgb(255, 0, 242);
-  }
-  to {
-    color: rgb(153, 0, 255);
-  }
-}
-
 .item-legendary-effect-description br {
   display: block;
   content: "";
   margin-bottom: 0;
+}
+
+.stat-increase {
+  color: green;
+  margin-left: 5px;
+}
+
+.stat-decrease {
+  color: red;
+  margin-left: 5px;
+}
+
+.text-red-1 {
+  color: #ffc6cb;
+}
+
+.text-red-2 {
+  color: #ffa9b1;
+}
+
+.text-red-3 {
+  color: #ff7a81;
+}
+
+.text-red-4 {
+  color: #ff6070;
+}
+
+.text-red-5 {
+  color: #ff0019;
+}
+
+.tooltip-item-attribute {
+  line-height: 18px;
 }

@@ -10,7 +10,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= head_item.id %>)" onmouseover="showTooltip(<%= head_item.id %>)" onmouseout="hideTooltip(<%= head_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(head_item) %>
+                <%= display_item_tooltip(head_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(head_item.item_image, alt: "head_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -31,7 +31,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= chest_item.id %>)" onmouseover="showTooltip(<%= chest_item.id %>)" onmouseout="hideTooltip(<%= chest_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(chest_item) %>
+                <%= display_item_tooltip(chest_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(chest_item.item_image, alt: "chest_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -52,7 +52,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= hands_item.id %>)" onmouseover="showTooltip(<%= hands_item.id %>)" onmouseout="hideTooltip(<%= hands_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(hands_item) %>
+                <%= display_item_tooltip(hands_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(hands_item.item_image, alt: "hands_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -73,7 +73,7 @@
             <div class="item-container" style="position: relative; padding: 0;">
               <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= feet_item.id %>)" onmouseover="showTooltip(<%= feet_item.id %>)" onmouseout="hideTooltip(<%= feet_item.id %>)">
                 <!-- Tooltip content -->
-                <%= display_item_tooltip(feet_item) %>
+                <%= display_item_tooltip(feet_item, @character) %>
                 <!-- Item Image -->
                 <%= image_tag(feet_item.item_image, alt: "feet_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
               </div>
@@ -155,7 +155,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= neck_item.id %>)" onmouseover="showTooltip(<%= neck_item.id %>)" onmouseout="hideTooltip(<%= neck_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(neck_item) %>
+                  <%= display_item_tooltip(neck_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(neck_item.item_image, alt: "neck_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -176,7 +176,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= waist_item.id %>)" onmouseover="showTooltip(<%= waist_item.id %>)" onmouseout="hideTooltip(<%= waist_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(waist_item) %>
+                  <%= display_item_tooltip(waist_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(waist_item.item_image, alt: "waist_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -197,7 +197,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger1_item.id %>)" onmouseover="showTooltip(<%= finger1_item.id %>)" onmouseout="hideTooltip(<%= finger1_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(finger1_item) %>
+                  <%= display_item_tooltip(finger1_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(finger1_item.item_image, alt: "finger1_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -218,7 +218,7 @@
               <div class="item-container" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= finger2_item.id %>)" onmouseover="showTooltip(<%= finger2_item.id %>)" onmouseout="hideTooltip(<%= finger2_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(finger2_item) %>
+                  <%= display_item_tooltip(finger2_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(finger2_item.item_image, alt: "finger2_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -243,7 +243,7 @@
               <div class="item-container col-2 text-center" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= main_hand_item.id %>)" onmouseover="showTooltip(<%= main_hand_item.id %>)" onmouseout="hideTooltip(<%= main_hand_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(main_hand_item) %>
+                  <%= display_item_tooltip(main_hand_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(main_hand_item.item_image, alt: "main_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -264,7 +264,7 @@
               <div class="item-container col-2 text-center" style="position: relative; padding: 0;">
                 <div class="hover-item" onmousemove="updateTooltipPosition(event, <%= off_hand_item.id %>)" onmouseover="showTooltip(<%= off_hand_item.id %>)" onmouseout="hideTooltip(<%= off_hand_item.id %>)">
                   <!-- Tooltip content -->
-                  <%= display_item_tooltip(off_hand_item) %>
+                  <%= display_item_tooltip(off_hand_item, @character) %>
                   <!-- Item Image -->
                   <%= image_tag(off_hand_item.item_image, alt: "off_hand_item", style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;') %>
                 </div>
@@ -288,69 +288,74 @@
     <!-- Character stats card -->
     <div class="card text-center mt-1" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; width: 800px;" id="character-stats-display">
       <div class="card-body">
-        <div class="row no-gutters">
-
+        <div class="row">
           <!-- Left column -->
           <div class="col-md-4">
             <div class="text-center">
-              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">General</h4><br>
+              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Offense</h4><br>
               <span data-tooltip="tooltip" title="Total amount of Health"><strong>Health:</strong> <%= number_with_delimiter(@character.total_health) %> / <%= number_with_delimiter(@character.total_max_health) %></span><br>
-                <% if (@character.neck.present? && @character.neck.name == "The Nexus") %>
-                  <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_max_attack %></span>              
-                  <% @character.active_elixir_ids.each do |elixir_id| %>
-                    <% elixir = Item.find(elixir_id) %>
-                    <% if elixir.name == "Elixir of Might" %>
-                      <span data-tooltip="tooltip" title="Elixir of Might" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_attack)}" %></span>              
-                    <% end %>
-                  <% end %>
-                  <br>
-                  <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_max_spellpower %></span>
-                  <% @character.active_elixir_ids.each do |elixir_id| %>
-                    <% elixir = Item.find(elixir_id) %>
-                    <% if elixir.name == "Elixir of Power" %>
-                      <span data-tooltip="tooltip" title="Elixir of Power" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_spellpower)}" %></span>
-                    <% end %>
-                  <% end %> 
-                  <br>             
-                  <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_max_necrosurge %></span>
-                  <% @character.active_elixir_ids.each do |elixir_id| %>
-                    <% elixir = Item.find(elixir_id) %>
-                    <% if elixir.name == "Elixir of Decay" %>
-                      <span data-tooltip="tooltip" title="Elixir of Decay" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_necrosurge)}" %></span>
-                    <% end %>
-                  <% end %>  
-                <% else %>
-                  <% average_attack = (@character.total_min_attack + @character.total_max_attack) / 2 %>
-                  <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_min_attack %> - <%= @character.total_max_attack %> <small class="text-muted">(~<%= number_with_delimiter(average_attack) %>)</small></span>              
-                  <% @character.active_elixir_ids.each do |elixir_id| %>
-                    <% elixir = Item.find(elixir_id) %>
-                    <% if (elixir.name == "Elixir of Might").present? %>
-                      <span data-tooltip="tooltip" title="Elixir of Might" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_attack)}" %></span>              
-                    <% end %>
-                  <% end %>
-                  <br>
-                  <% average_spellpower = (@character.total_min_spellpower + @character.total_max_spellpower) / 2 %>
-                  <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_min_spellpower %> - <%= @character.total_max_spellpower %> <small class="text-muted">(~<%= number_with_delimiter(average_spellpower) %>)</small></span>
-                  <% @character.active_elixir_ids.each do |elixir_id| %>
-                    <% elixir = Item.find(elixir_id) %>
-                    <% if (elixir.name == "Elixir of Power").present? %>
-                      <span data-tooltip="tooltip" title="Elixir of Power" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_spellpower)}" %></span>
-                    <% end %>
-                  <% end %> 
-                  <br>             
-                  <% average_necrosurge = (@character.total_min_necrosurge + @character.total_max_necrosurge) / 2 %>
-                  <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_min_necrosurge %> - <%= @character.total_max_necrosurge %> <small class="text-muted">(~<%= number_with_delimiter(average_necrosurge) %>)</small></span>
-                  <% @character.active_elixir_ids.each do |elixir_id| %>
-                    <% elixir = Item.find(elixir_id) %>
-                    <% if (elixir.name == "Elixir of Decay").present? %>
-                      <span data-tooltip="tooltip" title="Elixir of Decay" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_necrosurge)}" %></span>
-                    <% end %>
+              <% if (@character.neck.present? && @character.neck.name == "The Nexus") %>
+                <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_max_attack %></span>              
+                <% @character.active_elixir_ids.each do |elixir_id| %>
+                  <% elixir = Item.find(elixir_id) %>
+                  <% if elixir.name == "Elixir of Might" %>
+                    <span data-tooltip="tooltip" title="Elixir of Might" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_attack)}" %></span>              
                   <% end %>
                 <% end %>
+                <br>
+                <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_max_spellpower %></span>
+                <% @character.active_elixir_ids.each do |elixir_id| %>
+                  <% elixir = Item.find(elixir_id) %>
+                  <% if elixir.name == "Elixir of Power" %>
+                    <span data-tooltip="tooltip" title="Elixir of Power" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_spellpower)}" %></span>
+                  <% end %>
+                <% end %> 
+                <br>             
+                <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_max_necrosurge %></span>
+                <% @character.active_elixir_ids.each do |elixir_id| %>
+                  <% elixir = Item.find(elixir_id) %>
+                  <% if elixir.name == "Elixir of Decay" %>
+                    <span data-tooltip="tooltip" title="Elixir of Decay" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_necrosurge)}" %></span>
+                  <% end %>
+                <% end %>  
+              <% else %>
+                <% average_attack = (@character.total_min_attack + @character.total_max_attack) / 2 %>
+                <span data-tooltip="tooltip" title="Physical damage"><strong>Attack:</strong> <%= @character.total_min_attack %> - <%= @character.total_max_attack %> <small class="text-muted">(~<%= number_with_delimiter(average_attack) %>)</small></span>              
+                <% @character.active_elixir_ids.each do |elixir_id| %>
+                  <% elixir = Item.find(elixir_id) %>
+                  <% if (elixir.name == "Elixir of Might").present? %>
+                    <span data-tooltip="tooltip" title="Elixir of Might" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_attack)}" %></span>              
+                  <% end %>
+                <% end %>
+                <br>
+                <% average_spellpower = (@character.total_min_spellpower + @character.total_max_spellpower) / 2 %>
+                <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_min_spellpower %> - <%= @character.total_max_spellpower %> <small class="text-muted">(~<%= number_with_delimiter(average_spellpower) %>)</small></span>
+                <% @character.active_elixir_ids.each do |elixir_id| %>
+                  <% elixir = Item.find(elixir_id) %>
+                  <% if (elixir.name == "Elixir of Power").present? %>
+                    <span data-tooltip="tooltip" title="Elixir of Power" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_spellpower)}" %></span>
+                  <% end %>
+                <% end %> 
+                <br>             
+                <% average_necrosurge = (@character.total_min_necrosurge + @character.total_max_necrosurge) / 2 %>
+                <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_min_necrosurge %> - <%= @character.total_max_necrosurge %> <small class="text-muted">(~<%= number_with_delimiter(average_necrosurge) %>)</small></span>
+                <% @character.active_elixir_ids.each do |elixir_id| %>
+                  <% elixir = Item.find(elixir_id) %>
+                  <% if (elixir.name == "Elixir of Decay").present? %>
+                    <span data-tooltip="tooltip" title="Elixir of Decay" class="text-success"><%= " +#{number_with_delimiter(@character.elixir_necrosurge)}" %></span>
+                  <% end %>
+                <% end %>
+              <% end %>
               <br>
               <span data-tooltip="tooltip" title="Chance to Critically Strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
               <span data-tooltip="tooltip" title="Increases the damage of your Critical Strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
               <span data-tooltip="tooltip" title="Increases your damage dealt"><strong>Global Damage:</strong> <%= number_with_precision(@character.total_global_damage * 100, precision: 2) %>%</span><br>
+            </div>
+          </div>
+          <!-- Middle column -->
+          <div class="col-md-4">
+            <div class="text-center" style="height: 240px;">
+              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Defense</h4><br>
               <span data-tooltip="tooltip" title="Reduces physical damage taken"><strong>Armor: </strong><%= number_with_delimiter(@character.total_armor - @character.elixir_armor) %></span>
               <% @character.active_elixir_ids.each do |elixir_id| %>
                 <% elixir = Item.find(elixir_id) %>
@@ -369,22 +374,63 @@
               <br>              
               <span data-tooltip="tooltip" title="Evading an attack will allow you to not take damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
               <span data-tooltip="tooltip" title="Ignoring pain will reduce incoming damage by 20%"><strong>Chance to Ignore Pain:</strong> <%= number_with_precision(@character.ignore_pain_chance, precision: 2)%>%</span><br>
+              <span data-tooltip="tooltip" title="Reduces the damage taken from Critical Strikes"><strong>Critical Resistance:</strong> %</span><br>
+              <span data-tooltip="tooltip" title="Reduces global damage taken"><strong>Damage Reduction:</strong> %</span><br>
             </div>
           </div>
-
-          <!-- Middle column -->
+          <!-- Right column -->
           <div class="col-md-4">
-            <div class="text-center" style=" height:240px;">
+            <div class="text-center">
+              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Talents</h4><br>
+              <% if @skills.any?(&:unlocked) %>
+                <div class="row" style="padding-right: 15px; padding-left: 15px;">
+                  <% @skills.each do |skill| %>
+                    <% if skill.unlocked %>
+                      <div class="col-md-6">
+                        <div>
+                          <span data-tooltip="tooltip" title="<%= skill.description %>">
+                            <%= image_tag skill.skill_image, style: 'width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
+                          </span>
+                          <p style="margin-top: -5px; font-size:12px"><small><%= skill.name %></small></p>
+                          <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small><%= skill.skill_type&.capitalize %></small></p>
+                        </div>
+                      </div>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% else %>
+                <p>No talent unlocked.</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <!-- Second row -->
+        <div class="row">
+          <!-- Left column -->
+          <div class="col-md-4">
+            <div class="text-center">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Attributes</h4><br>
-              <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= number_with_delimiter(@character.strength) %></span><br>
+               <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= number_with_delimiter(@character.strength) %></span><br>
               <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= number_with_delimiter(@character.intelligence) %></span><br>
               <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= number_with_delimiter(@character.dreadmight) %></span><br>
               <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= number_with_delimiter(@character.agility) %></span><br>
               <span data-tooltip="tooltip" title="Increases your Critical Strike Chance"><strong>Luck:</strong> <%= number_with_delimiter(@character.luck) %></span><br>
               <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= number_with_delimiter(@character.willpower) %></span><br>
             </div>
-
-            <div class="text-center mt-3 mb-3">
+          </div>
+          <!-- Middle column -->
+          <div class="col-md-4">
+            <div class="text-center" style="height: 240px;">
+              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Resistances</h4><br>
+              <span data-tooltip="tooltip" title="Reduces Fire damage taken"><strong>Fire Resistance:</strong> %</span><br>
+              <span data-tooltip="tooltip" title="Reduces Cold damage taken"><strong>Cold Resistance:</strong> %</span><br>
+              <span data-tooltip="tooltip" title="Reduces Lightning damage taken"><strong>Lightning Resistance:</strong> %</span><br>
+              <span data-tooltip="tooltip" title="Reduces Poison damage taken"><strong>Poison Resistance:</strong> %</span><br>
+            </div>
+          </div>
+          <!-- Right column -->
+          <div class="col-md-4">
+            <div class="text-center">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Elixirs</h4><br>
               <div class="d-flex justify-content-center">
                 <% if @character.active_elixir_ids.present? %>
@@ -432,37 +478,6 @@
                 <% end %>
               </div>
             </div>
-          </div>
-
-          <!-- Right column -->
-          <div class="col-md-4">
-            <div class="text-center" style=" height:240px;">
-              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Talents</h4><br>
-              <% if @skills.any?(&:unlocked) %>
-                <div class="row" style="padding-right: 15px; padding-left: 15px;">
-                  <% @skills.each do |skill| %>
-                    <% if skill.unlocked %>
-                      <div class="col-md-6">
-                        <div>
-                          <span data-tooltip="tooltip" title="<%= skill.description %>">
-                            <%= image_tag skill.skill_image, style: 'width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;' %>
-                          </span>
-                          <p style="margin-top: -5px; font-size:12px"><small><%= skill.name %></small></p>
-                          <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small><%= skill.skill_type&.capitalize %></small></p>
-                        </div>
-                      </div>
-                    <% end %>
-                  <% end %>
-                </div>
-              <% else %>
-                <p>No talent unlocked.</p>
-              <% end %>
-            </div>
-
-            <div class="text-center mt-3">
-              <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto;">Placeholder</h4><br>
-            </div>
-
           </div>
         </div>
       </div>

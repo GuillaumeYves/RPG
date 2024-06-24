@@ -522,7 +522,6 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
         end
     end
 
-
     def gain_experience
         @character = current_user.selected_character
 
@@ -678,7 +677,7 @@ before_action :authenticate_user!, only: [:new, :create, :user_characters]
                 inventory.items << item
                 inventory.save
                 @character.save
-                item.update(purchased: true)
+                item.update(merchant_item: false)
                 respond_to do |format|
                     format.js { render js: "window.location.reload()" }
                 end

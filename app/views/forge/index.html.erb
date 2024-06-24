@@ -23,7 +23,7 @@
       <% if @selected_item %>
         <div>
           <%= image_tag(@selected_item.item_image, style: 'width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;') %>
-          <p id="selected-item-upgrade">Upgrade: <%= @selected_item.upgrade %>/5</p>
+          <p id="selected-item-upgrade">Upgrade: <%= @selected_item.upgrade %>/20</p>
             <form action="<%= upgrade_forge_index_path %>" method="post" id="upgrade-form-<%= @selected_item.id %>">
               <%= hidden_field_tag :item_id, @selected_item.id %>
               <input type="submit" value="Upgrade" id="upgrade-button-<%= @selected_item.id %>" class="btn btn-primary">
@@ -47,7 +47,7 @@
     document.getElementById("forge-slot").innerHTML = `
       <div>
         <img src="${itemImage}" style="width: 100px; height: 100px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;">
-        <p id="selected-item-upgrade">${itemUpgrade} / 5</p>
+        <p id="selected-item-upgrade">${itemUpgrade} / 20</p>
         <form action="/forge/upgrade" method="post" id="upgrade-form-${itemId}">
           <input type="hidden" name="item_id" value="${itemId}" id="selected-item-id-${itemId}">
           <input type="submit" value="Upgrade" id="upgrade-button-${itemId}" class="btn btn-primary">

@@ -211,6 +211,9 @@ class CombatController < ApplicationController
                             end
                         end
                     end
+                    if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                        [(damage * 2).round, 0].max # Return damage with Divine Strength
+                    end
                     if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                         [(damage * 1.5).round, 0].max # Return damage with Nemesis
                     end
@@ -239,6 +242,9 @@ class CombatController < ApplicationController
                                 @opponent_has_ignored_pain = true
                             end
                         end
+                    end
+                    if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                        [(damage * 2).round, 0].max # Return damage with Divine Strength
                     end
                     if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                         [(damage * 1.5).round, 0].max # Return damage with Nemesis
@@ -307,6 +313,9 @@ class CombatController < ApplicationController
                 end
             end
         end
+        if @opponent.is_a?(Character) && ((rand(0..100) <= 15) && @opponent.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+            [(damage * 2).round, 0].max # Return damage with Divine Strength
+        end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
         end
@@ -351,6 +360,9 @@ class CombatController < ApplicationController
                         @opponent_has_ignored_pain = true
                     end
                 end
+                if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                    [(damage * 2).round, 0].max # Return damage with Divine Strength
+                end
                 if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                     [(damage * 1.5).round, 0].max # Return damage with Nemesis
                 end
@@ -385,6 +397,9 @@ class CombatController < ApplicationController
                     end
                 end
             end
+        end
+        if @opponent.is_a?(Character) && ((rand(0..100) <= 15) && @opponent.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+            [(damage * 2).round, 0].max # Return damage with Divine Strength
         end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
@@ -438,6 +453,9 @@ class CombatController < ApplicationController
                         end
                     end
                 end
+                if ((rand(0..100) <= 15) && @character.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+                    [(damage * 2).round, 0].max # Return damage with Divine Strength
+                end
                 if @character.main_hand.present? && @character.main_hand.name == "Nemesis" && @opponent_health_in_combat >= (@opponent.total_max_health * 0.70)
                     [(damage * 1.5).round, 0].max # Return damage with Nemesis
                 end
@@ -481,6 +499,9 @@ class CombatController < ApplicationController
                 end
             end
         end
+        if @opponent.is_a?(Character) && ((rand(0..100) <= 15) && @opponent.skills.find_by(name: "Divine Strength", unlocked: true).present?)
+            [(damage * 2).round, 0].max # Return damage with Divine Strength
+        end
         if @opponent.is_a?(Character) && @opponent.main_hand.present? && @opponent.main_hand.name == "Nemesis" && @character.total_health >= (@character.total_max_health * 0.70)
             [(damage * 1.5).round, 0].max # Return damage with Nemesis
         end
@@ -496,39 +517,43 @@ class CombatController < ApplicationController
         # Character turn
         if @character_turn
 ############# After attack talents
-            # Sharpened Blade - Rogue talent
+            # Sharpened Blade - Nightstalker talent
             if rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
-                sharpened_blade_image = "<img src='/assets/rogue_skills/sharpenedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [((damage * 0.5).round - (@opponent.total_armor + @opponent.buffed_armor)), 0].max
+                sharpened_blade_image = "<img src='/assets/nightstalker_skills/sharpenedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                additional_damage = [((damage * 0.8).round - (@opponent.total_armor + @opponent.buffed_armor)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{@sharpened_blade_image} Sharpened Blade - <strong>#{additional_damage}</strong> additional physical damage"
+                if additional_damage.positive?
+                    log_message = "#{@character.character_name}: #{@sharpened_blade_image} Sharpened Blade - <strong>#{additional_damage}</strong> additional physical damage"
+                end
                 @combat_logs << log_message
-            # Poisened Blade - Rogue talent
+            # Poisened Blade - Nightstalker talent
             elsif rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
-                poisoned_blade_image = "<img src='/assets/rogue_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [((damage * 0.5).round - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
+                poisoned_blade_image = "<img src='/assets/nightstalker_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                additional_damage = [((damage * 0.8).round - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{@poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional magic damage"
+                if additional_damage.positive?
+                    log_message = "#{@character.character_name}: #{@poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional magic damage"
+                end
                 @combat_logs << log_message
             end
-            # From the Shadows - Rogue talent
+            # From the Shadows - Nightstalker talent
             if @character_has_crit == true && @character.skills.find_by(name: 'From the Shadows', unlocked: true).present?
-                from_the_shadows_image = "<img src='/assets/rogue_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                from_the_shadows_image = "<img src='/assets/nightstalker_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 additional_damage = [(damage * 0.25).round, 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
                 log_message = "#{@character.character_name}: #{@from_the_shadows_image} From the Shadows - <strong>#{additional_damage}</strong> additional true damage"
                 @combat_logs << log_message
             end
             # Skullsplitter - Warrior talent
-            if @character_has_crit == true && @character.skills.find_by(name: 'Skullsplitter', unlocked: true).present? && !(@character.main_hand.name == 'Hellbound' || @character.off_hand.name == 'Hellbound')
+            if @character_has_crit == true && @character.skills.find_by(name: 'Skullsplitter', unlocked: true).present?
                 skullsplitter_image = "<img src='/assets/warrior_skills/skullsplitter.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [(@opponent.total_max_health * 0.01).round, 0].max
+                additional_damage = [((@opponent.total_max_health * 0.10).round - (@opponent.total_armor + @opponent.buffed_armor)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@character.character_name}: #{@skullsplitter_image} Skullsplitter - <strong>#{additional_damage}</strong> additional true damage"
+                log_message = "#{@character.character_name}: #{skullsplitter_image} Skullsplitter - <strong>#{additional_damage}</strong> additional physical damage"
                 @combat_logs << log_message
             end
             # Deep Wounds - Warrior talent initialize
-            if @character.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @character_deep_wounds_turn == 0
+            if (damage.positive? && @character.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @character_deep_wounds_turn == 0)
                 @character_deep_wounds_turn = 3
                 @character_deep_wounds_damage = [(damage / 3).round, 0].max
             end
@@ -552,7 +577,7 @@ class CombatController < ApplicationController
             # Ruler of Storms
             if (@character.main_hand.present? && @character.main_hand.name == "Ruler of Storms") || (@character.off_hand.present? && @character.off_hand.name == "Ruler of Storms")
                 rulerofstorms_image = "<img src='/assets/legendary_items/rulerofstorms.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                additional_damage = [(((damage * 0.2).round) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
+                additional_damage = [(((damage * 0.4).round) - (@opponent.total_magic_resistance + @opponent.buffed_magic_resistance)), 0].max
                 @opponent_health_in_combat -= [additional_damage, 0].max
                 log_message = "#{@character.character_name}: #{rulerofstorms_image} Sentence of the Skies - <strong>#{additional_damage}</strong> additional magic damage"
                 @combat_logs << log_message
@@ -562,39 +587,39 @@ class CombatController < ApplicationController
         # Opponent turn
         elsif @opponent_turn && @opponent.is_a?(Character)
 ############# After attack talents
-            # Sharpened Blade - Rogue talent
+            # Sharpened Blade - Nightstalker talent
             if rand(0.0..100.0) <= 30.0 && @opponent.skills.find_by(name: 'Sharpened Blade', unlocked: true).present?
-                sharpened_blade_image = "<img src='/assets/rogue_skills/sharpenedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [((damage * 0.5).round - (@character.total_armor + @character.buffed_armor)), 0].max
-                @opponent_health_in_combat -= [additional_damage, 0].max
+                sharpened_blade_image = "<img src='/assets/nightstalker_skills/sharpenedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                additional_damage = [((damage * 0.8).round - (@character.total_armor + @character.buffed_armor)), 0].max
+                @character.total_health -= [additional_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{sharpened_blade_image} Sharpened Blade - <strong>#{additional_damage}</strong> additional physical damage"
                 @combat_logs << log_message
-                # Poisened Blade - Rogue talent
+                # Poisened Blade - Nightstalker talent
             elsif rand(0.0..100.0) <= 30.0 && @opponent.skills.find_by(name: 'Poisoned Blade', unlocked: true).present?
-                poisoned_blade_image = "<img src='/assets/rogue_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [((damage * 0.5).round - (@character.total_magic_resistance + @character.buffed_magic_resistance)), 0].max
-                @opponent_health_in_combat -= [additional_damage, 0].max
+                poisoned_blade_image = "<img src='/assets/nightstalker_skills/poisonedblade.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                additional_damage = [((damage * 0.8).round - (@character.total_magic_resistance + @character.buffed_magic_resistance)), 0].max
+                @character.total_health -= [additional_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{poisoned_blade_image} Poisoned Blade - <strong>#{additional_damage}</strong> additional magic damage"
                 @combat_logs << log_message
             end
-            # From the Shadows - Rogue talent
+            # From the Shadows - Nightstalker talent
             if @opponent_has_crit == true && @opponent.skills.find_by(name: 'From the Shadows', unlocked: true).present?
-                from_the_shadows_image = "<img src='/assets/rogue_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                from_the_shadows_image = "<img src='/assets/nightstalker_skills/fromtheshadows.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 additional_damage = [(damage * 0.25).round, 0].max
-                @opponent_health_in_combat -= [additional_damage, 0].max
+                @character.total_health -= [additional_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{from_the_shadows_image} From the Shadows - <strong>#{additional_damage}</strong> additional true damage"
                 @combat_logs << log_message
             end
             # Skullsplitter - Warrior talent
-            if @opponent_has_crit == true && @opponent.skills.find_by(name: 'Skullsplitter', unlocked: true).present? && !(@opponent.main_hand.name == 'Hellbound' || @opponent.off_hand.name == 'Hellbound')
+            if @opponent_has_crit == true && @opponent.skills.find_by(name: 'Skullsplitter', unlocked: true).present?
                 skullsplitter_image = "<img src='/assets/warrior_skills/skullsplitter.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                additional_damage = [(@opponent.total_max_health * 0.01).round, 0].max
-                @opponent_health_in_combat -= [additional_damage, 0].max
-                log_message = "#{@opponent.character_name}: #{skullsplitter_image} Skullsplitter - <strong>#{additional_damage}</strong> additional true damage"
+                additional_damage = [((@character.total_max_health * 0.10).round - (@character.total_armor + @character.buffed_armor)), 0].max
+                @character.total_health -= [additional_damage, 0].max
+                log_message = "#{@opponent.character_name}: #{skullsplitter_image} Skullsplitter - <strong>#{additional_damage}</strong> additional physical damage"
                 @combat_logs << log_message
             end
             # Deep Wounds - Warrior talent
-            if @opponent.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @opponent_deep_wounds_turn == 0
+            if (damage.positive? && @opponent.skills.find_by(name: 'Deep Wounds', unlocked:true).present? && @opponent_deep_wounds_turn == 0)
                 @opponent_deep_wounds_turn = 3
                 @opponent_deep_wounds_damage = [(damage / 3).round, 0].max
             end
@@ -602,7 +627,7 @@ class CombatController < ApplicationController
             if @opponent.skills.find_by(name: 'Judgement', unlocked: true).present?
                 judgement_image = "<img src='/assets/paladin_skills/judgement.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 additional_damage = [(damage * 0.05).round, 0].max
-                @opponent_health_in_combat -= [additional_damage, 0].max
+                @character.total_health -= [additional_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{judgement_image} Judgement - <strong>#{additional_damage}</strong> additional true damage"
                 @combat_logs << log_message
             end
@@ -618,8 +643,8 @@ class CombatController < ApplicationController
             # Ruler of Storms
             if (@opponent.main_hand.present? && @opponent.main_hand.name == "Ruler of Storms") || (@opponent.off_hand.present? && @opponent.off_hand.name == "Ruler of Storms")
                 rulerofstorms_image = "<img src='/assets/legendary_items/rulerofstorms.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
-                additional_damage = [((damage * 0.2).round), 0].max
-                @opponent_health_in_combat -= [additional_damage, 0].max
+                additional_damage = [((damage * 0.4).round), 0].max
+                @character.total_health -= [additional_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{rulerofstorms_image} Sentence of the Skies - <strong>#{additional_damage}</strong> additional magic damage"
                 @combat_logs << log_message
             end
@@ -645,7 +670,7 @@ class CombatController < ApplicationController
                 eternal_rage_image = "<img src='/assets/legendary_items/eternalrage.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Helion' class='log-skill-image'>"
                 @character.buffed_min_attack += (@character.min_attack * 0.15)
                 @character.buffed_max_attack += (@character.max_attack * 0.15)
-                log_message = "#{@character.character_name}: #{eternal_rage_image} Eternal Rage - ⬆️ Attack increased by <strong>15%</strong>"
+                log_message = "#{@character.character_name}: #{eternal_rage_image} Wrathful Obsession - ⬆️ Attack increased by <strong>15%</strong>"
                 @combat_logs << log_message
             end
         # Opponent turn
@@ -664,7 +689,7 @@ class CombatController < ApplicationController
                 eternal_rage_image = "<img src='/assets/legendary_items/eternalrage.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Helion' class='log-skill-image'>"
                 @opponent.buffed_min_attack += (@opponent.min_attack * 0.15)
                 @opponent.buffed_max_attack += (@opponent.max_attack * 0.15)
-                log_message = "#{@opponent.character_name}: #{eternal_rage_image} Eternal Rage - ⬆️ Attack increased by <strong>15%</strong>"
+                log_message = "#{@opponent.character_name}: #{eternal_rage_image} Wrathful Obsession - ⬆️ Attack increased by <strong>15%</strong>"
                 @combat_logs << log_message
             end
         end
@@ -738,7 +763,7 @@ class CombatController < ApplicationController
                     elsif @opponent_has_evaded == true
                         log_message = "#{@character.character_name}: ⚔️ Basic attack - 🚫 (EVADE)"
                     else
-                        log_message = "#{@character.character_name}: ⚔️ Basic attack - Damage has been mitigated"
+                        log_message = "#{@character.character_name}: ⚔️ Basic attack - Damage mitigated"
                     end
                 else
                     if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -785,6 +810,8 @@ class CombatController < ApplicationController
                             log_message = "#{@opponent.character_name}: ⚔️ Basic attack - ❌ (MISS)"
                         elsif @character_has_evaded == true
                             log_message = "#{@opponent.character_name}: ⚔️ Basic attack - 🚫 (EVADE)"
+                        else
+                            log_message = "#{@opponent.character_name}: ⚔️ Basic attack - Damage mitigated"
                         end
                     else
                         if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -807,6 +834,8 @@ class CombatController < ApplicationController
                             log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - ❌ (MISS)"
                         elsif @character_has_evaded == true
                             log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - 🚫 (EVADE)"
+                        else
+                            log_message = "#{@opponent.monster_name}: ⚔️ Basic attack - Damage mitigated"
                         end
                     else
                         if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -842,6 +871,7 @@ class CombatController < ApplicationController
 
         # Character turn
         if @character_turn
+            # Additional attack talents
             # Fervor - Paladin talent
             if rand(0.0..100.0) <= 30.0 && @character.skills.find_by(name: 'Fervor', unlocked: true).present?
                 fervor_image = "<img src='/assets/paladin_skills/fervor.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
@@ -866,6 +896,8 @@ class CombatController < ApplicationController
                             log_message = "#{@character.character_name}: #{fervor_image} Fervor - ❌ (MISS)"
                         elsif @opponent_has_evaded == true
                             log_message = "#{@character.character_name}: #{fervor_image} Fervor - 🚫 (EVADE)"
+                        else
+                            log_message = "#{@character.character_name}: #{fervor_image} Fervor - Damage mitigated"
                         end
                     else
                         if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -888,53 +920,7 @@ class CombatController < ApplicationController
                 buffs_after_attack
                 damage_after_attack(damage)
             end
-            # Skullsplitter - Warrior talent + Hellbound
-            if @character.skills.find_by(name: 'Skullsplitter', unlocked: true).present? && (@character.main_hand.present? && @character.main_hand.name == "Hellbound") || (@character.off_hand.present? && @character.off_hand.name == "Hellbound")
-                hellbound_skullsplitter_image = "<img src='/assets/warrior_skills/skullsplitter.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                if @character_attack > @character_spellpower && @character_attack > @character_necrosurge
-                    if (@character.feet.present? && @character.feet.name == "Voidwalkers")
-                        damage = [(physical_damage * 0.30).round, 0].max
-                        damage_type = 'shadow'
-                    else
-                        damage = [(physical_damage * 0.30).round, 0].max
-                        damage_type = 'physical'
-                    end
-                elsif @character_spellpower > @character_attack && @character_spellpower > @character_necrosurge
-                    damage = (magic_damage * 0.30).round
-                    damage_type = 'magic'
-                elsif @character_necrosurge > @character_attack && @character_necrosurge > @character_spellpower
-                    damage = (shadow_damage * 0.30).round
-                    damage_type = 'shadow'
-                end
-                    # Check for the statuses
-                    if damage == 0
-                        if @character_has_missed == true
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - ❌ (MISS)"
-                        elsif @opponent_has_evaded == true
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - 🚫 (EVADE)"
-                        end
-                    else
-                        if @character_has_crit == true && @opponent_has_ignored_pain == true
-                            @opponent_health_in_combat -= [damage, 0].max
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-                        elsif @character_has_crit == true
-                            @opponent_health_in_combat -= [damage, 0].max
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
-                        elsif @opponent_has_ignored_pain == true
-                            @opponent_health_in_combat -= [damage, 0].max
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-                        else
-                            @opponent_health_in_combat -= [damage, 0].max
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - <strong>#{damage}</strong> #{damage_type} damage"
-                        end
-                    end
-                @character.apply_combat_skills
-                @combat_logs << log_message
-                healing_after_attack(damage)
-                buffs_after_attack
-                damage_after_attack(damage)
-            end
-            # Swift movements - Rogue talent
+            # Swift movements - Nightstalker talent
             if @character.skills.find_by(name: 'Swift Movements', unlocked: true).present?
                 # Picks the element of attack
                 if @character_attack > @character_spellpower && @character_attack > @character_necrosurge
@@ -954,13 +940,15 @@ class CombatController < ApplicationController
                 end
                 chance_of_additional_attack = @character.agility
                 if rand(0.0..5000.0) <= chance_of_additional_attack
-                    swift_movements_image = "<img src='/assets/rogue_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                    swift_movements_image = "<img src='/assets/nightstalker_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                     # Check for the statuses of an attack
                     if damage == 0
                         if @character_has_missed == true
                             log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
                         elsif @opponent_has_evaded == true
                             log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - 🚫 (EVADE)"
+                        else
+                            log_message = "#{@character.character_name}: #{swift_movements_image} Swift Movements - Damage mitigated"
                         end
                     else
                         if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -983,11 +971,61 @@ class CombatController < ApplicationController
                 buffs_after_attack
                 damage_after_attack(damage)
                 end
+                # Additional attack items
+                # Hellbound
+                if (rand(0..100) <= 10) && (@character.main_hand.present? && @character.main_hand.name == "Hellbound") || (@character.off_hand.present? && @character.off_hand.name == "Hellbound")
+                    hellbound_image = "<img src='/assets/images/legendary_items/hellbound.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                    if @character_attack > @character_spellpower && @character_attack > @character_necrosurge
+                        if (@character.feet.present? && @character.feet.name == "Voidwalkers")
+                            damage = [(physical_damage * 1.5).round, 0].max
+                            damage_type = 'shadow'
+                        else
+                            damage = [(physical_damage * 1.5).round, 0].max
+                            damage_type = 'physical'
+                        end
+                    elsif @character_spellpower > @character_attack && @character_spellpower > @character_necrosurge
+                        damage = (magic_damage * 1.5).round
+                        damage_type = 'magic'
+                    elsif @character_necrosurge > @character_attack && @character_necrosurge > @character_spellpower
+                        damage = (shadow_damage * 1.5).round
+                        damage_type = 'shadow'
+                    end
+                        # Check for the statuses
+                        if damage == 0
+                            if @character_has_missed == true
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - ❌ (MISS)"
+                            elsif @opponent_has_evaded == true
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - 🚫 (EVADE)"
+                            else
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - Damage mitigated"
+                            end
+                        else
+                            if @character_has_crit == true && @opponent_has_ignored_pain == true
+                                @opponent_health_in_combat -= [damage, 0].max
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                            elsif @character_has_crit == true
+                                @opponent_health_in_combat -= [damage, 0].max
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
+                            elsif @opponent_has_ignored_pain == true
+                                @opponent_health_in_combat -= [damage, 0].max
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                            else
+                                @opponent_health_in_combat -= [damage, 0].max
+                                log_message = "#{@character.character_name}: #{hellbound_image} Hellbound - <strong>#{damage}</strong> #{damage_type} damage"
+                            end
+                        end
+                    @character.apply_combat_skills
+                    @combat_logs << log_message
+                    healing_after_attack(damage)
+                    buffs_after_attack
+                    damage_after_attack(damage)
+                end
             end
             # Opponent took damage is now true if damage is positive
             @opponent.took_damage = true if damage.positive?
         # Opponent turn
         elsif (@opponent_turn && @opponent.is_a?(Character))
+            # Additional attack talents
             # Fervor - Paladin talent
             if rand(0.0..100.0) <= 30.0 && @opponent.skills.find_by(name: 'Fervor', unlocked: true).present?
                 fervor_image = "<img src='/assets/paladin_skills/fervor.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
@@ -1012,6 +1050,8 @@ class CombatController < ApplicationController
                             log_message = "#{@opponent.character_name}: #{fervor_image} Fervor - ❌ (MISS)"
                         elsif @character_has_evaded == true
                             log_message = "#{@opponent.character_name}: #{fervor_image} Fervor - 🚫 (EVADE)"
+                        else
+                            log_message = "#{@opponent.character_name}: #{fervor_image} Fervor -  Damage mitigated"
                         end
                     else
                         if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -1036,55 +1076,7 @@ class CombatController < ApplicationController
                 buffs_after_attack
                 damage_after_attack(damage)
             end
-            # Skullsplitter - Warrior talent + Hellbound
-            if @opponent.skills.find_by(name: 'Skullsplitter', unlocked: true).present? && (@opponent.main_hand.present? && @opponent.main_hand.name == "Hellbound") || (@opponent.off_hand.present? && @opponent.off_hand.name == "Hellbound")
-                hellbound_skullsplitter_image = "<img src='/assets/warrior_skills/skullsplitter.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
-                if @opponent_attack > @opponent_spellpower && @opponent_attack > @opponent_necrosurge
-                    if @opponent.is_a?(Character) && (@opponent.feet.present? && @opponent.feet.name == "Voidwalkers")
-                        damage = [(physical_damage * 0.30).round, 0].max
-                        damage_type = 'shadow'
-                    else
-                        damage = [(physical_damage * 0.30).round, 0].max
-                        damage_type = 'physical'
-                    end
-                elsif @opponent_spellpower > @opponent_attack && @opponent_spellpower > @opponent_necrosurge
-                    damage = (magic_damage * 0.30).round
-                    damage_type = 'magic'
-                elsif @opponent_necrosurge > @opponent_attack && @opponent_necrosurge > @opponent_spellpower
-                    damage = (shadow_damage * 0.30).round
-                    damage_type = 'shadow'
-                end
-                    # Check for the statuses
-                    if damage == 0
-                        if @opponent_has_missed == true
-                            log_message = "#{@opponent.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - ❌ (MISS)"
-                        elsif @character_has_evaded == true
-                            log_message = "#{@opponent.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - 🚫 (EVADE)"
-                        end
-                    else
-                        if @opponent_has_crit == true && @character_has_ignored_pain == true
-                            @character.total_health -= [damage, 0].max
-                            log_message = "#{@character.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-                        elsif @opponent_has_crit == true
-                            @character.total_health -= [damage, 0].max
-                            log_message = "#{@opponent.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
-                        elsif @character_has_ignored_pain == true
-                            @character.total_health -= [damage, 0].max
-                            log_message = "#{@opponent.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
-                        else
-                            @character.total_health -= [damage, 0].max
-                            log_message = "#{@opponent.character_name}: #{hellbound_skullsplitter_image} Skullsplitter - <strong>#{damage}</strong> #{damage_type} damage"
-                        end
-                    end
-                    if @opponent.is_a?(Character)
-                        @opponent.apply_combat_skills
-                    end
-                @combat_logs << log_message
-                healing_after_attack(damage)
-                buffs_after_attack
-                damage_after_attack(damage)
-            end
-            # Swift movements - Rogue talent
+            # Swift movements - Nightstalker talent
             if @opponent.skills.find_by(name: 'Swift Movements', unlocked: true).present?
                 # Picks the element of attack
                 if @opponent_attack > @opponent_spellpower && @opponent_attack > @opponent_necrosurge
@@ -1104,13 +1096,15 @@ class CombatController < ApplicationController
                 end
                 chance_of_additional_attack = @opponent.agility
                 if rand(0.0..5000.0) <= chance_of_additional_attack
-                    swift_movements_image = "<img src='/assets/rogue_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                    swift_movements_image = "<img src='/assets/nightstalker_skills/swiftmovements.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                     # Check for the statuses of an attack
                     if damage == 0
                         if @opponent_has_missed == true
                             log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - ❌ (MISS)"
                         elsif @character_has_evaded == true
                             log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements - 🚫 (EVADE)"
+                        else
+                            log_message = "#{@opponent.character_name}: #{swift_movements_image} Swift Movements -  Damage mitigated"
                         end
                     else
                         if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -1134,6 +1128,57 @@ class CombatController < ApplicationController
                 healing_after_attack(damage)
                 buffs_after_attack
                 damage_after_attack(damage)
+                end
+                # Additional attack items
+                # Hellbound
+                if (rand(0..100) <= 10) && (@opponent.main_hand.present? && @opponent.main_hand.name == "Hellbound") || (@opponent.off_hand.present? && @opponent.off_hand.name == "Hellbound")
+                    hellbound_image = "<img src='/assets/images/legendary_items/hellbound.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
+                    if @opponent_attack > @opponent_spellpower && @opponent_attack > @opponent_necrosurge
+                        if @opponent.is_a?(Character) && (@opponent.feet.present? && @opponent.feet.name == "Voidwalkers")
+                            damage = [(physical_damage * 1.5).round, 0].max
+                            damage_type = 'shadow'
+                        else
+                            damage = [(physical_damage * 1.5).round, 0].max
+                            damage_type = 'physical'
+                        end
+                    elsif @opponent_spellpower > @opponent_attack && @opponent_spellpower > @opponent_necrosurge
+                        damage = (magic_damage * 1.5).round
+                        damage_type = 'magic'
+                    elsif @opponent_necrosurge > @opponent_attack && @opponent_necrosurge > @opponent_spellpower
+                        damage = (shadow_damage * 1.5).round
+                        damage_type = 'shadow'
+                    end
+                        # Check for the statuses
+                        if damage == 0
+                            if @opponent_has_missed == true
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound - ❌ (MISS)"
+                            elsif @character_has_evaded == true
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound - 🚫 (EVADE)"
+                            else
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound -  Damage mitigated"
+                            end
+                        else
+                            if @opponent_has_crit == true && @character_has_ignored_pain == true
+                                @character.total_health -= [damage, 0].max
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound - ❗ (CRITICAL STRIKE), 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                            elsif @opponent_has_crit == true
+                                @character.total_health -= [damage, 0].max
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound - ❗ (CRITICAL STRIKE) <strong>#{damage}</strong> #{damage_type} damage"
+                            elsif @character_has_ignored_pain == true
+                                @character.total_health -= [damage, 0].max
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound - 🛡️ (IGNORE PAIN) <strong>#{damage}</strong> #{damage_type} damage"
+                            else
+                                @character.total_health -= [damage, 0].max
+                                log_message = "#{@opponent.character_name}: #{hellbound_image} Hellbound - <strong>#{damage}</strong> #{damage_type} damage"
+                            end
+                        end
+                        if @opponent.is_a?(Character)
+                            @opponent.apply_combat_skills
+                        end
+                    @combat_logs << log_message
+                    healing_after_attack(damage)
+                    buffs_after_attack
+                    damage_after_attack(damage)
                 end
             end
         # Character took damage is now true if damage is positive
@@ -1176,6 +1221,8 @@ class CombatController < ApplicationController
                         log_message = "#{@character.character_name}: #{laceration_image} Lethal Strikes - ❌ (MISS)"
                     elsif @opponent_has_evaded == true
                         log_message = "#{@character.character_name}: #{laceration_image} Lethal Strikes - 🚫 (EVADE)"
+                    else
+                        log_message = "#{@character.character_name}: #{laceration_image} Lethal Strikes - Damage mitigated"
                     end
                 else
                     if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -1191,8 +1238,8 @@ class CombatController < ApplicationController
                         @opponent_health_in_combat -= [laceration_damage, 0].max
                         log_message = "#{@character.character_name}: #{laceration_image} Lethal Strikes - <strong>#{laceration_damage}</strong> #{damage_type} damage"
                     end
+                    @combat_logs << log_message
                 end
-            @combat_logs << log_message
             # Opponent took damage is now true if damage is positive
             @opponent.took_damage = true if laceration_damage.positive?
             end
@@ -1207,6 +1254,8 @@ class CombatController < ApplicationController
                         log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❌ (MISS)"
                     elsif @opponent_has_evaded == true
                         log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - 🚫 (EVADE)"
+                    else
+                        log_message = "#{@character.character_name}: #{tempest_band_image} Stormcaller's Embrace - Damage mitigated"
                     end
                 else
                     if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -1238,6 +1287,8 @@ class CombatController < ApplicationController
                         log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - ❌ (MISS)"
                     elsif @opponent_has_evaded == true
                         log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - 🚫 (EVADE)"
+                    else
+                        log_message = "#{@character.character_name}: #{stormweavers_image} Arcane Tempest - Damage mitigated"
                     end
                 else
                     if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -1277,7 +1328,7 @@ class CombatController < ApplicationController
                 nethil_damage = 333
                 @opponent_health_in_combat -= [nethil_damage, 0].max
                 @character.total_health += [nethil_damage, @character.total_max_health - @character.total_health].min
-                log_message = "#{@character.character_name}: #{nethil_image} Necrotic Touch - <strong>#{nethil_damage}</strong> shadow damage, <strong>#{damage}</strong> Health recovery"
+                log_message = "#{@character.character_name}: #{nethil_image} Necrotic Touch - <strong>#{nethil_damage}</strong> shadow damage, <strong>#{nethil_damage}</strong> Health recovery"
                 @combat_logs << log_message
                 # Opponent took damage is now true if damage is positive
                 @opponent.took_damage = true if nethil_damage.positive?
@@ -1306,7 +1357,7 @@ class CombatController < ApplicationController
                 @character.took_damage = true if lifetap_damage.positive?
             end
             # Deep Wounds
-            if (@opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Deep Wounds', unlocked: true).present?) && @opponent_deep_wounds_turn > 0
+            if ((@opponent.is_a?(Character) && @opponent.skills.find_by(name: 'Deep Wounds', unlocked: true).present?) && @opponent_deep_wounds_turn > 0)
                 deep_wounds_image = "<img src='/assets/warrior_skills/deepwounds.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 @character.total_health -= [@opponent_deep_wounds_damage, 0].max
                 log_message = "#{@opponent.character_name}: #{deep_wounds_image} Deep Wounds - <strong>#{@opponent_deep_wounds_damage}</strong> physical damage"
@@ -1331,7 +1382,7 @@ class CombatController < ApplicationController
             thefirstflame_image = "<img src='/assets/legendary_items/thefirstflame.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
                 if rand(0.00..100.00) <= 10.0
                     damage = [(@character.total_max_health * 0.08).round, 0].max
-                    @character_health_in_combat -= damage
+                    @character.total_health -= damage
                     log_message = "#{@opponent.character_name}: #{thefirstflame_image} Flicker of Destruction - <strong>#{damage}</strong> fire damage"
                     @combat_logs << log_message
                     # Character took damage is now true if damage is positive
@@ -1358,6 +1409,8 @@ class CombatController < ApplicationController
                     log_message = "#{@opponent.character_name}: #{laceration_image} Lethal Strikes - ❌ (MISS)"
                 elsif @character_has_evaded == true
                     log_message = "#{@opponent.character_name}: #{laceration_image} Lethal Strikes - 🚫 (EVADE)"
+                else
+                    log_message = "#{@opponent.character_name}: #{laceration_image} Lethal Strikes - Damage mitigated"
                 end
             else
                 if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -1373,8 +1426,8 @@ class CombatController < ApplicationController
                     @character.total_health -= [laceration_damage, 0].max
                     log_message = "#{@opponent.character_name}: #{laceration_image} Lethal Strikes - <strong>#{laceration_damage}</strong> #{damage_type} damage"
                 end
+                @combat_logs << log_message
             end
-            @combat_logs << log_message
             # Character took damage is now true if damage is positive
             @character.took_damage = true if laceration_damage.positive?
             end
@@ -1389,6 +1442,8 @@ class CombatController < ApplicationController
                         log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - ❌ (MISS)"
                     elsif @character_has_evaded == true
                         log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - 🚫 (EVADE)"
+                    else
+                        log_message = "#{@opponent.character_name}: #{tempest_band_image} Stormcaller's Embrace - Damage mitigated"
                     end
                 else
                     if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -1420,6 +1475,8 @@ class CombatController < ApplicationController
                         log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - ❌ (MISS)"
                     elsif @character_has_evaded == true
                         log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - 🚫 (EVADE)"
+                    else
+                        log_message = "#{@opponent.character_name}: #{stormweavers_image} Arcane Tempest - Damage mitigated"
                     end
                 else
                     if @opponent_has_crit == true && @character_has_ignored_pain == true
@@ -1469,7 +1526,7 @@ class CombatController < ApplicationController
             if @opponent.skills.find_by(name: 'Crimson Torrent', unlocked: true).present?
                 crimson_torrent_image = "<img src='/assets/deathwalker_skills/crimsontorrent.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 crimson_torrent_damage = (@opponent.total_max_health * 0.03).round
-                @character_health_in_combat -= crimson_torrent_damage
+                @character.total_health -= crimson_torrent_damage
                 log_message = "#{@opponent.character_name}: #{crimson_torrent_image} Crimson Torrent - <strong>#{crimson_torrent_damage}</strong> shadow damage"
                 @combat_logs << log_message
                 # Character took damage is now true if damage is positive
@@ -1490,7 +1547,7 @@ class CombatController < ApplicationController
             end
 
             # Deep Wounds
-            if @character.skills.find_by(name: 'Deep Wounds', unlocked: true).present? && @character_deep_wounds_turn > 0
+            if (@character.skills.find_by(name: 'Deep Wounds', unlocked: true).present? && @character_deep_wounds_turn > 0)
                 deep_wounds_image = "<img src='/assets/warrior_skills/deepwounds.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Swift Movements' class='log-skill-image'>"
                 @opponent_health_in_combat -= [@character_deep_wounds_damage, 0].max
                 log_message = "#{@character.character_name}: #{deep_wounds_image} Deep Wounds - <strong>#{@character_deep_wounds_damage}</strong> physical damage"
@@ -1515,8 +1572,8 @@ class CombatController < ApplicationController
     def execution_effects
         if @character_turn
             # Dawnbreaker
-            if (@opponent_health_in_combat <= (@opponent.total_max_health * 0.10)) && (@character.main_hand.present? && @character.main_hand.name == "Dawnbreaker") ||
-            (@character.off_hand.present? && @character.off_hand.name == "Dawnbreaker")
+            if ((@opponent_health_in_combat <= (@opponent.total_max_health * 0.10)) && ((@character.main_hand.present? && @character.main_hand.name == "Dawnbreaker") ||
+            (@character.off_hand.present? && @character.off_hand.name == "Dawnbreaker")))
                 dawnbreaker_image = "<img src='/assets/legendary_items/dawnbreaker.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
                     if @character_attack > @character_spellpower && @character_attack > @character_necrosurge
                         dawnbreaker_damage = (physical_damage * 1.11).round
@@ -1534,6 +1591,8 @@ class CombatController < ApplicationController
                                 log_message = "#{@character.character_name}: #{dawnbreaker_image} Dawn's Judgement - ❌ (MISS)"
                             elsif @opponent_has_evaded == true
                                 log_message = "#{@character.character_name}: #{dawnbreaker_image} Dawn's Judgement - 🚫 (EVADE)"
+                            else
+                                log_message = "#{@character.character_name}: #{dawnbreaker_image} Dawn's Judgement - Damage mitigated"
                             end
                         else
                             if @character_has_crit == true && @opponent_has_ignored_pain == true
@@ -1556,8 +1615,8 @@ class CombatController < ApplicationController
             end
         elsif @opponent_turn && @opponent.is_a?(Character)
             # Dawnbreaker
-            if (@character.total_health <= (@character.total_max_health * 0.10)) && (@opponent.main_hand.present? && @opponent.main_hand.name == "Dawnbreaker") ||
-            (@opponent.off_hand.present? && @opponent.off_hand.name == "Dawnbreaker")
+            if ((@character.total_health <= (@character.total_max_health * 0.10)) && ((@opponent.main_hand.present? && @opponent.main_hand.name == "Dawnbreaker") ||
+            (@opponent.off_hand.present? && @opponent.off_hand.name == "Dawnbreaker")))
                 dawnbreaker_image = "<img src='/assets/legendary_items/dawnbreaker.jpg' style='width: 25px; height: 25px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888;' alt='Dawn's Judgement' class='log-skill-image'>"
                     if @opponent_attack > @opponent_spellpower && @opponent_attack > @opponent_necrosurge
                         dawnbreaker_damage = (physical_damage * 1.11).round
@@ -1575,6 +1634,8 @@ class CombatController < ApplicationController
                                 log_message = "#{@opponent.character_name}: #{dawnbreaker_image} Dawn's Judgement - ❌ (MISS)"
                             elsif @character_has_evaded == true
                                 log_message = "#{@opponent.character_name}: #{dawnbreaker_image} Dawn's Judgement - 🚫 (EVADE)"
+                            else
+                                log_message = "#{@opponent.character_name}: #{dawnbreaker_image} Dawn's Judgement - Damage mitigated"
                             end
                         else
                             if @opponent_has_crit == true && @character_has_ignored_pain == true

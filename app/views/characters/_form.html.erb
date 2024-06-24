@@ -1,4 +1,4 @@
-<div class="card text-left mt-5 mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; width: 500px; margin-right: 20px; position: relative;">
+<div class="card text-center mt-5 mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; width: 500px; position: relative;">
   <%= form_with(model: @character, local: true) do |form| %>
     <% if @character.errors.any? %>
       <div id="error_explanation">
@@ -11,11 +11,21 @@
       </div>
     <% end %>
       
-    <img id="raceImagePreview" src="#" alt="Race Image Preview" style="max-width:100%; height:auto; border: 5px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 20px;">
+    <img id="raceImagePreview" src="#" alt="Race Image Preview" class= "mx-auto" style="width: 100%; height: 460px; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;">
     
-    <div class="field">
-      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name', style: 'text-align: center; font-size: 20px;' %>
+<div class="field">
+  <div class="row justify-content-center align-items-center">
+    <div class="col d-flex justify-content-center position-relative">
+      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name', style: 'text-align: center; font-size: 20px; background-color: transparent; border: none; outline: none; box-shadow: none; width: 50%;' %>
+      <button type="button" class="btn position-absolute" id="generate-random-name" style="padding: 0; border: none; background: none; right: 0;">
+        <i class="fas fa-dice" style="font-size: 32px; margin-right: 50px; margin-top: 10px;"></i>
+      </button>
     </div>
+  </div>
+</div>
+
+
+
     
     <div class="field mt-3 mb-3" style="text-align: center;">
       <label class="mb-2"><strong>Gender</strong></label>
@@ -36,7 +46,7 @@
         <button type="button" id="nextRace">&gt;</button>
       </div>
     </div>
-    <p class="mb-3 mt-2" id="raceDescription" style="height: 50px; overflow-y: auto; text-align: center;"></p>
+    <p class="mb-2 mt-2" id="raceDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
 
     <div class="field " style="text-align: center;">
       <label class="mb-2"><strong>Class</strong></label>
@@ -61,19 +71,27 @@
 </script>
 
 <script>
-  $(document).ready(function() {
+$(document).ready(function() {
     var imagePreview = $('#raceImagePreview');
     var raceDescription = $('#raceDescription');
     var classDescription = $('#classDescription');
     var races = ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin', 'morvandir'];
-    var classes = ['warrior', 'mage', 'rogue', 'paladin', 'deathwalker', 'warlock'];
+    var classes = {
+      'human': ['warrior', 'mage', 'nightstalker', 'paladin', 'deathwalker', 'acolyte'],
+      'elf': ['mage', 'paladin', 'acolyte'],
+      'dwarf': ['warrior', 'mage', 'paladin'],
+      'troll': ['warrior', 'nightstalker', 'paladin'],
+      'orc': ['warrior', 'deathwalker', 'acolyte'],
+      'goblin': ['mage', 'nightstalker', 'acolyte'],
+      'morvandir': ['mage', 'deathwalker', 'acolyte']
+    };
     var currentRaceIndex = 0;
     var currentClassIndex = 0;
-    var selectedRace = 'human'
+    var selectedRace = 'human';
     $('#selectedRace').val(selectedRace);
-    var selectedGender = 'male'
+    var selectedGender = 'male';
     $('#selectedGender').val(selectedGender);
-    var selectedClass = 'warrior'
+    var selectedClass = 'warrior';
     $('#selectedClass').val(selectedClass);
 
     function updateRaceImage(selectedRace, selectedGender) {
@@ -106,27 +124,38 @@
       var imagePath = '/assets/races/' + imageFileName;
       imagePreview.attr('src', imagePath);
 
+    // Update race description with available classes
+    var availableClasses;
+    if (selectedRace === 'human') {
+      availableClasses = 'All';
+    } else {
+      availableClasses = classes[selectedRace].map(function(className) {
+        return className.charAt(0).toUpperCase() + className.slice(1);
+      }).join(', ');
+    }
+    raceDescription.html('<small class="text-muted" style="font-size: 80%;">(Available classes: ' + availableClasses + ')</small><br>');
+
       switch(selectedRace) {
         case 'human':
-          raceDescription.text('Diverse, ambitious, adaptable. Passion drives progress, while kindness battles cruelty.');
+          raceDescription.append('Diverse, ambitious, adaptable. Passion drives progress, while kindness battles cruelty.');
           break;
         case 'elf':
-          raceDescription.text('Known for their grace, wisdom and knowledge, power is what they seek above all.');
+          raceDescription.append('Known for their grace, wisdom and knowledge, power is what they seek above all.');
           break;
         case 'dwarf':
-          raceDescription.text('Durable and loyal, they live to protect their kingdom and allies.');
+          raceDescription.append('Durable and loyal, they live to protect their kingdom and allies.');
           break;
         case 'troll':
-          raceDescription.text('Rugged, loyal defenders of nature. Strong and fierce, they uphold ancient traditions.');
+          raceDescription.append('Rugged, loyal defenders of nature. Strong and fierce, they uphold ancient traditions.');
           break;
         case 'orc':
-          raceDescription.text('Powerful conquerors. They are ruthless and show no mercy, even to their own kind.');
+          raceDescription.append('Powerful conquerors. They are ruthless and show no mercy, even to their own kind.');
           break;
         case 'goblin':
-          raceDescription.text('Crafty tricksters, masters of opportunity. Small yet ambitious, they thrive on ingenuity.');
+          raceDescription.append('Crafty, masters of opportunity. Small yet ambitious, they thrive on ingenuity.');
           break;
         case 'morvandir':
-          raceDescription.text('Forsaken by their origins, they wield dark powers and keep their secrets veiled in the shadows.');
+          raceDescription.append('Forsaken by their origins, they wield dark powers and keep their secrets veiled in the shadows.');
           break;
       }
       $('#raceDisplay').text(selectedRace.charAt(0).toUpperCase() + selectedRace.slice(1));
@@ -138,9 +167,9 @@
           classDescription.text('Masters of combat, honed strength, and resilience.');
           break;
         case 'mage':
-          classDescription.text('Weavers of arcane, bending reality with spells..');
+          classDescription.text('Weavers of arcane, bending reality itself with powerful spells.');
           break;
-        case 'rogue':
+        case 'nightstalker':
           classDescription.text('Agile tricksters, navigating shadows with finesse.');
           break;
         case 'paladin':
@@ -149,8 +178,8 @@
         case 'deathwalker':
           classDescription.text("Embracers of decay, feeding on life's essence to wield death's unyielding power.");
           break;
-        case 'warlock':
-          classDescription.text('Dark disciples of forbidden magics, bound by pacts to powerful Demons.');
+        case 'acolyte':
+          classDescription.text('Dark disciples of forbidden magics, bound by pacts to dreaded Demons.');
           break;
       }
       $('#classDisplay').text(selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1));
@@ -160,44 +189,153 @@
     
     updateRaceImage(selectedRace, selectedGender);
 
-$('#maleButton').click(function() {
-  selectedGender = 'male';
-  $('#selectedGender').val(selectedGender);
-  updateRaceImage(selectedRace, selectedGender);
-});
+    $('#maleButton').click(function() {
+      selectedGender = 'male';
+      $('#selectedGender').val(selectedGender);
+      updateRaceImage(selectedRace, selectedGender);
+    });
 
-$('#femaleButton').click(function() {
-  selectedGender = 'female';
-  $('#selectedGender').val(selectedGender);
-  updateRaceImage(selectedRace, selectedGender);
-});
+    $('#femaleButton').click(function() {
+      selectedGender = 'female';
+      $('#selectedGender').val(selectedGender);
+      updateRaceImage(selectedRace, selectedGender);
+    });
 
-$('#prevRace').click(function() {
-  currentRaceIndex = (currentRaceIndex - 1 + races.length) % races.length;
-  selectedRace = races[currentRaceIndex];
-  $('#selectedRace').val(selectedRace);
-  updateRaceImage(selectedRace, selectedGender);
-});
+    $('#prevRace').click(function() {
+      currentRaceIndex = (currentRaceIndex - 1 + races.length) % races.length;
+      selectedRace = races[currentRaceIndex];
+      $('#selectedRace').val(selectedRace);
+      updateRaceImage(selectedRace, selectedGender);
 
-$('#nextRace').click(function() {
-  currentRaceIndex = (currentRaceIndex + 1) % races.length;
-  selectedRace = races[currentRaceIndex];
-  $('#selectedRace').val(selectedRace);
-  updateRaceImage(selectedRace, selectedGender);
-});
+      // Update class buttons based on selected race
+      updateClassButtons(selectedRace);
+    });
 
-$('#prevClass').click(function() {
-  currentClassIndex = (currentClassIndex - 1 + classes.length) % classes.length;
-  selectedClass = classes[currentClassIndex];
-  $('#selectedClass').val(selectedClass);
-  updateClassDescription(selectedClass);
-});
+    $('#nextRace').click(function() {
+      currentRaceIndex = (currentRaceIndex + 1) % races.length;
+      selectedRace = races[currentRaceIndex];
+      $('#selectedRace').val(selectedRace);
+      updateRaceImage(selectedRace, selectedGender);
 
-$('#nextClass').click(function() {
-  currentClassIndex = (currentClassIndex + 1) % classes.length;
-  selectedClass = classes[currentClassIndex];
-  $('#selectedClass').val(selectedClass);
-  updateClassDescription(selectedClass);
-});
+      // Update class buttons based on selected race
+      updateClassButtons(selectedRace);
+    });
+
+    $('#prevClass').click(function() {
+      currentClassIndex = (currentClassIndex - 1 + classes[selectedRace].length) % classes[selectedRace].length;
+      selectedClass = classes[selectedRace][currentClassIndex];
+      $('#selectedClass').val(selectedClass);
+      updateClassDescription(selectedClass);
+    });
+
+    $('#nextClass').click(function() {
+      currentClassIndex = (currentClassIndex + 1) % classes[selectedRace].length;
+      selectedClass = classes[selectedRace][currentClassIndex];
+      $('#selectedClass').val(selectedClass);
+      updateClassDescription(selectedClass);
+    });
+
+    // Function to update class buttons based on selected race
+    function updateClassButtons(selectedRace) {
+      currentClassIndex = 0; // Reset class index when race changes
+      selectedClass = classes[selectedRace][currentClassIndex];
+      $('#selectedClass').val(selectedClass);
+      updateClassDescription(selectedClass);
+    }
+
+    // Initial setup of class buttons based on initial race
+    updateClassButtons(selectedRace);
   });
+</script>
+
+<script>
+    document.getElementById('generate-random-name').addEventListener('click', function() {
+      var randomNames = {
+        'human': {
+          'male': [
+            "Aldric", "Branor", "Cassian", "Darius", "Eldric", "Finnian", "Gawain", "Hadrian", "Ilias", "Julian",
+            "Kaelan", "Lysander", "Maximus", "Nikolai", "Octavian", "Percival", "Quentin", "Roland", "Sebastian", "Tavian"
+          ],
+          'female': [
+            "Aurelia", "Brielle", "Calista", "Daphne", "Elowen", "Fiona", "Guinevere", "Hermione", "Isolde", "Jessamine",
+            "Kaia", "Lyra", "Maeve", "Nadia", "Ophelia", "Persephone", "Quintessa", "Rosalind", "Seraphine", "Thalia"
+          ]
+        },
+        'elf': {
+          'male': [
+            "Legolas", "Thranduil", "Elrond", "Glorfindel", "Elladan", "Elrohir", "Aranion", "Thalion", "Finrod", "Fingolfin",
+            "Maedhros", "Finarfin", "Lúthien", "Eärendil", "Celebrimbor", "Gil-galad", "Elros", "Feanor", "Fëanor", "Celebrimbor"
+          ],
+          'female': [
+            "Arwen", "Galadriel", "Celeborn", "Lúthien", "Elenwe", "Aranwen", "Tinúviel", "Finduilas", "Nenya", "Idril",
+            "Aredhel", "Amarië", "Melian", "Nimloth", "Aelindis", "Anairë", "Earwen", "Elwing", "Varda", "Yavanna"
+          ]
+        },
+        'dwarf': {
+          'male': [
+            "Thrain", "Gimli", "Durin", "Thorin", "Balin", "Bofur", "Bombur", "Gloin", "Dain", "Thror",
+            "Eitri", "Brok", "Thulin", "Khazad", "Khadgar", "Drar", "Thralin", "Tharden", "Grungni", "Thurdin"
+          ],
+          'female': [
+            "Dís", "Dísar", "Thora", "Brynna", "Dagny", "Hilda", "Greta", "Gudrun", "Hlin", "Sigrid",
+            "Solveig", "Sunniva", "Thyra", "Unn", "Vör", "Helga", "Freja", "Astrid", "Freydis", "Ingrid"
+          ]
+        },
+        'troll': {
+          'male': [
+            "Grugg", "Throgg", "Murgg", "Skragg", "Groth", "Norg", "Brulg", "Krugg", "Thrugg", "Smagg",
+            "Grogg", "Tharugg", "Murlog", "Skrugg", "Gorth", "Norb", "Brolg", "Kragg", "Thurg", "Smogg"
+          ],
+          'female': [
+            "Grulga", "Thragga", "Murga", "Skrugga", "Grothra", "Norga", "Brulga", "Krugga", "Thrugga", "Smagga",
+            "Grogga", "Tharugga", "Murloga", "Skrugga", "Gortha", "Norba", "Brolga", "Kragga", "Thurga", "Smogga"
+          ]
+        },
+        'orc': {
+          'male': [
+            "Graknash", "Grommash", "Durgol", "Urgnok", "Nazgul", "Thokk", "Kargh", "Skarzag", "Gul'dan", "Azhag",
+            "Ghurak", "Throgg", "Urthok", "Drakka", "Tharok", "Gorthok", "Nak'zul", "Garzok", "Morkar", "Drazgul"
+          ],
+          'female': [
+            "Grishna", "Morga", "Urga", "Draga", "Thraka", "Nazgula", "Groshka", "Morka", "Azga", "Tharaga",
+            "Gulda", "Urgana", "Durgana", "Thorka", "Grulga", "Throkka", "Garza", "Kargana", "Narzula", "Drazga"
+          ]
+        },
+        'goblin': {
+          'male': [
+            "Snik", "Grik", "Zogg", "Mogg", "Rik", "Skrag", "Thrik", "Snarg", "Vork", "Gruk",
+            "Zork", "Mork", "Rok", "Skab", "Thrag", "Snag", "Vorag", "Gruk", "Zark", "Mort"
+          ],
+          'female': [
+            "Snikka", "Grikka", "Zogga", "Mogga", "Rikka", "Skraga", "Thrikka", "Snarga", "Vorka", "Gruka",
+            "Zorka", "Morka", "Roka", "Skaba", "Thraga", "Snaga", "Voraga", "Gruka", "Zarka", "Morta"
+          ]
+        },
+        'morvandir': {
+          'male': [
+            "Zaroth", "Morgrim", "Xaldrin", "Vargash", "Tharil", "Drakken", "Zorin", "Malgrim", "Zethos", "Varin",
+            "Xandor", "Thraxus", "Gravok", "Zorak", "Vorthan", "Maldrak", "Xarnor", "Thalrok", "Zornak", "Vraxus"
+          ],
+          'female': [
+            "Zaraia", "Morwen", "Xandra", "Vasha", "Thalira", "Drana", "Zephira", "Malara", "Zora", "Vela",
+            "Xalara", "Thrana", "Grivara", "Zaria", "Vashara", "Maldara", "Xavara", "Thalara", "Zorina", "Vrana"
+          ]
+        }
+      };
+
+      var selectedRace = $('#selectedRace').val();
+      var selectedGender = $('#selectedGender').val();
+      var randomName;
+
+      // Retrieve random name based on selected race and gender
+      if (randomNames[selectedRace]) {
+        if (selectedGender === 'male') {
+          randomName = randomNames[selectedRace]['male'][Math.floor(Math.random() * randomNames[selectedRace]['male'].length)];
+        } else {
+          randomName = randomNames[selectedRace]['female'][Math.floor(Math.random() * randomNames[selectedRace]['female'].length)];
+        }
+      }
+
+      $('.character-name-field').val(randomName);
+    });
 </script>
