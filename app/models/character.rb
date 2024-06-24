@@ -142,48 +142,37 @@ class Character < ApplicationRecord
         end
     end
 
-    def set_default_values_for_stat_bonuses
-        self.strength_bonus = 0
-        self.intelligence_bonus = 0
-        self.agility_bonus = 0
-        self.dreadmight_bonus = 0
-    end
-
     def set_default_values_for_total_stats
         if self.character_class == 'nightstalker' && skills.find_by(name: 'Swift Movements', unlocked: true)
-            self.total_min_attack = ((self.min_attack + (self.agility_bonus * 0.80)) + (self.min_attack * self.paragon_attack))
-            self.total_max_attack = ((self.max_attack + (self.agility_bonus * 0.80)) + (self.max_attack * self.paragon_attack))
+            self.total_min_attack = ((self.min_attack + (self.agility_bonus * 0.80)) + (self.min_attack * self.paragon_attack)).to_i
+            self.total_max_attack = ((self.max_attack + (self.agility_bonus * 0.80)) + (self.max_attack * self.paragon_attack)).to_i
         else
-            self.total_min_attack = ((self.min_attack + self.strength_bonus) + (self.min_attack * self.paragon_attack))
-            self.total_max_attack = ((self.max_attack + self.strength_bonus) + (self.max_attack * self.paragon_attack))
+            self.total_min_attack = (self.min_attack + (self.strength_bonus) + (self.min_attack * self.paragon_attack)).to_i
+            self.total_max_attack = (self.max_attack + (self.strength_bonus) + (self.max_attack * self.paragon_attack)).to_i
         end
-        self.total_min_spellpower = ((self.min_spellpower + self.intelligence_bonus) + self.paragon_spellpower)
-        self.total_max_spellpower = ((self.max_spellpower + self.intelligence_bonus) + self.paragon_spellpower)
-        if self.character_class == 'paladin' && skills.find_by(name: 'Piety', unlocked: true)
-            self.total_armor = ((self.armor + self.strength_bonus) + (self.armor * self.paragon_armor))
-        else
-            self.total_armor = (self.armor + (self.armor * self.paragon_armor))
-        end
-        self.total_min_necrosurge = (self.min_necrosurge + self.dreadmight_bonus)
-        self.total_max_necrosurge = (self.max_necrosurge + self.dreadmight_bonus)
-        self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance))
-        self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance)
+        self.total_min_spellpower = (self.min_spellpower + (self.intelligence_bonus * self.paragon_spellpower)).to_i
+        self.total_max_spellpower = (self.max_spellpower + (self.intelligence_bonus * self.paragon_spellpower)).to_i
+        self.total_min_necrosurge = (self.min_necrosurge + self.dreadmight_bonus).to_i
+        self.total_max_necrosurge = (self.max_necrosurge + self.dreadmight_bonus).to_i
+        self.total_armor = (self.armor + (self.armor * self.paragon_armor)).to_i
+        self.total_magic_resistance = (self.magic_resistance + (self.magic_resistance * self.paragon_magic_resistance)).to_i
+        self.total_critical_strike_chance = ((self.critical_strike_chance + calculate_luck_bonus) + self.paragon_critical_strike_chance).to_d
         if self.character_class == 'mage' && skills.find_by(name: 'Book of Edim', unlocked: true)
-            self.total_critical_strike_damage = ((self.critical_strike_damage + (self.intelligence_bonus * 0.001).to_d) + self.paragon_critical_strike_damage)
+            self.total_critical_strike_damage = ((self.critical_strike_damage + (self.intelligence_bonus * 0.002)) + self.paragon_critical_strike_damage).to_d
         else
             self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage)
         end
-        self.total_damage_reduction = (self.damage_reduction + ((self.ignore_pain_chance * 0.001).to_d))
-        self.total_critical_resistance = (self.critical_resistance + ((self.strength_bonus * 0.02).to_i))
-        self.total_fire_resistance = (self.fire_resistance + ((self.intelligence_bonus * 0.02).to_i))
-        self.total_cold_resistance = (self.cold_resistance + ((self.intelligence_bonus * 0.02).to_i))
-        self.total_lightning_resistance = (self.lightning_resistance + ((self.intelligence_bonus * 0.02).to_i))
-        self.total_poison_resistance = (self.poison_resistance + ((self.intelligence_bonus * 0.02).to_i))
+        self.total_damage_reduction = (self.damage_reduction + (self.ignore_pain_chance * 0.002)).to_d
+        self.total_critical_resistance = (self.critical_resistance + (self.strength_bonus * 0.05)).to_i
+        self.total_fire_resistance = (self.fire_resistance + (self.intelligence_bonus * 0.05)).to_i
+        self.total_cold_resistance = (self.cold_resistance + (self.intelligence_bonus * 0.05)).to_i
+        self.total_lightning_resistance = (self.lightning_resistance + (self.intelligence_bonus * 0.05)).to_i
+        self.total_poison_resistance = (self.poison_resistance + (self.intelligence_bonus * 0.05)).to_i
         self.max_health = self.health
         if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
-            self.total_health = ((self.health + self.strength_bonus) + (self.health * self.paragon_total_health))
+            self.total_health = (self.health + (self.strength_bonus)) + (self.health * self.paragon_total_health).to_i
         else
-            self.total_health = (self.health + (self.health * self.paragon_total_health))
+            self.total_health = (self.health + (self.health * self.paragon_total_health)).to_i
         end
         self.total_max_health = self.total_health
         self.total_global_damage = (self.global_damage + self.paragon_global_damage)
@@ -428,17 +417,17 @@ class Character < ApplicationRecord
 
     def calculate_strength_bonus
         if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
-            self.strength_bonus = (self.strength * 0.1)
+            self.strength_bonus = (self.strength * 0.5)
         else
-            self.strength_bonus = (self.strength * 0.04)
+            self.strength_bonus = (self.strength * 0.10)
         end
     end
 
     def calculate_intelligence_bonus
         if self.character_class == 'mage' && skills.find_by(name: 'Enlighten', unlocked: true)
-            self.intelligence_bonus = (self.intelligence * 0.2)
+            self.intelligence_bonus = (self.intelligence * 0.5)
         else
-            self.intelligence_bonus = (self.intelligence * 0.04)
+            self.intelligence_bonus = (self.intelligence * 0.10)
         end
     end
 
@@ -497,7 +486,7 @@ class Character < ApplicationRecord
 
     def revert_stats_based_on_item(item)
         # Subtract stats of the unequipped item
-        if (item.all_attributes.present? && !item.all_attributes.nil)
+        if (item.all_attributes.present? && !item.all_attributes.nil?)
             self.strength -= item.all_attributes
             self.intelligence -= item.all_attributes
             self.agility -= item.all_attributes
@@ -505,7 +494,7 @@ class Character < ApplicationRecord
             self.luck -= item.all_attributes
             self.willpower -= item.all_attributes
         end
-        if (item.all_resistances.present? && !item.all_resistances.nil)
+        if (item.all_resistances.present? && !item.all_resistances.nil?)
             self.fire_resistance -= item.all_resistances
             self.cold_resistance -= item.all_resistances
             self.lightning_resistance -= item.all_resistances
@@ -539,7 +528,7 @@ class Character < ApplicationRecord
 
     def modify_stats_based_on_item(item)
         # Adds stats of the equipped item
-        if (item.all_attributes.present? && !item.all_attributes.nil)
+        if (item.all_attributes.present? && !item.all_attributes.nil?)
             self.strength += item.all_attributes
             self.intelligence += item.all_attributes
             self.agility += item.all_attributes
@@ -547,7 +536,7 @@ class Character < ApplicationRecord
             self.luck += item.all_attributes
             self.willpower += item.all_attributes
         end
-        if (item.all_resistances.present? && !item.all_resistances.nil)
+        if (item.all_resistances.present? && !item.all_resistances.nil?)
             self.fire_resistance += item.all_resistances
             self.cold_resistance += item.all_resistances
             self.lightning_resistance += item.all_resistances

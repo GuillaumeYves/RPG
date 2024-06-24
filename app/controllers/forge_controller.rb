@@ -6,10 +6,12 @@ class ForgeController < ApplicationController
   end
 
   def upgrade_item_stat(item)
-    stats = %i[health global_damage critical_strike_chance critical_strike_damage armor magic_resistance strength intelligence agility dreadmight luck willpower min_attack max_attack min_spellpower max_spellpower min_necrosurge max_necrosurge]
+    stats = %i[health global_damage critical_strike_chance critical_strike_damage armor magic_resistance damage_reduction
+    critical_resistance all_resistances fire_resistance cold_resistance lightning_resistance poison_resistance
+    all_attributes strength intelligence agility dreadmight luck willpower
+    min_attack max_attack min_spellpower max_spellpower min_necrosurge max_necrosurge]
     available_stats = stats.select { |stat| item.respond_to?(stat) && item.send(stat).present? }
     @stat_to_upgrade = available_stats.sample
-
     case @stat_to_upgrade
     when :health
       upgrade_increase = (item.initial_health * 0.10).round
@@ -35,6 +37,38 @@ class ForgeController < ApplicationController
       upgrade_increase = (item.initial_magic_resistance * 0.10).round
       item.magic_resistance += upgrade_increase
       item.upgraded_magic_resistance += upgrade_increase
+    when :damage_reduction
+      reduction_amount = (item.initial_damage_reduction * 0.10).to_d
+      item.damage_reduction += [reduction_amount, 0].max
+      item.upgraded_damage_reduction += [reduction_amount, 0].max
+    when :critical_resistance
+      reduction_amount = (item.initial_critical_resistance * 0.10).round
+      item.critical_resistance += [reduction_amount, 0].max
+      item.upgraded_critical_resistance += [reduction_amount, 0].max
+    when :all_resistances
+      reduction_amount = (item.initial_all_resistances * 0.10).round
+      item.all_resistances += [reduction_amount, 0].max
+      item.upgraded_all_resistances += [reduction_amount, 0].max
+    when :fire_resistance
+      reduction_amount = (item.initial_fire_resistance * 0.10).round
+      item.fire_resistance += [reduction_amount, 0].max
+      item.upgraded_fire_resistance += [reduction_amount, 0].max
+    when :cold_resistance
+      reduction_amount = (item.initial_cold_resistance * 0.10).round
+      item.cold_resistance += [reduction_amount, 0].max
+      item.upgraded_cold_resistance += [reduction_amount, 0].max
+    when :lightning_resistance
+      reduction_amount = (item.initial_lightning_resistance * 0.10).round
+      item.lightning_resistance += [reduction_amount, 0].max
+      item.upgraded_lightning_resistance += [reduction_amount, 0].max
+    when :poison_resistance
+      reduction_amount = (item.initial_poison_resistance * 0.10).round
+      item.poison_resistance += [reduction_amount, 0].max
+      item.upgraded_poison_resistance += [reduction_amount, 0].max
+    when :all_attributes
+      reduction_amount = (item.initiam_all_attributes * 0.10).round
+      item.all_attributes += [reduction_amount, 0].max
+      item.upgraded_all_attributes += [reduction_amount, 0].max
     when :strength
       upgrade_increase = (item.initial_strength * 0.10).round
       item.strength += upgrade_increase
@@ -85,10 +119,12 @@ class ForgeController < ApplicationController
   end
 
   def downgrade_item_stat(item)
-    stats = %i[health global_damage critical_strike_chance critical_strike_damage armor magic_resistance strength intelligence agility dreadmight luck willpower min_attack max_attack min_spellpower max_spellpower min_necrosurge max_necrosurge]
+    stats = %i[health global_damage critical_strike_chance critical_strike_damage armor magic_resistance damage_reduction
+    critical_resistance all_resistances fire_resistance cold_resistance lightning_resistance poison_resistance
+    all_attributes strength intelligence agility dreadmight luck willpower
+    min_attack max_attack min_spellpower max_spellpower min_necrosurge max_necrosurge]
     available_stats = stats.select { |stat| item.respond_to?(stat) && item.send(stat).present? }
     @stat_to_degrade = available_stats.sample
-
     case @stat_to_degrade
     when :health
       reduction_amount = (item.initial_health * 0.10).round
@@ -114,6 +150,38 @@ class ForgeController < ApplicationController
       reduction_amount = (item.initial_magic_resistance * 0.10).round
       item.magic_resistance -= [reduction_amount, 0].max
       item.upgraded_magic_resistance -= [reduction_amount, 0].max
+    when :damage_reduction
+      reduction_amount = (item.initial_damage_reduction * 0.10).to_d
+      item.damage_reduction -= [reduction_amount, 0].max
+      item.upgraded_damage_reduction -= [reduction_amount, 0].max
+    when :critical_resistance
+      reduction_amount = (item.initial_critical_resistance * 0.10).round
+      item.critical_resistance -= [reduction_amount, 0].max
+      item.upgraded_critical_resistance -= [reduction_amount, 0].max
+    when :all_resistances
+      reduction_amount = (item.initial_all_resistances * 0.10).round
+      item.all_resistances -= [reduction_amount, 0].max
+      item.upgraded_all_resistances -= [reduction_amount, 0].max
+    when :fire_resistance
+      reduction_amount = (item.initial_fire_resistance * 0.10).round
+      item.fire_resistance -= [reduction_amount, 0].max
+      item.upgraded_fire_resistance -= [reduction_amount, 0].max
+    when :cold_resistance
+      reduction_amount = (item.initial_cold_resistance * 0.10).round
+      item.cold_resistance -= [reduction_amount, 0].max
+      item.upgraded_cold_resistance -= [reduction_amount, 0].max
+    when :lightning_resistance
+      reduction_amount = (item.initial_lightning_resistance * 0.10).round
+      item.lightning_resistance -= [reduction_amount, 0].max
+      item.upgraded_lightning_resistance -= [reduction_amount, 0].max
+    when :poison_resistance
+      reduction_amount = (item.initial_poison_resistance * 0.10).round
+      item.poison_resistance -= [reduction_amount, 0].max
+      item.upgraded_poison_resistance -= [reduction_amount, 0].max
+    when :all_attributes
+      reduction_amount = (item.initiam_all_attributes * 0.10).round
+      item.all_attributes -= [reduction_amount, 0].max
+      item.upgraded_all_attributes -= [reduction_amount, 0].max
     when :strength
       reduction_amount = (item.initial_strength * 0.10).round
       item.strength -= [reduction_amount, 0].max
@@ -223,14 +291,16 @@ class ForgeController < ApplicationController
     @character = current_user.selected_character
     @item = Item.find_by(id: params[:item_id])
 
-    if @item.upgrade <= 5
+    if @item.upgrade >= 0 && @item.upgrade <= 5
       attempt_upgrade(100)
-    elsif @item.upgrade > 5 && @item.upgrade <= 10
-      attempt_upgrade(75)
-    elsif @item.upgrade > 10 && @item.upgrade <= 15
-      attempt_upgrade(50)
-    elsif @item.upgrade > 15 && @item.upgrade <= 20
-      attempt_upgrade(25)
+    elsif @item.upgrade > 5 && @item.upgrade <= 9
+      attempt_upgrade(80)
+    elsif @item.upgrade > 9 && @item.upgrade <= 13
+      attempt_upgrade(60)
+    elsif @item.upgrade > 13 && @item.upgrade <= 17
+      attempt_upgrade(30)
+    elsif @item.upgrade > 17 && @item.upgrade <= 20
+      attempt_upgrade(10)
     end
     redirect_to forge_index_path
   end

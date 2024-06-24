@@ -52,8 +52,8 @@ end
     item_class: "Axe",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 121 ,
-    max_attack: 608 ,
+    min_attack: 60,
+    max_attack: 304,
     image_path: 'app/assets/images/items/axes/executionersaxe.jpg'
   },
   {
@@ -62,8 +62,8 @@ end
     item_class: "Axe",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 121 ,
-    max_attack: 608 ,
+    min_attack: 60,
+    max_attack: 304,
     image_path: 'app/assets/images/items/axes/woodsplitter.jpg'
   },
 ### Belts
@@ -104,8 +104,8 @@ end
     item_class: "Bow",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 294 ,
-    max_attack: 440 ,
+    min_attack: 147,
+    max_attack: 220,
     image_path: 'app/assets/images/items/bows/elvenlongbow.jpg'
   },
   {
@@ -114,8 +114,8 @@ end
     item_class: "Bow",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 294 ,
-    max_attack: 440 ,
+    min_attack: 147,
+    max_attack: 220,
     image_path: 'app/assets/images/items/bows/flamefeather.jpg'
   },
   {
@@ -124,8 +124,8 @@ end
     item_class: "Bow",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 294 ,
-    max_attack: 440 ,
+    min_attack: 147,
+    max_attack: 220,
     image_path: 'app/assets/images/items/bows/frostwind.jpg'
   },
   {
@@ -134,8 +134,8 @@ end
     item_class: "Bow",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 294 ,
-    max_attack: 440 ,
+    min_attack: 147,
+    max_attack: 220,
     image_path: 'app/assets/images/items/bows/lightningstrike.jpg'
   },
   {
@@ -144,8 +144,8 @@ end
     item_class: "Bow",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 294 ,
-    max_attack: 440 ,
+    min_attack: 147,
+    max_attack: 220,
     image_path: 'app/assets/images/items/bows/plainhuntersbow.jpg'
   },
 ### Cloth
@@ -226,8 +226,8 @@ end
     item_class: "Dagger",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 102 ,
-    max_attack: 132 ,
+    min_attack: 51,
+    max_attack: 66,
     image_path: 'app/assets/images/items/daggers/blackfang.jpg'
   },
   {
@@ -236,8 +236,8 @@ end
     item_class: "Dagger",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 102 ,
-    max_attack: 132 ,
+    min_attack: 51,
+    max_attack: 66,
     image_path: 'app/assets/images/items/daggers/kingsbane.jpg'
   },
   {
@@ -246,8 +246,8 @@ end
     item_class: "Dagger",
     level_requirement: 100,
     gold_price: 57500,
-    min_spellpower: 102 ,
-    max_spellpower: 132 ,
+    min_spellpower: 51,
+    max_spellpower: 66,
     image_path: 'app/assets/images/items/daggers/runicdagger.jpg'
   },
 ### Leather
@@ -378,8 +378,8 @@ end
     item_class: "Mace",
     level_requirement: 100,
     gold_price: 57500,
-    min_spellpower: 33 ,
-    max_spellpower: 424 ,
+    min_spellpower: 16 ,
+    max_spellpower: 212 ,
     image_path: 'app/assets/images/items/maces/blessedmace.jpg'
   },
   {
@@ -388,8 +388,8 @@ end
     item_class: "Mace",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 58 ,
-    max_attack: 728 ,
+    min_attack: 29 ,
+    max_attack: 364 ,
     image_path: 'app/assets/images/items/maces/cerberus.jpg'
   },
   {
@@ -398,8 +398,8 @@ end
     item_class: "Mace",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 58 ,
-    max_attack: 728 ,
+    min_attack: 29 ,
+    max_attack: 364 ,
     image_path: 'app/assets/images/items/maces/dwarvenhammer.jpg'
   },
   {
@@ -408,8 +408,8 @@ end
     item_class: "Mace",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 58 ,
-    max_attack: 728 ,
+    min_attack: 29 ,
+    max_attack: 364 ,
     image_path: 'app/assets/images/items/maces/fortressbreaker.jpg'
   },
   {
@@ -418,8 +418,8 @@ end
     item_class: "Mace",
     level_requirement: 100,
     gold_price: 57500,
-    min_spellpower: 33 ,
-    max_spellpower: 424 ,
+    min_spellpower: 16 ,
+    max_spellpower: 212 ,
     image_path: 'app/assets/images/items/maces/penancehammer.jpg'
   },
   {
@@ -428,8 +428,8 @@ end
     item_class: "Mace",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 58 ,
-    max_attack: 728 ,
+    min_attack: 29 ,
+    max_attack: 364 ,
     image_path: 'app/assets/images/items/maces/viciousmaul.jpg'
   },
 ### Plate
@@ -700,8 +700,8 @@ end
     item_class: "Staff",
     level_requirement: 100,
     gold_price: 57500,
-    min_spellpower: 106,
-    max_spellpower: 664,
+    min_spellpower: 53,
+    max_spellpower: 332,
     image_path: 'app/assets/images/items/staves/twilightemissary.jpg'
   },
 ### Swords
@@ -711,8 +711,8 @@ end
     item_class: "Sword",
     level_requirement: 100,
     gold_price: 57500,
-    min_spellpower: 182,
-    max_spellpower: 304,
+    min_spellpower: 91,
+    max_spellpower: 152,
     image_path: 'app/assets/images/items/swords/crystalshortsword.jpg'
   },
   {
@@ -721,8 +721,8 @@ end
     item_class: "Sword",
     level_requirement: 100,
     gold_price: 57500,
-    min_spellpower: 182,
-    max_spellpower: 304,
+    min_spellpower: 91,
+    max_spellpower: 152,
     image_path: 'app/assets/images/items/swords/infusedlongsword.jpg'
   },
   {
@@ -731,8 +731,8 @@ end
     item_class: "Sword",
     level_requirement: 100,
     gold_price: 57500,
-    min_attack: 182,
-    max_attack: 304,
+    min_attack: 91,
+    max_attack: 152,
     image_path: 'app/assets/images/items/swords/longsword.jpg'
   },
 ].each do |item_params|

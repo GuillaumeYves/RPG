@@ -12,7 +12,7 @@ class NightstalkerSkillsSeeder
     poisoned_blade = Skill.create(
       name: "Poisoned Blade",
       skill_type: "combat",
-      description: "After attacking you have a 30% chance to inflict 80% of initial attack damage as additional magic damage.",
+      description: "After attacking you have a 30% chance to inflict 80% of initial attack damage as additional poison damage.",
       row: 1,
       level_requirement: 25,
       character_class: nightstalker_class,
@@ -37,7 +37,7 @@ class NightstalkerSkillsSeeder
 
     hidden_blade = Skill.create(
       name: "Hidden Blade",
-      description: "While dual wielding Daggers your Critical Strike Chance by 5% and your Critical Strikes deal 50% increased damage.",
+      description: "While dual wielding Daggers your Critical Strike Chance by 10% and your Critical Strikes deal 100% increased damage.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -45,8 +45,8 @@ class NightstalkerSkillsSeeder
       character_id: character.id,
       effect: "
       if self.main_hand.present? && self.off_hand.present? && self.main_hand.item_class == 'Dagger' && self.off_hand.item_class == 'Dagger'
-        self.total_critical_strike_chance += 5.0;
-        self.total_critical_strike_damage += 0.50;
+        self.total_critical_strike_chance += 10.0;
+        self.total_critical_strike_damage += 1.0;
       end "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'nightstalker_skills', 'hiddenblade.jpg')
@@ -55,7 +55,7 @@ class NightstalkerSkillsSeeder
 
     menacing_presence = Skill.create(
       name: "Menacing Presence",
-      description: "Your Health is increased by 50% and your Attack is increased by 30%.",
+      description: "Your Health is increased by 50% and your Attack is increased by 30%. Increase your Damage Reduction by 10%.",
       skill_type: "passive",
       row: 2,
       level_requirement: 50,
@@ -64,7 +64,8 @@ class NightstalkerSkillsSeeder
       effect: " self.total_health *= 1.5;
         self.total_max_health *= 1.5;
         self.total_min_attack *= 1.3;
-        self.total_max_attack *= 1.3; "
+        self.total_max_attack *= 1.3;
+        self.total_damage_reduction = (self.total_damage_reduction + 0.10); "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'nightstalker_skills', 'menacingpresence.jpg')
     menacing_presence.skill_image.attach(io: File.open(image_path), filename: 'menacingpresence.jpg', content_type: 'image/jpeg')

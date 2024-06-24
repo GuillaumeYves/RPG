@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_24_010401) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_24_082615) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -306,6 +306,22 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_24_010401) do
     t.decimal "damage_reduction"
     t.integer "all_attributes"
     t.integer "all_resistances"
+    t.integer "upgraded_all_attributes", default: 0
+    t.integer "upgraded_all_resistances", default: 0
+    t.integer "upgraded_fire_resistance", default: 0
+    t.integer "upgraded_cold_resistance", default: 0
+    t.integer "upgraded_lightning_resistance", default: 0
+    t.integer "upgraded_poison_resistance", default: 0
+    t.integer "upgraded_critical_resistance", default: 0
+    t.decimal "upgraded_damage_reduction", precision: 6, scale: 3, default: "0.0"
+    t.integer "initial_all_attributes", default: 0
+    t.integer "initial_all_resistances", default: 0
+    t.integer "initial_fire_resistance", default: 0
+    t.integer "initial_cold_resistance", default: 0
+    t.integer "initial_lightning_resistance", default: 0
+    t.integer "initial_poison_resistance", default: 0
+    t.integer "initial_critical_resistance", default: 0
+    t.decimal "initial_damage_reduction", precision: 6, scale: 3, default: "0.0"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 
