@@ -374,8 +374,8 @@
               <br>              
               <span data-tooltip="tooltip" title="Evading an attack will allow you to not take damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
               <span data-tooltip="tooltip" title="Ignoring pain will reduce incoming damage by 20%"><strong>Chance to Ignore Pain:</strong> <%= number_with_precision(@character.ignore_pain_chance, precision: 2)%>%</span><br>
-              <span data-tooltip="tooltip" title="Reduces the damage taken from Critical Strikes"><strong>Critical Resistance:</strong> %</span><br>
-              <span data-tooltip="tooltip" title="Reduces global damage taken"><strong>Damage Reduction:</strong> %</span><br>
+              <span data-tooltip="tooltip" title="Reduces the damage taken from Critical Strikes"><strong>Critical Resistance:</strong> <%= number_with_delimiter(@character.total_critical_resistance) %></span><br>
+              <span data-tooltip="tooltip" title="Reduces damage taken from all sources"><strong>Damage Reduction:</strong> <%= number_with_precision(@character.total_damage_reduction, precision: 2)%>%</span><br>
             </div>
           </div>
           <!-- Right column -->
@@ -422,10 +422,10 @@
           <div class="col-md-4">
             <div class="text-center" style="height: 240px;">
               <h4 class="card-header text-white bg-primary" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Resistances</h4><br>
-              <span data-tooltip="tooltip" title="Reduces Fire damage taken"><strong>Fire Resistance:</strong> %</span><br>
-              <span data-tooltip="tooltip" title="Reduces Cold damage taken"><strong>Cold Resistance:</strong> %</span><br>
-              <span data-tooltip="tooltip" title="Reduces Lightning damage taken"><strong>Lightning Resistance:</strong> %</span><br>
-              <span data-tooltip="tooltip" title="Reduces Poison damage taken"><strong>Poison Resistance:</strong> %</span><br>
+              <span data-tooltip="tooltip" title="Reduces Fire damage taken"><strong>Fire Resistance:</strong> <%= number_with_delimiter(@character.total_fire_resistance) %></span><br>
+              <span data-tooltip="tooltip" title="Reduces Cold damage taken"><strong>Cold Resistance:</strong> <%= number_with_delimiter(@character.total_cold_resistance) %></span><br>
+              <span data-tooltip="tooltip" title="Reduces Lightning damage taken"><strong>Lightning Resistance:</strong> <%= number_with_delimiter(@character.total_lightning_resistance) %></span><br>
+              <span data-tooltip="tooltip" title="Reduces Poison damage taken"><strong>Poison Resistance:</strong> <%= number_with_delimiter(@character.total_poison_resistance) %></span><br>
             </div>
           </div>
           <!-- Right column -->
