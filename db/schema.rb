@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_20_120208) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_24_010401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -144,6 +144,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_120208) do
     t.integer "total_min_necrosurge"
     t.integer "total_max_necrosurge"
     t.bigint "guild_id"
+    t.integer "fire_resistance", default: 0
+    t.integer "cold_resistance", default: 0
+    t.integer "lightning_resistance", default: 0
+    t.integer "poison_resistance", default: 0
+    t.integer "critical_resistance", default: 0
+    t.decimal "damage_reduction", precision: 6, scale: 3, default: "0.0"
+    t.integer "total_fire_resistance"
+    t.integer "total_cold_resistance"
+    t.integer "total_lightning_resistance"
+    t.integer "total_poison_resistance"
+    t.integer "total_critical_resistance"
+    t.decimal "total_damage_reduction", precision: 6, scale: 3
     t.index ["guild_id"], name: "index_characters_on_guild_id"
     t.index ["hunt_id"], name: "index_characters_on_hunt_id"
     t.index ["user_id"], name: "index_characters_on_user_id"
@@ -286,6 +298,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_120208) do
     t.integer "initial_dreadmight", default: 0
     t.integer "initial_luck", default: 0
     t.integer "initial_willpower", default: 0
+    t.integer "fire_resistance"
+    t.integer "cold_resistance"
+    t.integer "lightning_resistance"
+    t.integer "poison_resistance"
+    t.integer "critical_resistance"
+    t.decimal "damage_reduction"
+    t.integer "all_attributes"
+    t.integer "all_resistances"
     t.index ["inventory_type", "inventory_id"], name: "index_items_on_inventory"
   end
 

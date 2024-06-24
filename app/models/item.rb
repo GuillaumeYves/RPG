@@ -590,7 +590,7 @@ class Item < ApplicationRecord
     end
 
     def self.set_merchant_items(character)
-        # Determine the armor types to show in shop based on character class
+        # Determine the armor/weapon types to show in shop based on character class
         weapon_types =
                     case character.character_class
                         when 'warrior'
@@ -599,7 +599,7 @@ class Item < ApplicationRecord
                             ["Sword", "Mace", "Small Shield", "Great Shield"]
                         when 'deathwalker'
                             ["Sword", "Axe"]
-                        when 'nightstalker'
+                        when 'nightstalker', 'hunter'
                             ["Sword", "Dagger"]
                         when 'mage', 'acolyte'
                             ["Sword", "Staff", "Dagger", "Small Shield"]
@@ -613,7 +613,6 @@ class Item < ApplicationRecord
                         when 'mage', 'acolyte'
                             ["Cloth", "Belt"]
                     end
-
         Item.where(item_type: ["One-handed Weapon", "Two-handed Weapon", "Shield"], item_class: [weapon_types], merchant_item: false, generated_item: false)
             .order('RANDOM()')
             .limit(5)

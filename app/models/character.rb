@@ -34,12 +34,15 @@ class Character < ApplicationRecord
     validates :character_name, presence: true, uniqueness: true, length: { minimum: 4, maximum: 20 }
     validates :level, presence: true, numericality: { only_integer: true, greater_than: 0 }
     validates :experience, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-    validates :skill_points, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
     validate :max_characters, on: :create
     validate :valid_character_name, on: :create
 
-    attr_accessor :buffed_min_attack, :buffed_max_attack, :buffed_min_spellpower, :buffed_max_spellpower, :buffed_min_necrosurge, :buffed_max_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage
+    attr_accessor :buffed_min_attack, :buffed_max_attack, :buffed_min_spellpower, :buffed_max_spellpower, :buffed_min_necrosurge,
+    :buffed_max_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage,
+    :buffed_damage_reduction, :buffed_critical_resistance, :buffed_fire_resistance, :buffed_cold_resistance, :buffed_lightning_resistance,
+    :buffed_poison_resistance
+
     attr_accessor :took_damage
     attr_accessor :piety
     attr_accessor :nullify
@@ -170,6 +173,12 @@ class Character < ApplicationRecord
         else
             self.total_critical_strike_damage = (self.critical_strike_damage + self.paragon_critical_strike_damage)
         end
+        self.total_damage_reduction = (self.damage_reduction + ((self.ignore_pain_chance * 0.001).to_d))
+        self.total_critical_resistance = (self.critical_resistance + ((self.strength_bonus * 0.02).to_i))
+        self.total_fire_resistance = (self.fire_resistance + ((self.intelligence_bonus * 0.02).to_i))
+        self.total_cold_resistance = (self.cold_resistance + ((self.intelligence_bonus * 0.02).to_i))
+        self.total_lightning_resistance = (self.lightning_resistance + ((self.intelligence_bonus * 0.02).to_i))
+        self.total_poison_resistance = (self.poison_resistance + ((self.intelligence_bonus * 0.02).to_i))
         self.max_health = self.health
         if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
             self.total_health = ((self.health + self.strength_bonus) + (self.health * self.paragon_total_health))
@@ -199,6 +208,12 @@ class Character < ApplicationRecord
         self.buffed_magic_resistance = 0
         self.buffed_critical_strike_chance = 0.0
         self.buffed_critical_strike_damage = 0.0
+        self.buffed_damage_reduction = 0.0
+        self.buffed_critical_resistance = 0
+        self.buffed_fire_resistance = 0
+        self.buffed_cold_resistance = 0
+        self.buffed_lightning_resistance = 0
+        self.buffed_poison_resistance = 0
     end
 
     def apply_combat_skills
@@ -482,6 +497,20 @@ class Character < ApplicationRecord
 
     def revert_stats_based_on_item(item)
         # Subtract stats of the unequipped item
+        if (item.all_attributes.present? && !item.all_attributes.nil)
+            self.strength -= item.all_attributes
+            self.intelligence -= item.all_attributes
+            self.agility -= item.all_attributes
+            self.dreadmight -= item.all_attributes
+            self.luck -= item.all_attributes
+            self.willpower -= item.all_attributes
+        end
+        if (item.all_resistances.present? && !item.all_resistances.nil)
+            self.fire_resistance -= item.all_resistances
+            self.cold_resistance -= item.all_resistances
+            self.lightning_resistance -= item.all_resistances
+            self.poison_resistance -= item.all_resistances
+        end
         self.min_attack -= item.min_attack unless item.min_attack.nil?
         self.max_attack -= item.max_attack unless item.max_attack.nil?
         self.min_necrosurge -= item.min_necrosurge unless item.min_necrosurge.nil?
@@ -500,10 +529,30 @@ class Character < ApplicationRecord
         self.critical_strike_chance -= item.critical_strike_chance unless item.critical_strike_chance.nil?
         self.critical_strike_damage -= item.critical_strike_damage unless item.critical_strike_damage.nil?
         self.global_damage -= item.global_damage unless item.global_damage.nil?
+        self.damage_reduction -= item.damage_reduction unless item.damage_reduction.nil?
+        self.critical_resistance -= item.critical_resistance unless item.critical_resistance.nil?
+        self.fire_resistance -= item.fire_resistance unless item.fire_resistance.nil?
+        self.cold_resistance -= item.cold_resistance unless item.cold_resistance.nil?
+        self.lightning_resistance -= item.lightning_resistance unless item.lightning_resistance.nil?
+        self.poison_resistance -= item.poison_resistance unless item.poison_resistance.nil?
     end
 
     def modify_stats_based_on_item(item)
         # Adds stats of the equipped item
+        if (item.all_attributes.present? && !item.all_attributes.nil)
+            self.strength += item.all_attributes
+            self.intelligence += item.all_attributes
+            self.agility += item.all_attributes
+            self.dreadmight += item.all_attributes
+            self.luck += item.all_attributes
+            self.willpower += item.all_attributes
+        end
+        if (item.all_resistances.present? && !item.all_resistances.nil)
+            self.fire_resistance += item.all_resistances
+            self.cold_resistance += item.all_resistances
+            self.lightning_resistance += item.all_resistances
+            self.poison_resistance += item.all_resistances
+        end
         self.min_attack += item.min_attack unless item.min_attack.nil?
         self.max_attack += item.max_attack unless item.max_attack.nil?
         self.min_necrosurge += item.min_necrosurge unless item.min_necrosurge.nil?
@@ -522,12 +571,17 @@ class Character < ApplicationRecord
         self.critical_strike_chance += item.critical_strike_chance unless item.critical_strike_chance.nil?
         self.critical_strike_damage += item.critical_strike_damage unless item.critical_strike_damage.nil?
         self.global_damage += item.global_damage unless item.global_damage.nil?
+        self.damage_reduction += item.damage_reduction unless item.damage_reduction.nil?
+        self.critical_resistance += item.critical_resistance unless item.critical_resistance.nil?
+        self.fire_resistance += item.fire_resistance unless item.fire_resistance.nil?
+        self.cold_resistance += item.cold_resistance unless item.cold_resistance.nil?
+        self.lightning_resistance += item.lightning_resistance unless item.lightning_resistance.nil?
+        self.poison_resistance += item.poison_resistance unless item.poison_resistance.nil?
     end
 
     def level_up
         # Increase level
         update(level: level + 1)
-
         # Check if skill point should be added at specific levels
         if [25, 50, 75, 100].include?(level)
             self.skill_points += 1
@@ -535,7 +589,6 @@ class Character < ApplicationRecord
         if self.level >= 100
             self.paragon_points += 1
         end
-
         # Modify health based on character class
         case character_class
         when 'warrior'
@@ -549,14 +602,11 @@ class Character < ApplicationRecord
         when 'deathwalker'
             self.health += 18
         end
-
         self.modify_stats_based_on_attributes
         self.apply_passive_skills
-
         # Calculate the remaining experience after leveling up
         remaining_experience = experience - required_experience_for_next_level
         update_required_experience_for_next_level
-
         # Update the character's experience with the remaining experience
         update(experience: remaining_experience)
         save
@@ -633,12 +683,10 @@ class Character < ApplicationRecord
     def has_legendary_item_equipped?
         equipment_slots = %i[head chest hands feet main_hand off_hand finger1 finger2 neck waist]
         legendary_items_count = 0
-
-        equipment_slots.each do |slot|
-            equipped_item = self.send(slot)
-            legendary_items_count += 1 if equipped_item&.rarity == 'Legendary'
-        end
-
+            equipment_slots.each do |slot|
+                equipped_item = self.send(slot)
+                legendary_items_count += 1 if equipped_item&.rarity == 'Legendary'
+            end
         legendary_items_count >= 3
     end
 
@@ -661,8 +709,8 @@ class Character < ApplicationRecord
                         errors.add(:base, "Only Paladins and Warriors can equip Great Shields.")
                         return false
                     when 'Small Shield'
-                        return true if %w[warrior paladin mage].include?(character_class)
-                        errors.add(:base, "Only Warriors, Paladins and Mages can equip Small Shields.")
+                        return true if %w[warrior paladin mage acolyte].include?(character_class)
+                        errors.add(:base, "Only Warriors, Paladins, Mages and Acolytes can equip Small Shields.")
                         return false
                     when 'Axe'
                         return true if %w[warrior deathwalker].include?(character_class)
@@ -673,28 +721,28 @@ class Character < ApplicationRecord
                         errors.add(:base, "Only Paladins can equip Maces.")
                         return false
                     when 'Dagger'
-                        return true if %w[nightstalker pathfinder].include?(character_class)
-                        errors.add(:base, "Only Nightstalkers and Pathfinders can equip Daggers.")
+                        return true if %w[nightstalker hunter mage acolyte].include?(character_class)
+                        errors.add(:base, "Only Nightstalkers, Hunters, Mages and Acolytes can equip Daggers.")
                         return false
                     when 'Bow'
-                        return true if character_class == 'pathfinder'
-                        errors.add(:base, "Only Pathfinders can equip Bows.")
+                        return true if character_class == 'hunter'
+                        errors.add(:base, "Only Hunters can equip Bows.")
                         return false
                     when 'Staff'
-                        return true if character_class == 'mage'
-                        errors.add(:base, "Only Mages can equip Staves.")
+                        return true if %w[mage acolyte].include?(character_class)
+                        errors.add(:base, "Only Mages and Acolytes can equip Staves.")
                         return false
                     when 'Plate'
                         return true if %w[warrior paladin deathwalker].include?(character_class)
                         errors.add(:base, "Only Warriors, Paladins and Deathwalkers can equip Plate.")
                         return false
                     when 'Leather'
-                        return true if %w[nightstalker pathfinder].include?(character_class)
-                        errors.add(:base, "Only Nightstalkers and Pathfinders can equip leather.")
+                        return true if %w[nightstalker hunter].include?(character_class)
+                        errors.add(:base, "Only Nightstalkers and Hunters can equip leather.")
                         return false
                     when 'Cloth'
-                        return true if %w[mage].include?(character_class)
-                        errors.add(:base, "Only Mages can equip cloth.")
+                        return true if %w[mage acolyte].include?(character_class)
+                        errors.add(:base, "Only Mages and Acolytes can equip cloth.")
                         return false
                     when 'Ring'
                         return true
@@ -732,22 +780,18 @@ class Character < ApplicationRecord
     def equip_one_handed_weapon(item)
         # Case 1: No existing weapon in the main hand or off hand
         if self.main_hand.nil? && self.off_hand.nil?
-            Rails.logger.debug("################## Entering Case 1")
             self.main_hand = item
             remove_item_from_inventory(item)
             modify_stats_based_on_item(item)
         # Case 2: Main hand but no off hand
         elsif self.main_hand.present? && self.off_hand.nil?
-            Rails.logger.debug("################## Entering Case 2")
             if self.main_hand.item_type == 'One-handed Weapon'
-                if ((self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'pathfinder'))
-                    Rails.logger.debug("################## Case 2 - Character is a nightstalker and item is either sword or dagger")
+                if ((self.main_hand.item_class == 'Dagger' || self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'hunter'))
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
                     return
                 elsif ((self.main_hand.item_class == 'Sword') && (self.character_class == 'nightstalker' || self.character_class == 'deathwalker'))
-                    Rails.logger.debug("################## Case 2 - Character is a nightstalker and item is a sword")
                     self.off_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -771,7 +815,7 @@ class Character < ApplicationRecord
                 remove_item_from_inventory(item)
                 modify_stats_based_on_item(item)
             elsif self.off_hand.item_type == 'One-handed Weapon'
-                if ((self.character_class == 'nightstalker' || self.character_class == 'pathfinder') && (item.item_class == 'Dagger' || item.item_class == 'Sword'))
+                if ((self.character_class == 'nightstalker' || self.character_class == 'hunter') && (item.item_class == 'Dagger' || item.item_class == 'Sword'))
                     self.main_hand = item
                     remove_item_from_inventory(item)
                     modify_stats_based_on_item(item)
@@ -788,7 +832,6 @@ class Character < ApplicationRecord
             end
         # Case 4: Both main hand and off hand have weapons
         elsif self.main_hand.present? && self.off_hand.present?
-            Rails.logger.debug("################## Entering Case 4")
             if self.off_hand.item_type == 'Shield'
                 unequip_main_hand
                 self.main_hand = item
@@ -1103,12 +1146,12 @@ class Character < ApplicationRecord
     private
 
     def max_characters
-        errors.add(:base, "You can't have more than 3 characters.") if user.characters.count >= 3
+        errors.add(:base, "You cannot have more than 3 characters") if user.characters.count >= 3
     end
 
     def valid_character_name
-        unless character_name.match?(/\A[a-zA-Z0-9']+\z/)
-            errors.add(:character_name, 'can only contain letters, numbers, and the single quote character.')
+        unless character_name.match?(/\A[[:alpha:]äâéàè']+\z/)
+            errors.add(:character_name, "is invalid <br>Please enter a new name")
         end
     end
 
