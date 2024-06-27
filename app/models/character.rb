@@ -41,7 +41,7 @@ class Character < ApplicationRecord
     attr_accessor :buffed_min_attack, :buffed_max_attack, :buffed_min_spellpower, :buffed_max_spellpower, :buffed_min_necrosurge,
     :buffed_max_necrosurge, :buffed_armor, :buffed_magic_resistance, :buffed_critical_strike_chance, :buffed_critical_strike_damage,
     :buffed_damage_reduction, :buffed_critical_resistance, :buffed_fire_resistance, :buffed_cold_resistance, :buffed_lightning_resistance,
-    :buffed_poison_resistance
+    :buffed_poison_resistance, :buffed_block_chance
 
     attr_accessor :took_damage
     attr_accessor :piety
@@ -146,9 +146,19 @@ class Character < ApplicationRecord
         if self.character_class == 'nightstalker' && skills.find_by(name: 'Swift Movements', unlocked: true)
             self.total_min_attack = ((self.min_attack + (self.agility_bonus * 0.80)) + (self.min_attack * self.paragon_attack)).to_i
             self.total_max_attack = ((self.max_attack + (self.agility_bonus * 0.80)) + (self.max_attack * self.paragon_attack)).to_i
+        elsif self.character_class == 'paladin' && skills.find_by(name: 'Divine Strength', unlocked: true)
+            self.total_min_attack = (((self.min_attack + self.strength_bonus) + (self.min_attack * self.paragon_attack)) + (((self.min_attack + self.strength_bonus) + (self.min_attack * self.paragon_attack) * self.total_damage_reduction))).to_i
+            self.total_max_attack = (((self.max_attack + self.strength_bonus) + (self.max_attack * self.paragon_attack)) + (((self.max_attack + self.strength_bonus) + (self.max_attack * self.paragon_attack) * self.total_damage_reduction))).to_i
         else
             self.total_min_attack = (self.min_attack + (self.strength_bonus) + (self.min_attack * self.paragon_attack)).to_i
             self.total_max_attack = (self.max_attack + (self.strength_bonus) + (self.max_attack * self.paragon_attack)).to_i
+        end
+        if self.character_class == 'paladin' && skills.find_by(name: 'Divine Strength', unlocked: true)
+            self.total_min_spellpower = (((self.min_spellpower + self.intelligence_bonus) + (self.min_spellpower * self.paragon_spellpower)) + (((self.min_spellpower + self.intelligence_bonus) + (self.min_spellpower * self.paragon_spellpower) * self.total_damage_reduction))).to_i
+            self.total_max_spellpower = (((self.max_spellpower + self.intelligence_bonus) + (self.max_spellpower * self.paragon_spellpower)) + (((self.max_spellpower + self.intelligence_bonus) + (self.max_spellpower * self.paragon_spellpower) * self.total_damage_reduction))).to_i
+        else
+            self.total_min_spellpower = (self.min_spellpower + (self.intelligence_bonus * self.paragon_spellpower)).to_i
+            self.total_max_spellpower = (self.max_spellpower + (self.intelligence_bonus * self.paragon_spellpower)).to_i
         end
         self.total_min_spellpower = (self.min_spellpower + (self.intelligence_bonus * self.paragon_spellpower)).to_i
         self.total_max_spellpower = (self.max_spellpower + (self.intelligence_bonus * self.paragon_spellpower)).to_i
@@ -168,6 +178,7 @@ class Character < ApplicationRecord
         self.total_cold_resistance = (self.cold_resistance + (self.intelligence_bonus * 0.05)).to_i
         self.total_lightning_resistance = (self.lightning_resistance + (self.intelligence_bonus * 0.05)).to_i
         self.total_poison_resistance = (self.poison_resistance + (self.intelligence_bonus * 0.05)).to_i
+        self.total_block_chance = self.block_chance
         self.max_health = self.health
         if self.character_class == 'warrior' && skills.find_by(name: 'Juggernaut', unlocked: true)
             self.total_health = (self.health + (self.strength_bonus)) + (self.health * self.paragon_total_health).to_i
@@ -444,19 +455,11 @@ class Character < ApplicationRecord
     end
 
     def evasion
-        if self.character_class == 'warrior' && skills.find_by(name: 'Unbridled Ferocity', unlocked: true)
-            evasion = 0.0
-        else
-            self.agility * 0.02
-        end
+        self.agility * 0.02
     end
 
     def ignore_pain_chance
-        if self.character_class == 'warrior' && skills.find_by(name: 'Unbridled Ferocity', unlocked: true)
-            ignore_pain_chance = 0.0
-        else
-            self.willpower * 0.02
-        end
+        self.willpower * 0.02
     end
 
     def assign_skills_based_on_class
@@ -524,6 +527,7 @@ class Character < ApplicationRecord
         self.cold_resistance -= item.cold_resistance unless item.cold_resistance.nil?
         self.lightning_resistance -= item.lightning_resistance unless item.lightning_resistance.nil?
         self.poison_resistance -= item.poison_resistance unless item.poison_resistance.nil?
+        self.block_chance -= item.block_chance unless item.block_chance.nil?
     end
 
     def modify_stats_based_on_item(item)
@@ -566,6 +570,7 @@ class Character < ApplicationRecord
         self.cold_resistance += item.cold_resistance unless item.cold_resistance.nil?
         self.lightning_resistance += item.lightning_resistance unless item.lightning_resistance.nil?
         self.poison_resistance += item.poison_resistance unless item.poison_resistance.nil?
+        self.block_chance += item.block_chance unless item.block_chance.nil?
     end
 
     def level_up

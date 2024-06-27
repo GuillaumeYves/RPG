@@ -30,7 +30,8 @@ class Item < ApplicationRecord
             agility: self.upgraded_agility,
             dreadmight: self.upgraded_dreadmight,
             luck: self.upgraded_luck,
-            willpower: self.upgraded_willpower
+            willpower: self.upgraded_willpower,
+            block_chance: self.upgraded_block_chance
         }
     end
 
@@ -53,6 +54,15 @@ class Item < ApplicationRecord
         self.initial_dreadmight = self.dreadmight if self.dreadmight.present?
         self.initial_luck = self.luck if self.luck.present?
         self.initial_willpower = self.willpower if self.willpower.present?
+        self.initial_all_attributes = self.all_attributes if self.all_attributes.present?
+        self.initial_fire_resistance = self.fire_resistance if self.fire_resistance.present?
+        self.initial_cold_resistance = self.cold_resistance if self.cold_resistance.present?
+        self.initial_lightning_resistance = self.lightning_resistance if self.lightning_resistance.present?
+        self.initial_poison_resistance = self.poison_resistance if self.poison_resistance.present?
+        self.initial_all_resistances = self.all_resistances if self.all_resistances.present?
+        self.initial_critical_resistance = self.critical_resistance if self.critical_resistance.present?
+        self.initial_damage_reduction = self.damage_reduction if self.damage_reduction.present?
+        self.initial_block_chance = self.block_chance if self.block_chance.present?
     end
 
     def attach_image_to_item(item, image_key)
@@ -73,6 +83,7 @@ class Item < ApplicationRecord
     end
 
     def randomize_attributes
+        self.randomize_rarity
         # Define base attributes and their max values
         base_attributes = {
             luck: 100,
@@ -81,8 +92,8 @@ class Item < ApplicationRecord
         }
         # Define specific attributes for certain item types and classes
         type_class_specific_attributes = {
-        "Shield_Small Shield" => { health: 1500, strength: 100, dreadmight: 100, intelligence: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 100, damage_reduction: 0.05 },
-        "Shield_Great Shield" => { health: 2000, strength: 100, intelligence: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 200, damage_reduction: 0.10 },
+        "Shield_Small Shield" => { health: 1500, strength: 100, dreadmight: 100, intelligence: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 100, damage_reduction: 0.05, block_chance: 20 },
+        "Shield_Great Shield" => { health: 2000, strength: 100, intelligence: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 200, damage_reduction: 0.10, block_chance: 30 },
         "Finger" => { critical_strike_chance: 5.0, critical_strike_damage: 0.5, health: 500, strength: 100, dreadmight: 100, agility: 100, intelligence: 100 },
         "Hands_Plate" => { critical_strike_chance: 2.5, critical_strike_damage: 0.25, health: 700, strength: 100, dreadmight: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50 },
         "Hands_Leather" => { critical_strike_chance: 2.5, critical_strike_damage: 0.25, health: 500, agility: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50 },
@@ -98,8 +109,8 @@ class Item < ApplicationRecord
         "Chest_Leather" => { health: 1300, agility: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 100 },
         "Chest_Cloth" => { health: 1100, intelligence: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 100 },
         "Waist" => { health: 1000, strength: 100, dreadmight: 100, agility: 100, intelligence: 100, fire_resistance: 100, cold_resistance: 100, lightning_resistance: 100, poison_resistance: 100, all_resistances: 50, critical_resistance: 100 },
-        "One-handed Weapon" => { strength: 100, dreadmight: 100, agility: 100, intelligence: 100 },
-        "Two-handed Weapon" => { strength: 100, dreadmight: 100, agility: 100, intelligence: 100 },
+        "One-handed Weapon" => { health: 500, strength: 100, dreadmight: 100, agility: 100, intelligence: 100 },
+        "Two-handed Weapon" => { health: 1000, strength: 100, dreadmight: 100, agility: 100, intelligence: 100 },
         }
         # Determine the key for specific attributes based on item type and class
         specific_key = self.item_type
@@ -108,7 +119,6 @@ class Item < ApplicationRecord
         attributes = base_attributes.merge(type_class_specific_attributes[specific_key] || {})
         allocated_attributes = {}
         assigned_attributes = []  # Track assigned attributes
-        self.randomize_rarity
         # Determine the number of attributes to assign based on rarity
         num_attributes_to_assign =
             case self.rarity
@@ -154,7 +164,8 @@ class Item < ApplicationRecord
             poison_resistance: "Poison Resistant",
             all_resistances: "Elemental",
             critical_resistance: "Enduring",
-            damage_reduction: "Fortified"
+            damage_reduction: "Fortified",
+            block_chance: "Guardian"
         }
         suffixes = {
             health: "of Health",
@@ -173,7 +184,8 @@ class Item < ApplicationRecord
             poison_resistance: "of Poison Resistance",
             all_resistances: "of Elements",
             critical_resistance: "of Endurance",
-            damage_reduction: "of Fortification"
+            damage_reduction: "of Fortification",
+            block_chance: "of Guarding"
         }
         epic_armor_names = [
             "Doomshroud", "Deathwhisper", "Stormcloak", "Windwraps", "Glimmershade", "Bonebreaker", "Hellgaze",
@@ -255,6 +267,7 @@ class Item < ApplicationRecord
             cold_resistance: self.cold_resistance,
             lightning_resistance: self.lightning_resistance,
             poison_resistance: self.poison_resistance,
+            block_chance: self.block_chance
         }.compact
         # Determine if the item is Epic (has 3 attributes)
         if allocated_attributes.length == 3
@@ -307,12 +320,13 @@ class Item < ApplicationRecord
             duped_item.critical_strike_damage = (self.critical_strike_damage * (rand(0.8..1.0))) if self.critical_strike_damage.present?
             duped_item.all_attributes = (self.all_attributes * (rand(0.8..1.0))) if self.all_attributes.present?
             duped_item.damage_reduction = (self.damage_reduction * (rand(0.8..1.0))) if self.damage_reduction.present?
-            duped_item.critical_resistance = (self.damage_reduction * (rand(0.8..1.0))) if self.damage_reduction.present?
+            duped_item.critical_resistance = (self.critical_resistance * (rand(0.8..1.0))) if self.critical_resistance.present?
             duped_item.all_resistances = (self.all_resistances * (rand(0.8..1.0))) if self.all_resistances.present?
             duped_item.fire_resistance = (self.fire_resistance * (rand(0.8..1.0))) if self.fire_resistance.present?
             duped_item.cold_resistance = (self.cold_resistance * (rand(0.8..1.0))) if self.cold_resistance.present?
             duped_item.lightning_resistance = (self.lightning_resistance * (rand(0.8..1.0))) if self.lightning_resistance.present?
             duped_item.poison_resistance = (self.poison_resistance * (rand(0.8..1.0))) if self.poison_resistance.present?
+            duped_item.block_chance = (self.block_chance * (rand(0.8..1.0))) if self.block_chance.present?
         else
             duped_item.randomize_attributes
         end

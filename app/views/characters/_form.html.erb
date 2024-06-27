@@ -1,68 +1,131 @@
-<div class="card text-center mt-5 mx-auto" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; width: 500px; position: relative;">
-  <%= form_with(model: @character, local: true) do |form| %>
-    <% if @character.errors.any? %>
-      <div id="error_explanation">
-        <h2><%= pluralize(@character.errors.count, 'error') %> prohibited this character from being saved:</h2>
-        <ul>
-          <% @character.errors.full_messages.each do |message| %>
-            <%= message.html_safe %>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-      
-    <img id="raceImagePreview" src="#" alt="Race Image Preview" class= "mx-auto" style="width: 100%; height: 460px; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;">
-    
-<div class="field">
-  <div class="row justify-content-center align-items-center">
-    <div class="col d-flex justify-content-center position-relative">
-      <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name', style: 'text-align: center; font-size: 20px; background-color: transparent; border: none; outline: none; box-shadow: none; width: 50%;' %>
-      <button type="button" class="btn position-absolute" id="generate-random-name" style="padding: 0; border: none; background: none; right: 0;">
-        <i class="fas fa-dice" style="font-size: 32px; margin-right: 50px; margin-top: 10px;"></i>
-      </button>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <!-- Character Form Card -->
+    <div class="card text-center mx-2 col-md-5" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; position: relative;">
+      <%= form_with(model: @character, local: true) do |form| %>
+        <% if @character.errors.any? %>
+          <div id="error_explanation">
+            <h2><%= pluralize(@character.errors.count, 'error') %> prohibited this character from being saved:</h2>
+            <ul>
+              <% @character.errors.full_messages.each do |message| %>
+                <%= message.html_safe %>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+        
+        <img id="raceImagePreview" src="#" alt="Race Image Preview" class= "mx-auto" style="width: 90%; border: 5px solid #000; box-shadow: 2px 2px 10px #888888;">
+        
+        <div class="field">
+          <div class="row justify-content-center align-items-center">
+            <div class="col d-flex justify-content-center position-relative">
+              <%= form.text_field :character_name, class: 'form-control character-name-field', placeholder: 'Character name', style: 'text-align: center; font-size: 20px; background-color: transparent; border: none; outline: none; box-shadow: none; width: 50%;' %>
+              <button type="button" class="btn position-absolute" id="generate-random-name" style="padding: 0; border: none; background: none; right: 0;">
+                <i class="fas fa-dice" style="font-size: 32px; margin-right: 50px; margin-top: 10px;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="field mt-3 mb-3" style="text-align: center;">
+          <label class="mb-2"><strong>Gender</strong></label>
+          <div>
+            <%= form.hidden_field :gender, id: 'selectedGender' %>
+            <input type="hidden" id="gender" name="gender" value="male" />
+            <button type="button" style="width: 40px; height: 40px; margin-right: 25px;" id="maleButton">♂</button>
+            <button type="button" style="width: 40px; height: 40px;" id="femaleButton">♀</button>
+          </div>
+        </div>
+  
+        <div class="field mt-3" style="text-align: center;">
+          <label class="mb-2"><strong>Race</strong></label>
+          <div>
+            <%= form.hidden_field :race, id: 'selectedRace' %>
+            <button type="button" id="prevRace">&lt;</button>
+            <span id="raceDisplay" style="display: inline-block; width: 100px; text-align: center;">Human</span>
+            <button type="button" id="nextRace">&gt;</button>
+          </div>
+        </div>
+        <p class="mb-2 mt-2" id="raceDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
+  
+        <div class="field " style="text-align: center;">
+          <label class="mb-2"><strong>Class</strong></label>
+          <div>
+            <%= form.hidden_field :character_class, id: 'selectedClass' %>
+            <button type="button" id="prevClass">&lt;</button>
+            <span id="classDisplay" style="display: inline-block; width: 100px; text-align: center;">Warrior</span>
+            <button type="button" id="nextClass">&gt;</button>
+          </div>
+        </div>
+        <p class="mb-3 mt-2" id="classDescription" style="height: 50px; overflow-y: auto; text-align: center;"></p>
+  
+        <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px;">
+          <%= form.submit 'Create', class: "btn btn-outline-primary" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Class Info Card -->
+    <div class="card text-center mx-2 col-md-5" style="border: 2px solid #000; box-shadow: 5px 5px 10px #888888; padding: 20px; height: 1000px; position: relative;">
+      <div class="card-body">
+        <h3 id="classTitle" class="mb-3" style="text-decoration: underline;">The Warrior</h3>
+        <p id="classItemAvailable" class="mb-5" style="height: 80px;">Plate armor<br>
+                                     Two-handed Axe, Two-handed Sword<br>
+                                     One-handed Sword<br>
+                                     Small Shield, Great Shield</p>
+        <div class="progress mb-2" style="position: relative; height: 24px; margin-bottom: 10px;">
+          <div id="attackBar" class="progress-bar bg-primary" role="progressbar" style="width: 100%; overflow: visible !important; white-space: nowrap; font-size: 18px; font-weight: 600; text-shadow: 1px 1px 1px black; position: relative;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+            <span style="position: absolute; margin-left: 5px;">Attack</span>
+          </div>
+        </div>
+        <div class="progress mb-2" style="position: relative; height: 24px; margin-bottom: 10px;">
+          <div id="spellpowerBar" class="progress-bar bg-primary" role="progressbar" style="width: 100%; overflow: visible !important; white-space: nowrap; font-size: 18px; font-weight: 600; text-shadow: 1px 1px 1px black; position: relative;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+            <span style="position: absolute; margin-left: 5px;">Spellpower</span>
+          </div>
+        </div>
+        <div class="progress mb-2" style="position: relative; height: 24px; margin-bottom: 10px;">
+          <div id="necrosurgeBar" class="progress-bar bg-primary" role="progressbar" style="width: 100%; overflow: visible !important; white-space: nowrap; font-size: 18px; font-weight: 600; text-shadow: 1px 1px 1px black; position: relative;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
+            <span style="position: absolute; margin-left: 5px;">Necrosurge</span>
+          </div>
+        </div>
+        <div class="progress mb-2" style="position: relative; height: 24px; margin-bottom: 10px;">
+          <div id="defenseBar" class="progress-bar bg-primary" role="progressbar" style="width: 100%; overflow: visible !important; white-space: nowrap; font-size: 18px; font-weight: 600; text-shadow: 1px 1px 1px black; position: relative;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+            <span style="position: absolute; margin-left: 5px;">Defense</span>
+          </div>
+        </div>
+        <div class="progress mb-2" style="position: relative; height: 24px;">
+          <div id="healthBar" class="progress-bar bg-primary" role="progressbar" style="width: 100%; overflow: visible !important; white-space: nowrap; font-size: 18px; font-weight: 600; text-shadow: 1px 1px 1px black; position: relative;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
+            <span style="position: absolute; margin-left: 5px;">Health</span>
+          </div>
+        </div>
+        <p id="classDetail" class="mt-5" style="height: 100px;">Warriors excel at dealing tons of physical damage.<br>
+                                        They can apply bleed, increase their Strength, Health or even push the limits of their damage at the cost of their defenses.
+        </p>
+        <div id="classSkills" class="row mt-3 d-flex justify-content-center align-items-center">
+          <div class="col-2 text-center">
+            <span data-tooltip="tooltip" title="You unlock the true potential of your Strength and it now also increases your Health.">
+              <img src='/assets/warrior_skills/juggernaut.jpg' style='width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;'>
+            </span>
+            <p style="margin-top: -5px; font-size:12px"><small>Juggernaut</small></p>
+            <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small>Passive</small></p>
+          </div>
+          <div class="col-2 text-center">
+            <span data-tooltip="tooltip" title="You unlock the true potential of your Strength and it now also increases your Health.">
+              <img src='/assets/warrior_skills/juggernaut.jpg' style='width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;'>
+            </span>
+            <p style="margin-top: -5px; font-size:12px"><small>Juggernaut</small></p>
+            <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small>Passive</small></p>
+          </div>
+          <div class="col-2 text-center">
+            <span data-tooltip="tooltip" title="You unlock the true potential of your Strength and it now also increases your Health.">
+              <img src='/assets/warrior_skills/juggernaut.jpg' style='width: 50px; height: 50px; border: 2px solid #000; box-shadow: 2px 2px 10px #888888; margin-bottom: 5px;'>
+            </span>
+            <p style="margin-top: -5px; font-size:12px"><small>Juggernaut</small></p>
+            <p style="font-size:11px; margin-top:-22px; margin-bottom: 15px"><small>Passive</small></p>
+          </div>
+        </div>
     </div>
   </div>
-</div>
-
-
-
-    
-    <div class="field mt-3 mb-3" style="text-align: center;">
-      <label class="mb-2"><strong>Gender</strong></label>
-      <div>
-        <%= form.hidden_field :gender, id: 'selectedGender' %>
-        <input type="hidden" id="gender" name="gender" value="male" />
-        <button type="button" style="width: 40px; height: 40px; margin-right: 25px;" id="maleButton">♂</button>
-        <button type="button" style="width: 40px; height: 40px;" id="femaleButton">♀</button>
-      </div>
-    </div>
-
-    <div class="field mt-3" style="text-align: center;">
-      <label class="mb-2"><strong>Race</strong></label>
-      <div>
-        <%= form.hidden_field :race, id: 'selectedRace' %>
-        <button type="button" id="prevRace">&lt;</button>
-        <span id="raceDisplay" style="display: inline-block; width: 100px; text-align: center;">Human</span>
-        <button type="button" id="nextRace">&gt;</button>
-      </div>
-    </div>
-    <p class="mb-2 mt-2" id="raceDescription" style="height: 80px; overflow-y: auto; text-align: center;"></p>
-
-    <div class="field " style="text-align: center;">
-      <label class="mb-2"><strong>Class</strong></label>
-      <div>
-        <%= form.hidden_field :character_class, id: 'selectedClass' %>
-        <button type="button" id="prevClass">&lt;</button>
-        <span id="classDisplay" style="display: inline-block; width: 100px; text-align: center;">Warrior</span>
-        <button type="button" id="nextClass">&gt;</button>
-      </div>
-    </div>
-    <p class="mb-3 mt-2" id="classDescription" style="height: 50px; overflow-y: auto; text-align: center;"></p>
-
-    <div class="actions" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); margin-bottom: 10px;">
-      <%= form.submit 'Create', class: "btn btn-outline-primary" %>
-    </div>
-  <% end %>
 </div>
 
 <script>
@@ -75,16 +138,35 @@ $(document).ready(function() {
     var imagePreview = $('#raceImagePreview');
     var raceDescription = $('#raceDescription');
     var classDescription = $('#classDescription');
+    var classTitle = $('#classTitle');
+    var classFullDescription = $('#classDetail');
+    var classItemAvailable = $('#classItemAvailable'); 
+    var attackBar = $('#attackBar');
+    var defenseBar = $('#defenseBar');
+    var spellpowerBar = $('#spellpowerBar');
+    var necrosurgeBar = $('#necrosurgeBar');
+    var healthBar = $('#healthBar');
+    
+    var classAttributes = {
+        'warrior': { attack: 100, defense: 50, spellpower: 10, necrosurge: 20, health: 80 },
+        'mage': { attack: 30, defense: 30, spellpower: 100, necrosurge: 20, health: 40 },
+        'nightstalker': { attack: 80, defense: 40, spellpower: 30, necrosurge: 20, health: 50 },
+        'paladin': { attack: 70, defense: 70, spellpower: 70, necrosurge: 10, health: 60 },
+        'deathwalker': { attack: 20, defense: 50, spellpower: 10, necrosurge: 70, health: 100 },
+        'acolyte': { attack: 10, defense: 30, spellpower: 60, necrosurge: 60, health: 40 }
+    };
+
     var races = ['human', 'elf', 'dwarf', 'troll', 'orc', 'goblin', 'morvandir'];
     var classes = {
-      'human': ['warrior', 'mage', 'nightstalker', 'paladin', 'deathwalker', 'acolyte'],
-      'elf': ['mage', 'paladin', 'acolyte'],
-      'dwarf': ['warrior', 'mage', 'paladin'],
-      'troll': ['warrior', 'nightstalker', 'paladin'],
-      'orc': ['warrior', 'deathwalker', 'acolyte'],
-      'goblin': ['mage', 'nightstalker', 'acolyte'],
-      'morvandir': ['mage', 'deathwalker', 'acolyte']
+        'human': ['warrior', 'mage', 'nightstalker', 'paladin', 'deathwalker', 'acolyte'],
+        'elf': ['mage', 'paladin', 'acolyte'],
+        'dwarf': ['warrior', 'mage', 'paladin'],
+        'troll': ['warrior', 'nightstalker', 'paladin'],
+        'orc': ['warrior', 'deathwalker', 'acolyte'],
+        'goblin': ['mage', 'nightstalker', 'acolyte'],
+        'morvandir': ['mage', 'deathwalker', 'acolyte']
     };
+    
     var currentRaceIndex = 0;
     var currentClassIndex = 0;
     var selectedRace = 'human';
@@ -95,157 +177,202 @@ $(document).ready(function() {
     $('#selectedClass').val(selectedClass);
 
     function updateRaceImage(selectedRace, selectedGender) {
-      var imageFileName;
+        var imageFileName;
 
-      switch (selectedRace) {
-        case 'human':
-          imageFileName = selectedGender === 'female' ? 'female_human.jpg' : 'human.jpg';
-          break;
-        case 'elf':
-          imageFileName = selectedGender === 'female' ? 'female_elf.jpg' : 'elf.jpg';
-          break;
-        case 'dwarf':
-          imageFileName = selectedGender === 'female' ? 'female_dwarf.jpg' : 'dwarf.jpg';
-          break;
-        case 'troll':
-          imageFileName = selectedGender === 'female' ? 'female_troll.jpg' : 'troll.jpg';
-          break;
-        case 'orc':
-          imageFileName = selectedGender === 'female' ? 'female_orc.jpg' : 'orc.jpg';
-          break;
-        case 'goblin':
-          imageFileName = selectedGender === 'female' ? 'female_goblin.jpg' : 'goblin.jpg';
-          break;
-        case 'morvandir':
-          imageFileName = selectedGender === 'female' ? 'female_morvandir.jpg' : 'morvandir.jpg';
-          break;
-      }
+        switch (selectedRace) {
+            case 'human':
+                imageFileName = selectedGender === 'female' ? 'female_human.jpg' : 'human.jpg';
+                break;
+            case 'elf':
+                imageFileName = selectedGender === 'female' ? 'female_elf.jpg' : 'elf.jpg';
+                break;
+            case 'dwarf':
+                imageFileName = selectedGender === 'female' ? 'female_dwarf.jpg' : 'dwarf.jpg';
+                break;
+            case 'troll':
+                imageFileName = selectedGender === 'female' ? 'female_troll.jpg' : 'troll.jpg';
+                break;
+            case 'orc':
+                imageFileName = selectedGender === 'female' ? 'female_orc.jpg' : 'orc.jpg';
+                break;
+            case 'goblin':
+                imageFileName = selectedGender === 'female' ? 'female_goblin.jpg' : 'goblin.jpg';
+                break;
+            case 'morvandir':
+                imageFileName = selectedGender === 'female' ? 'female_morvandir.jpg' : 'morvandir.jpg';
+                break;
+        }
 
-      var imagePath = '/assets/races/' + imageFileName;
-      imagePreview.attr('src', imagePath);
+        var imagePath = '/assets/races/' + imageFileName;
+        imagePreview.attr('src', imagePath);
 
-    // Update race description with available classes
-    var availableClasses;
-    if (selectedRace === 'human') {
-      availableClasses = 'All';
-    } else {
-      availableClasses = classes[selectedRace].map(function(className) {
-        return className.charAt(0).toUpperCase() + className.slice(1);
-      }).join(', ');
-    }
-    raceDescription.html('<small class="text-muted" style="font-size: 80%;">(Available classes: ' + availableClasses + ')</small><br>');
+        // Update race description with available classes
+        var availableClasses;
+        if (selectedRace === 'human') {
+            availableClasses = 'All';
+        } else {
+            availableClasses = classes[selectedRace].map(function(className) {
+                return className.charAt(0).toUpperCase() + className.slice(1);
+            }).join(', ');
+        }
+        raceDescription.html('<small class="text-muted" style="font-size: 80%;">(Available classes: ' + availableClasses + ')</small><br>');
 
-      switch(selectedRace) {
-        case 'human':
-          raceDescription.append('Diverse, ambitious, adaptable. Passion drives progress, while kindness battles cruelty.');
-          break;
-        case 'elf':
-          raceDescription.append('Known for their grace, wisdom and knowledge, power is what they seek above all.');
-          break;
-        case 'dwarf':
-          raceDescription.append('Durable and loyal, they live to protect their kingdom and allies.');
-          break;
-        case 'troll':
-          raceDescription.append('Rugged, loyal defenders of nature. Strong and fierce, they uphold ancient traditions.');
-          break;
-        case 'orc':
-          raceDescription.append('Powerful conquerors. They are ruthless and show no mercy, even to their own kind.');
-          break;
-        case 'goblin':
-          raceDescription.append('Crafty, masters of opportunity. Small yet ambitious, they thrive on ingenuity.');
-          break;
-        case 'morvandir':
-          raceDescription.append('Forsaken by their origins, they wield dark powers and keep their secrets veiled in the shadows.');
-          break;
-      }
-      $('#raceDisplay').text(selectedRace.charAt(0).toUpperCase() + selectedRace.slice(1));
+        switch(selectedRace) {
+            case 'human':
+                raceDescription.append('Diverse, ambitious, adaptable. Passion drives progress, while kindness battles cruelty.');
+                break;
+            case 'elf':
+                raceDescription.append('Known for their grace, wisdom and knowledge, power is what they seek above all.');
+                break;
+            case 'dwarf':
+                raceDescription.append('Durable and loyal, they live to protect their kingdom and allies.');
+                break;
+            case 'troll':
+                raceDescription.append('Rugged, loyal defenders of nature. Strong and fierce, they uphold ancient traditions.');
+                break;
+            case 'orc':
+                raceDescription.append('Powerful conquerors. They are ruthless and show no mercy, even to their own kind.');
+                break;
+            case 'goblin':
+                raceDescription.append('Crafty, masters of opportunity. Small yet ambitious, they thrive on ingenuity.');
+                break;
+            case 'morvandir':
+                raceDescription.append('Forsaken by their origins, they wield dark powers and keep their secrets veiled in the shadows.');
+                break;
+        }
+        $('#raceDisplay').text(selectedRace.charAt(0).toUpperCase() + selectedRace.slice(1));
     }
 
     function updateClassDescription(selectedClass) {
-      switch(selectedClass) {
-        case 'warrior':
-          classDescription.text('Masters of combat, honed strength, and resilience.');
-          break;
-        case 'mage':
-          classDescription.text('Weavers of arcane, bending reality itself with powerful spells.');
-          break;
-        case 'nightstalker':
-          classDescription.text('Agile tricksters, navigating shadows with finesse.');
-          break;
-        case 'paladin':
-          classDescription.text('Champions of virtue, wielding righteousness in battle.');
-          break;
-        case 'deathwalker':
-          classDescription.text("Embracers of decay, feeding on life's essence to wield death's unyielding power.");
-          break;
-        case 'acolyte':
-          classDescription.text('Dark disciples of forbidden magics, bound by pacts to dreaded Demons.');
-          break;
-      }
-      $('#classDisplay').text(selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1));
+        switch(selectedClass) {
+            case 'warrior':
+                classDescription.text('Masters of combat, honed strength, and resilience.');
+                break;
+            case 'mage':
+                classDescription.text('Weavers of arcane, bending reality itself with powerful spells.');
+                break;
+            case 'nightstalker':
+                classDescription.text('Agile tricksters, navigating shadows with finesse.');
+                break;
+            case 'paladin':
+                classDescription.text('Champions of virtue, wielding righteousness in battle.');
+                break;
+            case 'deathwalker':
+                classDescription.text("Embracers of decay, feeding on life's essence to wield death's unyielding power.");
+                break;
+            case 'acolyte':
+                classDescription.text('Dark disciples of forbidden magics, bound by pacts to dreaded Demons.');
+                break;
+        }
+        $('#classDisplay').text(selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1));
+    }
+
+    function updateClassInfos(selectedClass) {
+        var attributes = classAttributes[selectedClass];
+        attackBar.css('width', attributes.attack + '%').attr('aria-valuenow', attributes.attack);
+        defenseBar.css('width', attributes.defense + '%').attr('aria-valuenow', attributes.defense);
+        spellpowerBar.css('width', attributes.spellpower + '%').attr('aria-valuenow', attributes.spellpower);
+        necrosurgeBar.css('width', attributes.necrosurge + '%').attr('aria-valuenow', attributes.necrosurge);
+        healthBar.css('width', attributes.health + '%').attr('aria-valuenow', attributes.health);
+
+        switch (selectedClass) {
+            case 'warrior':
+                classItemAvailable.html('Plate armor<br>Two-handed Axe, Two-handed Sword<br>One-handed Sword<br>Small Shield, Great Shield');
+                classFullDescription.text('Warriors excel at dealing tons of physical damage. They can apply bleed, increase their Strength, Health or even push the limits of their damage at the cost of their defenses.');
+                classTitle.text('The Warrior');
+                break;
+            case 'mage':
+                classItemAvailable.html('Cloth armor<br>Staff<br>One-handed Sword, Dagger<br>Small Shield');
+                classFullDescription.text('Mages command the arcane forces to unleash devastating magical attacks.');
+                classTitle.text('The Mage');
+                break;
+            case 'nightstalker':
+                classItemAvailable.html('Leather armor<br>One-handed Weapon, Dagger');
+                classFullDescription.text('Nightstalkers are not to be underestimated. They usually have low base damage, but their ability to attack multiple times per turn and deal immense Critical Strike Damage is what makes them feared.');
+                classTitle.text('The Nightstalker');
+                break;
+            case 'paladin':
+                classItemAvailable.html('Plate armor<br>One-handed Sword, Mace<br>Great Shield');
+                classFullDescription.text('Paladins are holy warriors who can deal incredible damage wether it is physical or magic. They can reduce their damage taken, heal and are more than capable of hitting back.');
+                classTitle.text('The Paladin');
+                break;
+            case 'deathwalker':
+                classItemAvailable.html('Light armor<br>Staff, One-handed Sword<br>Necromantic artifacts');
+                classFullDescription.text('Deathwalkers manipulate necromantic energies to drain life from their enemies.');
+                classTitle.text('The Deathwalker');
+                break;
+            case 'acolyte':
+                classItemAvailable.html('Cloth armor<br>Dark magical artifacts<br>One-handed Sword');
+                classFullDescription.text('Acolytes are sinister spellcasters who wield dark magic to corrupt and destroy.');
+                classTitle.text('The Acolyte');
+                break;
+        }
+        $('#classDisplay').text(selectedClass.charAt(0).toUpperCase() + selectedClass.slice(1));
     }
 
     updateClassDescription(selectedClass);
-    
+    updateClassInfos(selectedClass);
     updateRaceImage(selectedRace, selectedGender);
 
     $('#maleButton').click(function() {
-      selectedGender = 'male';
-      $('#selectedGender').val(selectedGender);
-      updateRaceImage(selectedRace, selectedGender);
+        selectedGender = 'male';
+        $('#selectedGender').val(selectedGender);
+        updateRaceImage(selectedRace, selectedGender);
     });
 
     $('#femaleButton').click(function() {
-      selectedGender = 'female';
-      $('#selectedGender').val(selectedGender);
-      updateRaceImage(selectedRace, selectedGender);
+        selectedGender = 'female';
+        $('#selectedGender').val(selectedGender);
+        updateRaceImage(selectedRace, selectedGender);
     });
 
     $('#prevRace').click(function() {
-      currentRaceIndex = (currentRaceIndex - 1 + races.length) % races.length;
-      selectedRace = races[currentRaceIndex];
-      $('#selectedRace').val(selectedRace);
-      updateRaceImage(selectedRace, selectedGender);
+        currentRaceIndex = (currentRaceIndex - 1 + races.length) % races.length;
+        selectedRace = races[currentRaceIndex];
+        $('#selectedRace').val(selectedRace);
+        updateRaceImage(selectedRace, selectedGender);
 
-      // Update class buttons based on selected race
-      updateClassButtons(selectedRace);
+        // Update class buttons based on selected race
+        updateClassButtons(selectedRace);
     });
 
     $('#nextRace').click(function() {
-      currentRaceIndex = (currentRaceIndex + 1) % races.length;
-      selectedRace = races[currentRaceIndex];
-      $('#selectedRace').val(selectedRace);
-      updateRaceImage(selectedRace, selectedGender);
+        currentRaceIndex = (currentRaceIndex + 1) % races.length;
+        selectedRace = races[currentRaceIndex];
+        $('#selectedRace').val(selectedRace);
+        updateRaceImage(selectedRace, selectedGender);
 
-      // Update class buttons based on selected race
-      updateClassButtons(selectedRace);
+        // Update class buttons based on selected race
+        updateClassButtons(selectedRace);
     });
 
     $('#prevClass').click(function() {
-      currentClassIndex = (currentClassIndex - 1 + classes[selectedRace].length) % classes[selectedRace].length;
-      selectedClass = classes[selectedRace][currentClassIndex];
-      $('#selectedClass').val(selectedClass);
-      updateClassDescription(selectedClass);
+        currentClassIndex = (currentClassIndex - 1 + classes[selectedRace].length) % classes[selectedRace].length;
+        selectedClass = classes[selectedRace][currentClassIndex];
+        $('#selectedClass').val(selectedClass);
+        updateClassDescription(selectedClass);
+        updateClassInfos(selectedClass);
     });
 
     $('#nextClass').click(function() {
-      currentClassIndex = (currentClassIndex + 1) % classes[selectedRace].length;
-      selectedClass = classes[selectedRace][currentClassIndex];
-      $('#selectedClass').val(selectedClass);
-      updateClassDescription(selectedClass);
+        currentClassIndex = (currentClassIndex + 1) % classes[selectedRace].length;
+        selectedClass = classes[selectedRace][currentClassIndex];
+        $('#selectedClass').val(selectedClass);
+        updateClassDescription(selectedClass);
+        updateClassInfos(selectedClass);
     });
 
     // Function to update class buttons based on selected race
     function updateClassButtons(selectedRace) {
-      currentClassIndex = 0; // Reset class index when race changes
-      selectedClass = classes[selectedRace][currentClassIndex];
-      $('#selectedClass').val(selectedClass);
-      updateClassDescription(selectedClass);
+        currentClassIndex = 0; // Reset class index when race changes
+        selectedClass = classes[selectedRace][currentClassIndex];
+        $('#selectedClass').val(selectedClass);
+        updateClassDescription(selectedClass);
+        updateClassInfos(selectedClass);
     }
-
     // Initial setup of class buttons based on initial race
     updateClassButtons(selectedRace);
-  });
+});
 </script>
 
 <script>
@@ -338,4 +465,14 @@ $(document).ready(function() {
 
       $('.character-name-field').val(randomName);
     });
+</script>
+
+<script>
+  $(function () {
+    $('[data-tooltip="tooltip"]').tooltip({
+      template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>',
+      delay: { "show": 500, "hide": 100 },
+      trigger: 'hover'
+    });
+  });
 </script>

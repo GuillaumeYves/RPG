@@ -25,7 +25,7 @@ class PaladinSkillsSeeder
     judgement = Skill.create(
       name: "Judgement",
       skill_type: "passive",
-      description: "Your attacks deal an additional 5% of their initial damage as true damage.",
+      description: "Your attacks deal an additional 10% of their initial damage as true damage.",
       row: 1,
       level_requirement: 25,
       character_class: paladin_class,
@@ -63,7 +63,7 @@ class PaladinSkillsSeeder
 
     smite = Skill.create(
       name: "Smite",
-      description: "100% of your Attack is converted into Spellpower.",
+      description: "100% of your Attack is converted into Spellpower. Increase your Spellpower by 25%.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
@@ -73,7 +73,9 @@ class PaladinSkillsSeeder
         " self.total_min_spellpower += self.total_min_attack;
           self.total_max_spellpower += self.total_max_attack;
           self.total_min_attack = 0;
-          self.total_max_attack = 0; "
+          self.total_max_attack = 0;
+          self.total_min_spellpower *= 1.25;
+          self.total_max_spellpower *= 1.25; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'smite.jpg')
     smite.skill_image.attach(io: File.open(image_path), filename: 'smite.jpg', content_type: 'image/jpeg')
@@ -81,7 +83,7 @@ class PaladinSkillsSeeder
 
     condemn = Skill.create(
       name: "Condemn",
-      description: "100% of your Spellpower is converted into Attack.",
+      description: "100% of your Spellpower is converted into Attack. Increase your Attack by 25%.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
@@ -91,7 +93,9 @@ class PaladinSkillsSeeder
         " self.total_min_attack += self.total_min_spellpower;
           self.total_max_attack += self.total_max_spellpower;
           self.total_min_spellpower = 0;
-          self.total_max_spellpower = 0;"
+          self.total_max_spellpower = 0;
+          self.total_min_attack *= 1.25;
+          self.total_max_attack *= 1.25; "
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'paladin_skills', 'condemn.jpg')
     condemn.skill_image.attach(io: File.open(image_path), filename: 'condemn.jpg', content_type: 'image/jpeg')
@@ -100,7 +104,7 @@ class PaladinSkillsSeeder
     divine_strength = Skill.create(
       name: "Divine Strength",
       skill_type: "passive",
-      description: "Your attacks have a 15% chance to deal double damage.",
+      description: "Your attacks have a 15% chance to deal double damage. Your Damage Reduction now also increases your Attack and Spellpower.",
       row: 4,
       level_requirement: 100,
       character_class: paladin_class,
@@ -112,7 +116,7 @@ class PaladinSkillsSeeder
 
     fervor = Skill.create(
       name: "Fervor",
-      description: "You have a 30% chance to attack for 80% of your damage each of your turns.",
+      description: "Once per turn you have a 30% chance to attack for 80% of your damage.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
