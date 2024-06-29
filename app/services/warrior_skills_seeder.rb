@@ -24,7 +24,7 @@ class WarriorSkillsSeeder
     rage.skill_image.attach(io: File.open(image_path), filename: 'rage.jpg', content_type: 'image/jpeg')
     warrior_skills << rage
 
-    defensive_stance = Skill.create(
+    juggernaut = Skill.create(
       name: "Juggernaut",
       skill_type: "passive",
       description: "You unlock the true potential of your Strength and it now also increases your Health.",
@@ -34,8 +34,8 @@ class WarriorSkillsSeeder
       character_id: character.id,
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'juggernaut.jpg')
-    defensive_stance.skill_image.attach(io: File.open(image_path), filename: 'juggernaut.jpg', content_type: 'image/jpeg')
-    warrior_skills << defensive_stance
+    juggernaut.skill_image.attach(io: File.open(image_path), filename: 'juggernaut.jpg', content_type: 'image/jpeg')
+    warrior_skills << juggernaut
 
     skullsplitter = Skill.create(
       name: "Skullsplitter",
@@ -67,14 +67,14 @@ class WarriorSkillsSeeder
     forged_in_battle = Skill.create(
       name: "Forged in Battle",
       skill_type: "passive",
-      description: "You can dual wield Two-handed Weapons but your attacks now have a 20% chance to miss. Reduce your Attack by 30%.",
+      description: "You can dual wield Two-handed Weapons but your attacks now have a 20% chance to miss. Reduce your Attack by 50%.",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,
       character_id: character.id,
       effect:
-      " self.total_min_attack *= 0.7;
-        self.total_max_attack *= 0.7;"
+      " self.total_min_attack *= 0.5;
+        self.total_max_attack *= 0.5;"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'forgedinbattle.jpg')
     forged_in_battle.skill_image.attach(io: File.open(image_path), filename: 'forgedinbattle.jpg', content_type: 'image/jpeg')
@@ -82,12 +82,15 @@ class WarriorSkillsSeeder
 
     undeniable = Skill.create(
       name: "Undeniable",
-      description: "Your attacks cannot be evaded.",
+      description: "Your attacks cannot be evaded. Reduce your Attack by 50%.",
       skill_type: "passive",
       row: 3,
       level_requirement: 75,
       character_class: warrior_class,
       character_id: character.id,
+      effect:
+      " self.total_min_attack *= 0.5;
+        self.total_max_attack *= 0.5;"
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'undeniable.jpg')
     undeniable.skill_image.attach(io: File.open(image_path), filename: 'undeniable.jpg', content_type: 'image/jpeg')
@@ -95,15 +98,15 @@ class WarriorSkillsSeeder
 
     berserk = Skill.create(
       name: "Berserk",
-      description: "When you reach 20% Health your Attack is increased by 200%.",
+      description: "When you reach 20% Health your Attack is increased by 100%.",
       skill_type: "trigger",
       row: 4,
       level_requirement: 100,
       character_class: warrior_class,
       character_id: character.id,
       effect: " if (self.total_health <= (0.2 * self.total_max_health))
-            self.buffed_min_attack = (self.total_min_attack * 2).round;
-            self.buffed_max_attack = (self.total_max_attack * 2).round;
+            self.buffed_min_attack = (self.total_min_attack);
+            self.buffed_max_attack = (self.total_max_attack);
           end  "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'berserk.jpg')
@@ -112,7 +115,7 @@ class WarriorSkillsSeeder
 
     unbridled_ferocity = Skill.create(
       name: "Unbridled Ferocity",
-      description: "Your Attack is increased by 80% but you can no longer evade or ignore pain.",
+      description: "Your Attack is increased by 50% but your defenses are reduced by 50%.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
@@ -120,7 +123,13 @@ class WarriorSkillsSeeder
       character_id: character.id,
       effect:
           " self.total_min_attack *= 1.8;
-            self.total_max_attack *= 1.8;"
+            self.total_max_attack *= 1.8;
+
+            self.total_armor *= 0.5;
+            self.total_magic_resistance *= 0.5;
+            self.total_critical_resistance *= 0.5;
+            self.total_damage_reduction *= 0.5;
+            self.total_block_chance *= 0.5; "
     )
     image_path = Rails.root.join('app', 'assets', 'images', 'warrior_skills', 'unbridledferocity.jpg')
     unbridled_ferocity.skill_image.attach(io: File.open(image_path), filename: 'unbridledferocity.jpg', content_type: 'image/jpeg')

@@ -90,7 +90,36 @@ module ApplicationHelper
       end
       html += content_tag(:div, "<span style='font-weight: 400'>Necrosurge:</span> #{min_necrosurge_display} - #{max_necrosurge_display} <small class='text-muted'>(~#{number_with_delimiter(average_necrosurge.to_i)})</small>".html_safe, class: 'tooltip-item-attribute mb-2')
     end
-
+    # Block chance display
+    if item.block_chance.present?
+      base_value = item.block_chance
+      equipped_value = equipped_item&.block_chance
+      upgraded_value = item.upgraded_block_chance
+      base_value_display = base_value
+      equipped_value_display = equipped_value
+      attribute_html = ""
+        if upgraded_value.present? && upgraded_value.positive?
+          attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-success'>+#{upgraded_value}</small>)</span>"
+        elsif upgraded_value.present? && upgraded_value.negative? && upgraded_value != 0
+          attribute_html += "<span class='text-muted' style='font-size: smaller; vertical-align: sub; margin-left: -4px'>(<small class='text-danger'>#{upgraded_value}</small>)</span>"
+        end
+        if equipped_item
+          if equipped_value.nil?
+            difference_class = 'stat-increase'
+            difference_symbol = '▲'
+            difference_display = "#{difference_symbol} #{base_value_display} #{attribute_html}".html_safe
+          else
+            difference = base_value - equipped_value
+            if difference != 0
+              difference_class = difference.positive? ? 'stat-increase' : 'stat-decrease'
+              difference_symbol = difference.positive? ? '▲' : '▼'
+              difference_display = "#{difference_symbol} #{difference.abs}"
+              attribute_html += content_tag(:span, difference_display, class: difference_class)
+            end
+          end
+        end
+      html += content_tag(:div, "<span style='font-weight: 400'>Block Chance:</span> #{number_to_percentage(base_value_display, precision: 2)} #{attribute_html}".html_safe, class: 'tooltip-item-attribute mb-2')
+    end
     # Health display
     if item.health.present?
       base_value = item.health
@@ -175,7 +204,7 @@ module ApplicationHelper
               end
             end
           end
-          content_tag(:div, content_tag(:span, "#{attribute.humanize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
+          content_tag(:div, content_tag(:span, "#{attribute.titleize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
         end
       end.join.html_safe
     end
@@ -212,7 +241,7 @@ module ApplicationHelper
               end
             end
           end
-          content_tag(:div, content_tag(:span, "#{attribute.humanize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
+          content_tag(:div, content_tag(:span, "#{attribute.titleize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
         end
       end.compact.join.html_safe
     end
@@ -284,7 +313,7 @@ module ApplicationHelper
               end
             end
           end
-          content_tag(:div, content_tag(:span, "#{attribute.humanize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
+          content_tag(:div, content_tag(:span, "#{attribute.titleize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
         end
       end.join.html_safe
     end
@@ -320,7 +349,7 @@ module ApplicationHelper
             end
           end
         end
-        content_tag(:div, content_tag(:span, "#{attribute.humanize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
+        content_tag(:div, content_tag(:span, "#{attribute.titleize}: ", style: 'font-weight: 400') + "#{base_value_display} #{attribute_html}".html_safe, class: 'tooltip-item-attribute')
       end
     end.compact.join.html_safe
     html.html_safe

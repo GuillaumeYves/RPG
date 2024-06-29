@@ -95,14 +95,14 @@ class MageSkillsSeeder
 
     wisdom_and_power = Skill.create(
       name: "Wisdom and Power",
-      description: "Your Magic Resistance increases your Spellpower by 107% of its value.",
+      description: "Your Magic Resistance increases your Spellpower by 100% of its value.",
       skill_type: "passive",
       row: 4,
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance * 1.07));
-              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance * 1.07));"
+      effect: " self.total_min_spellpower = (self.total_min_spellpower + (self.total_magic_resistance));
+              self.total_max_spellpower = (self.total_max_spellpower + (self.total_magic_resistance));"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wisdomandpower.jpg')
     wisdom_and_power.skill_image.attach(io: File.open(image_path), filename: 'wisdomandpower.jpg', content_type: 'image/jpeg')
@@ -110,15 +110,14 @@ class MageSkillsSeeder
 
     wrath = Skill.create(
       name: "Wrath",
-      description: "After attacking your Spellpower increases by 10% and your Critical Strike Chance by 2%.",
+      description: "After attacking your Spellpower increases by 30%.",
       skill_type: "combat",
       row: 4,
       level_requirement: 100,
       character_class: mage_class,
       character_id: character.id,
-      effect: " self.buffed_min_spellpower += (self.total_min_spellpower * 0.1);
-                self.buffed_max_spellpower += (self.total_max_spellpower * 0.1);
-                self.buffed_critical_strike_chance += 2.0; "
+      effect: " self.buffed_min_spellpower += (self.total_min_spellpower * 0.30);
+                self.buffed_max_spellpower += (self.total_max_spellpower * 0.30);"
       )
     image_path = Rails.root.join('app', 'assets', 'images', 'mage_skills', 'wrath.jpg')
     wrath.skill_image.attach(io: File.open(image_path), filename: 'wrath.jpg', content_type: 'image/jpeg')

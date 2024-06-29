@@ -303,7 +303,7 @@
                   <% end %>
                 <% end %>
                 <br>
-                <span data-tooltip="tooltip" title="Magic damage"><strong>Spellpower:</strong> <%= @character.total_max_spellpower %></span>
+                <span data-tooltip="tooltip" title="Magic damage. Cannot be Evaded"><strong>Spellpower:</strong> <%= @character.total_max_spellpower %></span>
                 <% @character.active_elixir_ids.each do |elixir_id| %>
                   <% elixir = Item.find(elixir_id) %>
                   <% if elixir.name == "Elixir of Power" %>
@@ -311,7 +311,7 @@
                   <% end %>
                 <% end %> 
                 <br>             
-                <span data-tooltip="tooltip" title="Shadow damage"><strong>Necrosurge:</strong> <%= @character.total_max_necrosurge %></span>
+                <span data-tooltip="tooltip" title="Shadow damage. Cannot be a Critical strike and cannot be blocked"><strong>Necrosurge:</strong> <%= @character.total_max_necrosurge %></span>
                 <% @character.active_elixir_ids.each do |elixir_id| %>
                   <% elixir = Item.find(elixir_id) %>
                   <% if elixir.name == "Elixir of Decay" %>
@@ -347,9 +347,9 @@
                 <% end %>
               <% end %>
               <br>
-              <span data-tooltip="tooltip" title="Chance to Critically Strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
-              <span data-tooltip="tooltip" title="Increases the damage of your Critical Strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
-              <span data-tooltip="tooltip" title="Increases your damage dealt"><strong>Global Damage:</strong> <%= number_with_precision(@character.total_global_damage * 100, precision: 2) %>%</span><br>
+              <span data-tooltip="tooltip" title="Chance to Critically strike"><strong>Critical Strike Chance:</strong> <%= number_with_precision(@character.total_critical_strike_chance, precision: 2)%>%</span><br>
+              <span data-tooltip="tooltip" title="Increases the damage of your Critical strikes"><strong>Critical Strike Damage:</strong> <%= number_with_precision(@character.total_critical_strike_damage * 100, precision: 2) %>%</span><br>
+              <span data-tooltip="tooltip" title="Increases your damage from all sources"><strong>Global Damage:</strong> <%= number_with_precision(@character.total_global_damage * 100, precision: 2) %>%</span><br>
             </div>
           </div>
           <!-- Middle column -->
@@ -372,10 +372,11 @@
                 <% end %>
               <% end %>
               <br>              
-              <span data-tooltip="tooltip" title="Evading an attack will allow you to not take damage"><strong>Chance to Evade:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
-              <span data-tooltip="tooltip" title="Ignoring pain will reduce incoming damage by 20%"><strong>Chance to Ignore Pain:</strong> <%= number_with_precision(@character.ignore_pain_chance, precision: 2)%>%</span><br>
-              <span data-tooltip="tooltip" title="Reduces the damage taken from Critical Strikes"><strong>Critical Resistance:</strong> <%= number_with_delimiter(@character.total_critical_resistance) %></span><br>
-              <span data-tooltip="tooltip" title="Reduces damage taken from all sources"><strong>Damage Reduction:</strong> <%= number_with_precision(@character.total_damage_reduction, precision: 2)%>%</span><br>
+              <span data-tooltip="tooltip" title="You do not take damage from an evaded attack"><strong>Evasion:</strong> <%= number_with_precision(@character.evasion, precision: 2)%>%</span><br>
+              <span data-tooltip="tooltip" title="Reduces incoming damage by 20%"><strong>Ignore Pain:</strong> <%= number_with_precision(@character.ignore_pain_chance, precision: 2)%>%</span><br>
+              <span data-tooltip="tooltip" title="Reduces the damage taken from Critical strikes"><strong>Critical Resistance:</strong> <%= number_with_delimiter(@character.total_critical_resistance) %></span><br>
+              <span data-tooltip="tooltip" title="You do not take damage from a blocked attack"><strong>Block Chance:</strong> <%= number_to_percentage(@character.total_block_chance, precision: 2)%></span><br>
+              <span data-tooltip="tooltip" title="Reduces damage taken from all sources"><strong>Damage Reduction:</strong> <%= number_with_precision(@character.total_damage_reduction * 100, precision: 2)%>%</span><br>
             </div>
           </div>
           <!-- Right column -->
@@ -410,12 +411,12 @@
           <div class="col-md-4">
             <div class="text-center">
               <h4 class="card-header text-white bg-primary mt-3" style="width: 200px; margin: 0 auto; margin-bottom: -15px">Attributes</h4><br>
-               <span data-tooltip="tooltip" title="Increases physical damage"><strong>Strength:</strong> <%= number_with_delimiter(@character.strength) %></span><br>
-              <span data-tooltip="tooltip" title="Increases magic damage"><strong>Intelligence:</strong> <%= number_with_delimiter(@character.intelligence) %></span><br>
-              <span data-tooltip="tooltip" title="Increases shadow damage"><strong>Dreadmight:</strong> <%= number_with_delimiter(@character.dreadmight) %></span><br>
-              <span data-tooltip="tooltip" title="Increases your chance to evade damage"><strong>Agility:</strong> <%= number_with_delimiter(@character.agility) %></span><br>
+               <span data-tooltip="tooltip" title="Increases Attack and Critical Resistance"><strong>Strength:</strong> <%= number_with_delimiter(@character.strength) %></span><br>
+              <span data-tooltip="tooltip" title="Increases Spellpower and All Resistances"><strong>Intelligence:</strong> <%= number_with_delimiter(@character.intelligence) %></span><br>
+              <span data-tooltip="tooltip" title="Increases Necrosurge"><strong>Dreadmight:</strong> <%= number_with_delimiter(@character.dreadmight) %></span><br>
+              <span data-tooltip="tooltip" title="Increases your Evasion"><strong>Agility:</strong> <%= number_with_delimiter(@character.agility) %></span><br>
               <span data-tooltip="tooltip" title="Increases your Critical Strike Chance"><strong>Luck:</strong> <%= number_with_delimiter(@character.luck) %></span><br>
-              <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain"><strong>Willpower:</strong> <%= number_with_delimiter(@character.willpower) %></span><br>
+              <span data-tooltip="tooltip" title="Increases your chance to Ignore Pain and your Damage Reduction"><strong>Willpower:</strong> <%= number_with_delimiter(@character.willpower) %></span><br>
             </div>
           </div>
           <!-- Middle column -->

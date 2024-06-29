@@ -12,7 +12,7 @@ class NightstalkerSkillsSeeder
     poisoned_blade = Skill.create(
       name: "Poisoned Blade",
       skill_type: "combat",
-      description: "After attacking you have a 30% chance to inflict 80% of initial attack damage as additional poison damage.",
+      description: "Once per turn you have a 30% chance to inflict 80% of your damage as poison damage.",
       row: 1,
       level_requirement: 25,
       character_class: nightstalker_class,
@@ -25,7 +25,7 @@ class NightstalkerSkillsSeeder
     sharpened_blade = Skill.create(
       name: "Sharpened Blade",
       skill_type: "combat",
-      description: "After attacking you have a 30% chance to inflict 80% of initial attack damage as additional physical damage.",
+      description: "Once per turn you have a 30% chance to inflict 80% of your damage as physical damage.",
       row: 1,
       level_requirement: 25,
       character_class: nightstalker_class,
@@ -75,7 +75,7 @@ class NightstalkerSkillsSeeder
       name: "Swift Movements",
       skill_type: "passive",
       description: "You gain increased Attack based on your Agility instead of your Strength.
-      You have an increasing chance the more Agility you have to attack for 50% of your damage.",
+      You have an increasing chance the more Agility you have to attack an additional time for 50% of your damage.",
       row: 3,
       level_requirement: 75,
       character_class: nightstalker_class,

@@ -28,7 +28,7 @@ class DeathwalkerSkillsSeeder
 
     lifetap = Skill.create(
       name: "Lifetap",
-      description: "At the end of each of your turns you sacrifice 1% of your Maximum Health to gain that amount as Necrosurge.",
+      description: "Once per turn you sacrifice 1% of your Maximum Health to gain that amount as Necrosurge.",
       skill_type: "combat",
       row: 1,
       level_requirement: 25,
@@ -86,7 +86,7 @@ class DeathwalkerSkillsSeeder
 
     crimson_torrent = Skill.create(
       name: "Crimson Torrent",
-      description: "At the end of each of your turns you deal 3% of your maximum Health as shadow damage.",
+      description: "Once per turn you deal 3% of your maximum Health as shadow damage.",
       skill_type: "combat",
       row: 3,
       level_requirement: 75,
